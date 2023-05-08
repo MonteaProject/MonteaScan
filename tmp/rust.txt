@@ -1,0 +1,18 @@
+Unixインストール
+    curl https://sh.rustup.rs -sSf | sh
+    source "$HOME/.cargo/env"
+
+Rustバージョン
+    # cargo --version
+    cargo 1.69.0 (6e9a83356 2023-04-12)
+    # rustc -V
+    rustc 1.69.0 (84c898d65 2023-04-16)
+    # rustup -V
+    rustup 1.26.0 (5af9b9484 2023-04-05)
+    info: This is the version for the rustup toolchain manager, not the rustc compiler.
+    info: The currently active `rustc` version is `rustc 1.69.0 (84c898d65 2023-04-16)`
+
+VSCode拡張機能
+    rust-analyzer
+        rust-analyzer.check.Command
+        clippy

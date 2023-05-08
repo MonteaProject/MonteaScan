@@ -1,0 +1,17 @@
+MongoDB Community Edition
+https://www.mongodb.com/docs/manual/administration/install-community/
+
+# mongod --version
+db version v6.0.4
+Build Info: {
+    "version": "6.0.4",
+    "gitVersion": "44ff59461c1353638a71e710f385a566bcd2f547",
+    "openSSLVersion": "OpenSSL 1.1.1k  FIPS 25 Mar 2021",
+    "modules": [],
+    "allocator": "tcmalloc",
+    "environment": {
+        "distmod": "rhel80",
+        "distarch": "x86_64",
+        "target_arch": "x86_64"
+    }
+}

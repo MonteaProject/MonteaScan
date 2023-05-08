@@ -1,0 +1,348 @@
+Jvn/Nvd Data Format
+===
+<item rdf:about=\"https://jvndb.jvn.jp/ja/contents/2022/JVNDB-2022-004669.html\">
+    <title>Tenda ルータ G1 および G3 における境界外書き込みに関する脆弱性</title>
+    <link>https://jvndb.jvn.jp/ja/contents/2022/JVNDB-2022-004669.html</link>
+    <description>Tenda ルータ G1 および G3 には、境界外書き込みに関する脆弱性が存在します。&#13;\n&#13;\n</description>
+    <sec:identifier>JVNDB-2022-004669</sec:identifier>
+    <sec:references source=\"CVE\" id=\"CVE-2022-24164\">https://www.cve.org/CVERecord?id=CVE-2022-24164</sec:references>
+    <sec:references source=\"NVD\" id=\"CVE-2022-24164\">https://nvd.nist.gov/vuln/detail/CVE-2022-24164</sec:references>
+    <sec:references title=\"境界外書き込み(CWE-787)\" id=\"CWE-787\">https://cwe.mitre.org/data/definitions/787.html</sec:references>
+    <sec:cpe version=\"2.2\" vendor=\"Shenzhen Tenda Technology Co.,Ltd.\" product=\"G1 ファームウェア\">cpe:/o:tenda:g1_firmware</sec:cpe>
+    <sec:cpe version=\"2.2\" vendor=\"Shenzhen Tenda Technology Co.,Ltd.\" product=\"G3 ファームウェア\">cpe:/o:tenda:g3_firmware</sec:cpe>
+    <sec:cvss version=\"2.0\" score=\"7.8\" type=\"Base\" severity=\"High\" vector=\"AV:N/AC:L/Au:N/C:N/I:N/A:C\"/>
+    <sec:cvss version=\"3.0\" score=\"7.5\" type=\"Base\" severity=\"High\" vector=\"CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H\"/>
+    <dc:date>2023-04-27T16:47+09:00</dc:date>
+    <dcterms:issued>2023-04-27T16:47+09:00</dcterms:issued>
+    <dcterms:modified>2023-04-27T16:47+09:00</dcterms:modified>
+</item>
+==
+
+===
+object_1: Rdf { 
+    item: [
+        Item { 
+            about: "https://jvndb.jvn.jp/ja/contents/2022/JVNDB-2022-004666.html", 
+            title: "Tenda ルータ G1 および G3 におけるコマンドインジェクションの脆弱性", 
+            link: "https://jvndb.jvn.jp/ja/contents/2022/JVNDB-2022-004666.html", 
+            description: "Tenda ルータ G1 および G3 には、コマンドインジェクションの脆弱性が存在します。\r\n\r", 
+            identifier: "JVNDB-2022-004666", 
+            references: [
+                References { 
+                    source: Some("CVE"), 
+                    id: Some("CVE-2022-24167"), 
+                    title: None, 
+                    references: Some("https://www.cve.org/CVERecord?id=CVE-2022-24167") 
+                }, 
+                References { 
+                    source: Some("NVD"), 
+                    id: Some("CVE-2022-24167"), 
+                    title: None, references: Some("https://nvd.nist.gov/vuln/detail/CVE-2022-24167") 
+                }, 
+                References { 
+                    source: None, 
+                    id: Some("CWE-77"), 
+                    title: Some("コマンドインジェクション(CWE-77)"), 
+                    references: Some("https://cwe.mitre.org/data/definitions/77.html") 
+                }
+            ], 
+            cpe: [
+                Cpe { 
+                    version: Some("2.2"), 
+                    vendor: Some("Shenzhen Tenda Technology Co.,Ltd."), 
+                    product: Some("G1 ファームウェア"), 
+                    cpe: Some("cpe:/o:tenda:g1_firmware") 
+                }, 
+                Cpe { 
+                    version: Some("2.2"), 
+                    vendor: Some("Shenzhen Tenda Technology Co.,Ltd."), 
+                    product: Some("G3 ファームウェア"), 
+                    cpe: Some("cpe:/o:tenda:g3_firmware") 
+                }
+            ], 
+            cvss: Some(
+                [
+                    Cvss { 
+                        version: Some("2.0"), 
+                        score: Some("7.5"), 
+                        ty: Some("Base"), 
+                        severity: Some("High"), 
+                        vector: Some("AV:N/AC:L/Au:N/C:P/I:P/A:P") 
+                    }, 
+                    Cvss { 
+                        version: Some("3.0"), 
+                        score: Some("9.8"), 
+                        ty: Some("Base"), 
+                        severity: Some("Critical"), 
+                        vector: Some("CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H") 
+                    }
+                ]
+            ), 
+            date: "2023-04-27T16:41+09:00", 
+            issued: "2023-04-27T16:41+09:00", 
+            modified: "2023-04-27T16:41+09:00" 
+        },
+    ]
+}
+===
+
+Nvd { 
+    CVE_data_type: Some("CVE"), 
+    CVE_data_format: Some("MITRE"), 
+    CVE_data_version: Some("4.0"), 
+    CVE_data_numberOfCVEs: Some("6769"), 
+    CVE_data_timestamp: Some("2023-03-08T08:02Z"), 
+    CVE_Items:
+        Some([
+            CVE_Items { 
+                cve: Some(Cve { 
+                    data_type: Some("CVE"), 
+                    data_format: Some("MITRE"), 
+                    data_version: Some("4.0"), 
+                    CVE_data_meta: Some(CVE_data_meta { 
+                        ID: Some("CVE-1999-0001"), 
+                        ASSIGNER: Some("cve@mitre.org") 
+                    }), 
+                    problemtype: Some(problemtype { 
+                        problemtype_data: Some([problemtype_data { 
+                            description: Some([description { 
+                                lang: Some("en"), 
+                                value: Some("CWE-20") 
+                            }]) 
+                        }]) 
+                    }), 
+                    references: Some(references { 
+                        reference_data: Some([reference_data { 
+                            url: Some("http://www.openbsd.org/errata23.html#tcpfix"), 
+                            name: Some("http://www.openbsd.org/errata23.html#tcpfix"), 
+                            refsource: Some("CONFIRM"), 
+                            tags: Some([]) 
+                        }, 
+                        reference_data { 
+                            url: Some("http://www.osvdb.org/5707"), 
+                            name: Some("5707"), 
+                            refsource: Some("OSVDB"), 
+                            tags: Some([]) 
+                        }]) 
+                    }), 
+                    description2: None 
+                }), 
+                configurations: Some(Configurations { 
+                    CVE_data_version: Some("4.0"), 
+                    nodes: Some([nodes { 
+                        operator: Some("OR"), 
+                        children: Some([]), 
+                        negate: None, 
+                        cpe_match: Some([cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.2.5:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.2.2:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.1.7:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.2.3:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.0.5:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:1.1.5.1:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:bsdi:bsd_os:3.1:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.2.8:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:1.0:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.1.6.1:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.2:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            ersionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:3.0:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:openbsd:openbsd:2.4:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:1.1:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.2.4:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.2.6:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.1.6:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.1.7.1:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.0.1:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:1.2:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.1.5:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:openbsd:openbsd:2.3:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }, 
+                        cpe_match { 
+                            vulnerable: Some(true), 
+                            cpe23Uri: Some("cpe:2.3:o:freebsd:freebsd:2.0:*:*:*:*:*:*:*"), 
+                            versionStartExcluding: None, 
+                            versionStartIncluding: None, 
+                            versionEndExcluding: None, 
+                            versionEndIncluding: None 
+                        }]) 
+                    }]) 
+                }), 
+                impact: Some(Impact { 
+                    baseMetricV3: None, 
+                    baseMetricV2: Some(baseMetricV2 { 
+                        cvssV2: Some(cvssV2 { 
+                            version: Some("2.0"), 
+                            vectorString: Some("AV:N/AC:L/Au:N/C:N/I:N/A:P"), 
+                            accessVector: Some("NETWORK"), 
+                            accessComplexity: Some("LOW"), 
+                            authentication: Some("NONE"), 
+                            confidentialityImpact: Some("NONE"), 
+                            integrityImpact: Some("NONE"), 
+                            availabilityImpact: Some("PARTIAL"), 
+                            baseScore: Some(5.0) 
+                        }), 
+                        severity: Some("MEDIUM"), 
+                        exploitabilityScore: Some(10.0), 
+                        impactScore: Some(2.9), 
+                        obtainAllPrivilege: Some(false), 
+                        obtainUserPrivilege: Some(false), 
+                        obtainOtherPrivilege: Some(false), 
+                        userInteractionRequired: Some(false) 
+                    }) 
+                }), 
+                publishedDate: Some("1999-12-30T05:00Z"), 
+                lastModifiedDate: Some("2010-12-16T05:00Z") 
+            }, 
+        ])
+}

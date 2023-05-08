@@ -1,0 +1,34 @@
+n --version
+v9.0.0
+
+node -v
+v20.0.0
+
+npm -v
+9.6.5
+
+npm install -g @angular/cli
+ng new app
+ng serve --host 0.0.0.0
+npm install bootstrap --save
+
+https://morioh.com/p/e4c55d3876d1
+vim angular.json
+"styles": [
+  "node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "src/styles.css"
+],
+
+vim tsconfig.json
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+
+scss テーブル デザイン
+https://kodocode.net/design-css-table/
+
+■ VSCode拡張機能
+Live Server
+Live Sass Compiler
