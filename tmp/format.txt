@@ -1,4 +1,107 @@
-Jvn/Nvd Data Format
+OVAL RHEL
+https://www.redhat.com/security/data/oval/
+===
+OvalRhel { 
+    definitions: Definitions { 
+        definition: [
+            Definition { 
+                id: Some("oval:com.redhat.rhba:def:20111656"), 
+                class: Some("patch"), 
+                metadata: Some(Metadata { 
+                    title: Some("RHBA-2011:1656: mod_nss bug fix update  (Moderate)"), 
+                    affected: Some([
+                        Affected { 
+                            family: Some("unix"), 
+                            platform: Some([
+                                Platform { 
+                                    platform: None 
+                                }
+                            ]) 
+                        }
+                    ]), 
+                    reference: Some([
+                        Reference { 
+                            ref_id: Some("RHBA-2011:1656"), 
+                            ref_url: Some("https://access.redhat.com/errata/RHBA-2011:1656"), 
+                            source: Some("RHSA") 
+                        }, 
+                        Reference { 
+                            ref_id: Some("CVE-2011-4973"), 
+                            ref_url: Some("https://access.redhat.com/security/cve/CVE-2011-4973"), 
+                            source: Some("CVE") 
+                        }
+                    ]), 
+                    description: Some("The mod_nss module provides strong cryptography for the Apache HTTP Server via the Secure Sockets Layer (SSL) and 
+                                        Transport Layer Security (TLS) protocols, using the Network Security Services (NSS) security library.\n\nThis update 
+                                        fixes the following bugs: \n\n* When the NSS library was not initialized and mod_nss tried to clear its SSL cache on 
+                                        start-up, mod_nss terminated unexpectedly when the NSS library was built with debugging enabled. With this update, 
+                                        mod_nss does not try to clear the SSL cache in the described scenario, thus preventing this bug. (BZ#691502)\n\n* 
+                                        Previously, a static array containing the arguments for launching the nss_pcache command was overflowing the size by one. 
+                                        This could lead to a variety of issues including unexpected termination. This bug has been fixed, and mod_nss now uses 
+                                        properly sized static array when launching nss_pcache. (BZ#714154)\n\n* Prior to this update, client certificates were 
+                                        only retrieved during the initial SSL handshake if the NSSVerifyClient option was set to \"require\" or \"optional\". 
+                                        Also, the FakeBasicAuth option only retrieved Common Name rather than the entire certificate subject. Consequently, 
+                                        it was possible to spoof an identity using that option. This bug has been fixed, the FakeBasicAuth option is now 
+                                        prefixed with \"/\" and is thus compatible with OpenSSL, and certificates are now retrieved on all subsequent requests 
+                                        beyond the first one. (BZ#702437)\n\nUsers of mod_nss are advised to upgrade to this updated package, which fixes these bugs.
+                                    "), 
+                    advisory: Some([
+                        Advisory { 
+                            from: Some("secalert@redhat.com"), 
+                            severity: Some("Moderate"), 
+                            rights: Some("Copyright 2011 Red Hat, Inc."), 
+                            issued: Some(Issued { date: Some("2011-12-05") 
+                        }), 
+                        updated: Some(Updated { 
+                            date: Some("2011-12-06") 
+                        }), 
+                        cve: Some([
+                            Cve { 
+                                cvss2: Some("4.0/AV:N/AC:H/Au:N/C:P/I:P/A:N"), 
+                                cvss3: None, 
+                                cwe: None, 
+                                href: Some("https://access.redhat.com/security/cve/CVE-2011-4973"), 
+                                impact: Some("moderate"), 
+                                public: Some("20110504"), 
+                                cve: Some("CVE-2011-4973") 
+                            }
+                        ]), 
+                        bugzilla: Some([
+                            Bugzilla { 
+                                href: Some("https://bugzilla.redhat.com/1017197"), 
+                                id: Some("1017197"), 
+                                bugzilla: Some("CVE-2011-4973 mod_nss: FakeBasicAuth authentication bypass") 
+                            }
+                        ]), 
+                        affected_cpe_list: Some([
+                            AffectedCpeList { 
+                                cpe: Some([
+                                    "cpe:/o:redhat:enterprise_linux:6", 
+                                    "cpe:/o:redhat:enterprise_linux:6::client", 
+                                    "cpe:/o:redhat:enterprise_linux:6::computenode", 
+                                    "cpe:/o:redhat:enterprise_linux:6::server", 
+                                    "cpe:/o:redhat:enterprise_linux:6::workstation"
+                                ]) 
+                            }
+                        ]), 
+                        affected: None 
+                    }]) 
+                }), 
+                criteria: Some(Criteria { 
+                    operator: Some("OR"), 
+                    criterion: Some([
+                        Criterion { 
+                            comment: Some("Red Hat Enterprise Linux must be installed"), 
+                            test_ref: Some("oval:com.redhat.rhba:tst:20111656004") 
+                        }
+                    ]), 
+                    criteria2: None 
+                }) 
+            }, 
+            Definition { id....
+===
+
+Jvn xml
 ===
 <item rdf:about=\"https://jvndb.jvn.jp/ja/contents/2022/JVNDB-2022-004669.html\">
     <title>Tenda ルータ G1 および G3 における境界外書き込みに関する脆弱性</title>
@@ -18,6 +121,7 @@ Jvn/Nvd Data Format
 </item>
 ==
 
+Jvn json
 ===
 object_1: Rdf { 
     item: [
@@ -86,6 +190,8 @@ object_1: Rdf {
 }
 ===
 
+Nvd json
+===
 Nvd { 
     CVE_data_type: Some("CVE"), 
     CVE_data_format: Some("MITRE"), 
