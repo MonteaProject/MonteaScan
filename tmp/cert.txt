@@ -1,0 +1,20 @@
+# openssl genpkey -out key.pem -algorithm ED25519
+# openssl req -new -key key.pem -out cert.csr
+
+# vim v3.ext
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+
+# openssl x509 -in cert.csr -out cert.pem -req -signkey key.pem -days 3650 -extfile v3.ext
+
+# ls -la
+合計 16
+drwxr-xr-x. 2 root root  67  .
+drwxr-xr-x. 9 root root 147  ..
+-rw-r--r--. 1 root root 339  cert.csr
+-rw-r--r--. 1 root root 684  cert.pem
+-rw-------. 1 root root 119  key.pem
+-rw-r--r--. 1 root root 141  v3.ext
+
+# curl --insecure https://127.0.0.1:7878/xxx

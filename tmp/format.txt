@@ -1,3 +1,185 @@
+# curl --insecure https://127.0.0.1:7878/get_id/oval:com.redhat.rhba:def:20191992
+
+Some([
+    Criteria2 { 
+        operator: Some("AND"), 
+        criterion: Some([
+            Criterion2 { 
+                comment: Some("Red Hat Enterprise Linux 6 is installed"), 
+                test_ref: Some("oval:com.redhat.rhba:tst:20111656003") 
+            }, 
+            Criterion2 { 
+                comment: Some("mod_nss is earlier than 0:1.0.8-13.el6"), 
+                test_ref: Some("oval:com.redhat.rhba:tst:20111656001") 
+            }, 
+            Criterion2 { 
+                comment: Some("mod_nss is signed with Red Hat redhatrelease2 key"), 
+                test_ref: Some("oval:com.redhat.rhba:tst:20111656002") 
+            }
+        ]) 
+    }
+])
+
+[Criteria2 { operator: Some("AND"), criterion: Some([Criterion2 { comment: Some("cloud-init is earlier than 0:18.5-1.el8.4"), test_ref: Some("oval:com.redhat.rhba:tst:20191992001") }, Criterion2 { comment: Some("cloud-init is signed with Red Hat redhatrelease2 key"), test_ref: Some("oval:com.redhat.rhba:tst:20191992002") }]) }]
+
+===
+# curl --insecure https://127.0.0.1:7878/get_id/oval:com.redhat.rhba:def:20191992 | jq .
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  1629  100  1629    0     0  30735      0 --:--:-- --:--:-- --:--:-- 31326
+{
+  "@id": "oval:com.redhat.rhba:def:20191992",
+  "@class": "patch",
+  "metadata": {
+    "title": "RHBA-2019:1992: cloud-init bug fix and enhancement update (Moderate)",
+    "affected": [
+      {
+        "@family": "unix",
+        "platform": [
+          {
+            "platform": null
+          }
+        ]
+      }
+    ],
+    "reference": [
+      {
+        "@ref_id": "RHBA-2019:1992",
+        "@ref_url": "https://access.redhat.com/errata/RHBA-2019:1992",
+        "@source": "RHSA"
+      },
+      {
+        "@ref_id": "CVE-2019-0816",
+        "@ref_url": "https://access.redhat.com/security/cve/CVE-2019-0816",
+        "@source": "CVE"
+      }
+    ],
+    "description": "The cloud-init packages provide a set of init scripts for cloud instances. Cloud instances need special scripts to run during initialization to retrieve and install SSH keys, and to let the user run various scripts.\n\nUsers of cloud-init are advised to upgrade to these updated packages.",
+    "advisory": [
+      {
+        "@from": "secalert@redhat.com",
+        "severity": "Moderate",
+        "rights": "Copyright 2019 Red Hat, Inc.",
+        "issued": {
+          "@date": "2019-07-30"
+        },
+        "updated": {
+          "@date": "2019-07-30"
+        },
+        "cve": [
+          {
+            "@cvss2": null,
+            "@cvss3": "5.4/CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N",
+            "@cwe": "CWE-285",
+            "@href": "https://access.redhat.com/security/cve/CVE-2019-0816",
+            "@impact": "moderate",
+            "@public": "20190305",
+            "$value": "CVE-2019-0816"
+          }
+        ],
+        "bugzilla": [
+          {
+            "@href": "https://bugzilla.redhat.com/1680165",
+            "@id": "1680165",
+            "$value": "CVE-2019-0816 cloud-init: extra ssh keys added to authorized_keys on the Azure platform"
+          }
+        ],
+        "affected_cpe_list": [
+          {
+            "cpe": [
+              "cpe:/a:redhat:enterprise_linux:8",
+              "cpe:/a:redhat:enterprise_linux:8::appstream"
+            ]
+          }
+        ],
+        "affected": null
+      }
+    ]
+  },
+  "criteria": {
+    "@operator": "OR",
+    "criterion": [
+      {
+        "@comment": "Red Hat Enterprise Linux must be installed",
+        "@test_ref": "oval:com.redhat.rhba:tst:20191992005"
+      }
+    ],
+    "@criteria": null
+  }
+}
+===
+OVAL RHEL
+https://access.redhat.com/security/data/oval/v2/
+
+<definition class=\"patch\" id=\"oval:com.redhat.rhba:def:20111656\" version=\"637\">\n 
+    <metadata>\n  
+        <title>RHBA-2011:1656: mod_nss bug fix update  (Moderate)</title>\n  
+        <affected family=\"unix\">\n   
+            <platform>Red Hat Enterprise Linux 6</platform>\n  
+        </affected>\n  
+        <reference ref_id=\"RHBA-2011:1656\" ref_url=\"https://access.redhat.com/errata/RHBA-2011:1656\" source=\"RHSA\"/>\n  
+        <reference ref_id=\"CVE-2011-4973\" ref_url=\"https://access.redhat.com/security/cve/CVE-2011-4973\" source=\"CVE\"/>\n  
+        <description>   The mod_nss module provides strong cryptography for the Apache HTTP Server via the Secure Sockets Layer (SSL) 
+                        and Transport Layer Security (TLS) protocols, using the Network Security Services (NSS) security library.\n\nThis update 
+                        fixes the following bugs: \n\n* When the NSS library was not initialized and mod_nss tried to clear its SSL cache on start-up, 
+                        mod_nss terminated unexpectedly when the NSS library was built with debugging enabled. With this update, mod_nss does not try 
+                        to clear the SSL cache in the described scenario, thus preventing this bug. (BZ#691502)\n\n* Previously, a static array 
+                        containing the arguments for launching the nss_pcache command was overflowing the size by one. This could lead to a variety 
+                        of issues including unexpected termination. This bug has been fixed, and mod_nss now uses properly sized static array when 
+                        launching nss_pcache. (BZ#714154)\n\n* Prior to this update, client certificates were only retrieved during the initial SSL 
+                        handshake if the NSSVerifyClient option was set to &quot;require&quot; or &quot;optional&quot;. Also, the FakeBasicAuth option 
+                        only retrieved Common Name rather than the entire certificate subject. Consequently, it was possible to spoof an identity using 
+                        that option. This bug has been fixed, the FakeBasicAuth option is now prefixed with &quot;/&quot; and is thus compatible with 
+                        OpenSSL, and certificates are now retrieved on all subsequent requests beyond the first one. (BZ#702437)\n\nUsers of mod_nss 
+                        are advised to upgrade to this updated package, which fixes these bugs.
+        </description>\n  
+        <advisory from=\"secalert@redhat.com\">\n   
+            <severity>Moderate</severity>\n   
+            <rights>Copyright 2011 Red Hat, Inc.</rights>\n   
+            <issued date=\"2011-12-05\"/>\n   
+            <updated date=\"2011-12-06\"/>\n   
+            <cve cvss2=\"4.0/AV:N/AC:H/Au:N/C:P/I:P/A:N\" href=\"https://access.redhat.com/security/cve/CVE-2011-4973\" impact=\"moderate\" public=\"20110504\">CVE-2011-4973</cve>\n   
+            <bugzilla href=\"https://bugzilla.redhat.com/1017197\" id=\"1017197\">CVE-2011-4973 mod_nss: FakeBasicAuth authentication bypass</bugzilla>\n   
+            <affected_cpe_list>\n    
+                <cpe>cpe:/a:redhat:rhel_extras:6</cpe>\n    
+                <cpe>cpe:/a:redhat:rhel_extras_hpn:6</cpe>\n    
+                <cpe>cpe:/a:redhat:rhel_extras_oracle_java:6</cpe>\n    
+                <cpe>cpe:/a:redhat:rhel_extras_sap:6</cpe>\n    
+                <cpe>cpe:/a:redhat:rhel_extras_sap_hana:6</cpe>\n    
+                <cpe>cpe:/o:redhat:enterprise_linux:6</cpe>\n    
+                <cpe>cpe:/o:redhat:enterprise_linux:6::client</cpe>\n    
+                <cpe>cpe:/o:redhat:enterprise_linux:6::computenode</cpe>\n    
+                <cpe>cpe:/o:redhat:enterprise_linux:6::server</cpe>\n    
+                <cpe>cpe:/o:redhat:enterprise_linux:6::workstation</cpe>\n   
+            </affected_cpe_list>\n  
+        </advisory>\n 
+    </metadata>\n 
+    <criteria operator=\"OR\">\n  
+        <criterion comment=\"Red Hat Enterprise Linux must be installed\" test_ref=\"oval:com.redhat.rhba:tst:20111656004\"/>\n  
+        <criteria operator=\"AND\">\n   
+            <criterion comment=\"Red Hat Enterprise Linux 6 is installed\" test_ref=\"oval:com.redhat.rhba:tst:20111656003\"/>\n   
+            <criterion comment=\"mod_nss is earlier than 0:1.0.8-13.el6\" test_ref=\"oval:com.redhat.rhba:tst:20111656001\"/>\n   
+            <criterion comment=\"mod_nss is signed with Red Hat redhatrelease2 key\" test_ref=\"oval:com.redhat.rhba:tst:20111656002\"/>\n  
+        </criteria>\n 
+    </criteria>\n
+</definition>
+
+
+Definition { 
+    id: Some("oval:com.redhat.rhba:def:20191992"), 
+    class: Some("patch"), 
+    metadata: Some(Metadata { 
+        title: Some("RHBA-2019:1992: cloud-init bug fix and enhancement update (Moderate)"), 
+        affected: Some([
+            Affected { 
+                family: Some("unix"), 
+                platform: Some([
+                    Platform { 
+                        platform: None 
+                    }
+                ]) }]), reference: Some([Reference { ref_id: Some("RHBA-2019:1992"), ref_url: Some("https://access.redhat.com/errata/RHBA-2019:1992"), source: Some("RHSA") }, Reference { ref_id: Some("CVE-2019-0816"), ref_url: Some("https://access.redhat.com/security/cve/CVE-2019-0816"), source: Some("CVE") }]), description: Some("The cloud-init packages provide a set of init scripts for cloud instances. Cloud instances need special scripts to run during initialization to retrieve and install SSH keys, and to let the user run various scripts.\n\nUsers of cloud-init are advised to upgrade to these updated packages."), advisory: Some([Advisory { from: Some("secalert@redhat.com"), severity: Some("Moderate"), rights: Some("Copyright 2019 Red Hat, Inc."), issued: Some(Issued { date: Some("2019-07-30") }), updated: Some(Updated { date: Some("2019-07-30") }), cve: Some([Cve { cvss2: None, cvss3: Some("5.4/CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N"), cwe: Some("CWE-285"), href: Some("https://access.redhat.com/security/cve/CVE-2019-0816"), impact: Some("moderate"), public: Some("20190305"), cve: Some("CVE-2019-0816") }]), bugzilla: Some([Bugzilla { href: Some("https://bugzilla.redhat.com/1680165"), id: Some("1680165"), bugzilla: Some("CVE-2019-0816 cloud-init: extra ssh keys added to authorized_keys on the Azure platform") }]), affected_cpe_list: Some([AffectedCpeList { cpe: Some(["cpe:/a:redhat:enterprise_linux:8", "cpe:/a:redhat:enterprise_linux:8::appstream", "cpe:/a:redhat:enterprise_linux:8::crb", "cpe:/a:redhat:enterprise_linux:8::highavailability", "cpe:/a:redhat:enterprise_linux:8::nfv", "cpe:/a:redhat:enterprise_linux:8::realtime", "cpe:/a:redhat:enterprise_linux:8::resilientstorage", "cpe:/a:redhat:enterprise_linux:8::sap", "cpe:/a:redhat:enterprise_linux:8::sap_hana", "cpe:/a:redhat:enterprise_linux:8::supplementary", "cpe:/o:redhat:enterprise_linux:8", "cpe:/o:redhat:enterprise_linux:8::baseos"]) }]), affected: None }]) }), criteria: Some(Criteria { operator: Some("OR"), criterion: Some([Criterion { comment: Some("Red Hat Enterprise Linux must be installed"), test_ref: Some("oval:com.redhat.rhba:tst:20191992005") }]), criteria2: None }) }
+
+
 OVAL RHEL
 https://www.redhat.com/security/data/oval/
 ===

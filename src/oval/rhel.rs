@@ -180,7 +180,7 @@ async fn main() -> Result<()> {
 
     for v in rhel_ver {
         let v: &str = &v.to_string();
-        let url = String::from("https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL") + v + ".xml.bz2";
+        let url = String::from("https://access.redhat.com/security/data/oval/v2/RHEL") + v + "/rhel-" + v + ".oval.xml.bz2";
         let res = client.get(url.parse().unwrap()).await.unwrap();
         let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
 

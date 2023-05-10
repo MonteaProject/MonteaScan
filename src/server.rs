@@ -1,6 +1,7 @@
 use std::{fs::File, io::BufReader};
 use actix_web::{web, get, post, App, middleware, HttpRequest, HttpResponse, HttpServer, http::header::ContentType, error, Error};
-use mongodb::{bson::doc, options::IndexOptions, options::ClientOptions, Client as MongoClient, Collection, IndexModel};
+use futures::io::Cursor;
+use mongodb::{bson::doc, options::{IndexOptions, FindOneOptions}, options::ClientOptions, Client as MongoClient, Collection, IndexModel};
 use rustls::{Certificate, PrivateKey, ServerConfig};
 use rustls_pemfile::{certs, pkcs8_private_keys};
 use serde::{Deserialize, Serialize};
@@ -155,8 +156,8 @@ fn load_rustls_config() -> rustls::ServerConfig {
         .with_safe_defaults()
         .with_no_client_auth();
 
-    let cert_file = &mut BufReader::new(File::open("cert.pem").unwrap());
-    let key_file = &mut BufReader::new(File::open("key.pem").unwrap());
+    let cert_file = &mut BufReader::new(File::open("cert/cert.pem").unwrap());
+    let key_file = &mut BufReader::new(File::open("cert/key.pem").unwrap());
 
     let cert_chain = certs(cert_file)
         .unwrap()
@@ -177,21 +178,21 @@ fn load_rustls_config() -> rustls::ServerConfig {
     config.with_single_cert(cert_chain, key.remove(0)).unwrap()
 }
 
-#[get("/get_user/{username}")]
-async fn get_user(client: web::Data<MongoClient>, username: web::Path<String>) -> HttpResponse {
+#[get("/get_id/{id}")]
+async fn get_id(client: web::Data<MongoClient>, id: web::Path<String>) -> HttpResponse {
     let db = client.database("OvalRHEL");
-    let col = String::from("RHEL");
-    let type_collection = db.collection::<OvalRhel>(&col);
+    let col = String::from("RHEL8");
+    let type_collection = db.collection::<Definition>(&col);
 
-    let username = username.into_inner();
+    let id = id.into_inner();
 
     match type_collection
-        .find_one(doc! { "username": &username }, None)
+        .find_one(doc! { "@id": &id }, None)
         .await
     {
-        Ok(Some(user)) => HttpResponse::Ok().json(user),
+        Ok(Some(i)) => HttpResponse::Ok().json(i),
         Ok(None) => {
-            HttpResponse::NotFound().body(format!("No user found"))
+            HttpResponse::NotFound().body(format!("No id found"))
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
@@ -213,7 +214,7 @@ pub async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .app_data(web::Data::new(mongo_client.clone()))
-            .service(get_user)
+            .service(get_id)
     })
     .bind_rustls("127.0.0.1:7878", config).unwrap()
     .run()
