@@ -1,2 +1,0 @@
-{LARGE_FILE} filter=lfs diff=lfs merge=lfs -text
-src/c/server filter=lfs diff=lfs merge=lfs -text
