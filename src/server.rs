@@ -5,7 +5,9 @@ use mongodb::{bson::doc, options::{IndexOptions, FindOneOptions}, options::Clien
 use rustls::{Certificate, PrivateKey, ServerConfig};
 use rustls_pemfile::{certs, pkcs8_private_keys};
 use serde::{Deserialize, Serialize};
-
+use futures::stream::TryStreamExt;
+use bson::Document;
+use futures::StreamExt;
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct OvalRhel {
@@ -30,22 +32,17 @@ struct Definition {
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct Metadata {
     title: Option<String>,
-    affected: Option<Vec<Affected>>,
+    affected: Option<Affected>,
     reference: Option<Vec<Reference>>,
     description: Option<String>,
-    advisory: Option<Vec<Advisory>>,
+    advisory: Option<Advisory>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct Affected {
     #[serde(rename = "@family")]
     family: Option<String>,
-    platform: Option<Vec<Platform>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Platform {
-    platform: Option<String>
+    platform: Option<Vec<String>>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -68,8 +65,7 @@ struct Advisory{
     updated: Option<Updated>,
     cve: Option<Vec<Cve>>,
     bugzilla: Option<Vec<Bugzilla>>,
-    affected_cpe_list: Option<Vec<AffectedCpeList>>,
-    affected: Option<String>
+    affected_cpe_list: Option<AffectedCpeList>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -122,8 +118,7 @@ struct Criteria {
     #[serde(rename = "@operator")]
     operator: Option<String>,
     criterion: Option<Vec<Criterion>>,
-    #[serde(rename = "@criteria")]
-    criteria2: Option<Vec<Criteria2>>
+    criteria: Option<Vec<Criteria2>>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -138,8 +133,7 @@ struct Criterion {
 struct Criteria2 {
     #[serde(rename = "@operator")]
     operator: Option<String>,
-    #[serde(rename = "@criterion")]
-    criterion2: Option<Vec<Criterion2>>
+    criterion: Option<Vec<Criterion2>>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -178,10 +172,11 @@ fn load_rustls_config() -> rustls::ServerConfig {
     config.with_single_cert(cert_chain, key.remove(0)).unwrap()
 }
 
+
 #[get("/get_id/{id}")]
 async fn get_id(client: web::Data<MongoClient>, id: web::Path<String>) -> HttpResponse {
     let db = client.database("OvalRHEL");
-    let col = String::from("RHEL8");
+    let col = String::from("RHEL6");
     let type_collection = db.collection::<Definition>(&col);
 
     let id = id.into_inner();
@@ -197,6 +192,119 @@ async fn get_id(client: web::Data<MongoClient>, id: web::Path<String>) -> HttpRe
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
+
+#[get("/rhel6/")]
+async fn rhel6(client: web::Data<MongoClient>) -> HttpResponse {
+    let db = client.database("OvalRHEL");
+    let col = String::from("RHEL6");
+    
+    let mut aggr_pipeline: Vec<Document> = Vec::new();
+    let mut cursor = db
+        .collection::<Document>(&col)
+        .aggregate(aggr_pipeline, None)
+        .await
+        .expect("Error performing aggregation on examplemodel  collection.");
+
+    let mut results: Vec<Document> = Vec::new();
+
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(document) => {
+                results.push(document);
+            }
+            Err(_) => {
+                return HttpResponse::InternalServerError().finish();
+            }
+        }
+    }
+
+    HttpResponse::Ok().json(results)
+}
+
+#[get("/rhel7/")]
+async fn rhel7(client: web::Data<MongoClient>) -> HttpResponse {
+    let db = client.database("OvalRHEL");
+    let col = String::from("RHEL7");
+    
+    let mut aggr_pipeline: Vec<Document> = Vec::new();
+    let mut cursor = db
+        .collection::<Document>(&col)
+        .aggregate(aggr_pipeline, None)
+        .await
+        .expect("Error performing aggregation on examplemodel  collection.");
+
+    let mut results: Vec<Document> = Vec::new();
+
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(document) => {
+                results.push(document);
+            }
+            Err(_) => {
+                return HttpResponse::InternalServerError().finish();
+            }
+        }
+    }
+
+    HttpResponse::Ok().json(results)
+}
+
+#[get("/rhel8/")]
+async fn rhel8(client: web::Data<MongoClient>) -> HttpResponse {
+    let db = client.database("OvalRHEL");
+    let col = String::from("RHEL8");
+    
+    let mut aggr_pipeline: Vec<Document> = Vec::new();
+    let mut cursor = db
+        .collection::<Document>(&col)
+        .aggregate(aggr_pipeline, None)
+        .await
+        .expect("Error performing aggregation on examplemodel  collection.");
+
+    let mut results: Vec<Document> = Vec::new();
+
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(document) => {
+                results.push(document);
+            }
+            Err(_) => {
+                return HttpResponse::InternalServerError().finish();
+            }
+        }
+    }
+
+    HttpResponse::Ok().json(results)
+}
+
+#[get("/rhel9/")]
+async fn rhel9(client: web::Data<MongoClient>) -> HttpResponse {
+    let db = client.database("OvalRHEL");
+    let col = String::from("RHEL9");
+
+    let mut aggr_pipeline: Vec<Document> = Vec::new();
+    let mut cursor = db
+        .collection::<Document>(&col)
+        .aggregate(aggr_pipeline, None)
+        .await
+        .expect("Error performing aggregation on examplemodel  collection.");
+
+    let mut results: Vec<Document> = Vec::new();
+
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(document) => {
+                results.push(document);
+            }
+            Err(_) => {
+                return HttpResponse::InternalServerError().finish();
+            }
+        }
+    }
+
+    HttpResponse::Ok().json(results)
+}
+
 
 #[actix_web::main]
 pub async fn main() -> std::io::Result<()> {
@@ -215,6 +323,10 @@ pub async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .app_data(web::Data::new(mongo_client.clone()))
             .service(get_id)
+            .service(rhel6)
+            .service(rhel7)
+            .service(rhel8)
+            .service(rhel9)
     })
     .bind_rustls("127.0.0.1:7878", config).unwrap()
     .run()
