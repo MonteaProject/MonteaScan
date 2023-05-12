@@ -1,11 +1,6 @@
-use std::{fs::File, io::BufReader};
-use actix_web::{web, get, post, App, middleware, HttpRequest, HttpResponse, HttpServer, http::header::ContentType, error, Error};
-use futures::io::Cursor;
-use mongodb::{bson::doc, options::{IndexOptions, FindOneOptions}, options::ClientOptions, Client as MongoClient, Collection, IndexModel};
-use rustls::{Certificate, PrivateKey, ServerConfig};
-use rustls_pemfile::{certs, pkcs8_private_keys};
+use actix_web::{web, get, App, middleware, HttpResponse, HttpServer};
+use mongodb::{bson::doc, options::ClientOptions, Client as MongoClient};
 use serde::{Deserialize, Serialize};
-use futures::stream::TryStreamExt;
 use bson::Document;
 use futures::StreamExt;
 
@@ -144,33 +139,32 @@ struct Criterion2 {
     test_ref: Option<String>
 }
 
+// fn load_rustls_config() -> rustls::ServerConfig {
+//     let config = ServerConfig::builder()
+//         .with_safe_defaults()
+//         .with_no_client_auth();
 
-fn load_rustls_config() -> rustls::ServerConfig {
-    let config = ServerConfig::builder()
-        .with_safe_defaults()
-        .with_no_client_auth();
+//     let cert_file = &mut BufReader::new(File::open("cert/cert.pem").unwrap());
+//     let key_file = &mut BufReader::new(File::open("cert/key.pem").unwrap());
 
-    let cert_file = &mut BufReader::new(File::open("cert/cert.pem").unwrap());
-    let key_file = &mut BufReader::new(File::open("cert/key.pem").unwrap());
+//     let cert_chain = certs(cert_file)
+//         .unwrap()
+//         .into_iter()
+//         .map(Certificate)
+//         .collect();
 
-    let cert_chain = certs(cert_file)
-        .unwrap()
-        .into_iter()
-        .map(Certificate)
-        .collect();
+//     let mut key: Vec<PrivateKey> = pkcs8_private_keys(key_file)
+//         .unwrap()
+//         .into_iter()
+//         .map(PrivateKey)
+//         .collect();
 
-    let mut key: Vec<PrivateKey> = pkcs8_private_keys(key_file)
-        .unwrap()
-        .into_iter()
-        .map(PrivateKey)
-        .collect();
-
-    if key.is_empty() {
-        eprintln!("Could not locate PKCS 8 private keys.");
-        std::process::exit(1);
-    }
-    config.with_single_cert(cert_chain, key.remove(0)).unwrap()
-}
+//     if key.is_empty() {
+//         eprintln!("Could not locate PKCS 8 private keys.");
+//         std::process::exit(1);
+//     }
+//     config.with_single_cert(cert_chain, key.remove(0)).unwrap()
+// }
 
 
 #[get("/get_id/{id}")]
@@ -187,7 +181,7 @@ async fn get_id(client: web::Data<MongoClient>, id: web::Path<String>) -> HttpRe
     {
         Ok(Some(i)) => HttpResponse::Ok().json(i),
         Ok(None) => {
-            HttpResponse::NotFound().body(format!("No id found"))
+            HttpResponse::NotFound().body("Not Found")
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
@@ -198,19 +192,19 @@ async fn rhel6(client: web::Data<MongoClient>) -> HttpResponse {
     let db = client.database("OvalRHEL");
     let col = String::from("RHEL6");
     
-    let mut aggr_pipeline: Vec<Document> = Vec::new();
+    let aggr_pipeline: Vec<Document> = Vec::new();
     let mut cursor = db
         .collection::<Document>(&col)
         .aggregate(aggr_pipeline, None)
         .await
         .expect("Error performing aggregation on examplemodel  collection.");
 
-    let mut results: Vec<Document> = Vec::new();
+    let mut results: Vec<Vec<Document>> = Vec::new();
 
     while let Some(result) = cursor.next().await {
         match result {
             Ok(document) => {
-                results.push(document);
+                results.push(vec![document]);
             }
             Err(_) => {
                 return HttpResponse::InternalServerError().finish();
@@ -226,19 +220,19 @@ async fn rhel7(client: web::Data<MongoClient>) -> HttpResponse {
     let db = client.database("OvalRHEL");
     let col = String::from("RHEL7");
     
-    let mut aggr_pipeline: Vec<Document> = Vec::new();
+    let aggr_pipeline: Vec<Document> = Vec::new();
     let mut cursor = db
         .collection::<Document>(&col)
         .aggregate(aggr_pipeline, None)
         .await
         .expect("Error performing aggregation on examplemodel  collection.");
 
-    let mut results: Vec<Document> = Vec::new();
+    let mut results: Vec<Vec<Document>> = Vec::new();
 
     while let Some(result) = cursor.next().await {
         match result {
             Ok(document) => {
-                results.push(document);
+                results.push(vec![document]);
             }
             Err(_) => {
                 return HttpResponse::InternalServerError().finish();
@@ -254,19 +248,19 @@ async fn rhel8(client: web::Data<MongoClient>) -> HttpResponse {
     let db = client.database("OvalRHEL");
     let col = String::from("RHEL8");
     
-    let mut aggr_pipeline: Vec<Document> = Vec::new();
+    let aggr_pipeline: Vec<Document> = Vec::new();
     let mut cursor = db
         .collection::<Document>(&col)
         .aggregate(aggr_pipeline, None)
         .await
         .expect("Error performing aggregation on examplemodel  collection.");
 
-    let mut results: Vec<Document> = Vec::new();
+    let mut results: Vec<Vec<Document>> = Vec::new();
 
     while let Some(result) = cursor.next().await {
         match result {
             Ok(document) => {
-                results.push(document);
+                results.push(vec![document]);
             }
             Err(_) => {
                 return HttpResponse::InternalServerError().finish();
@@ -282,19 +276,19 @@ async fn rhel9(client: web::Data<MongoClient>) -> HttpResponse {
     let db = client.database("OvalRHEL");
     let col = String::from("RHEL9");
 
-    let mut aggr_pipeline: Vec<Document> = Vec::new();
+    let aggr_pipeline: Vec<Document> = Vec::new();
     let mut cursor = db
         .collection::<Document>(&col)
         .aggregate(aggr_pipeline, None)
         .await
         .expect("Error performing aggregation on examplemodel  collection.");
 
-    let mut results: Vec<Document> = Vec::new();
+    let mut results: Vec<Vec<Document>> = Vec::new();
 
     while let Some(result) = cursor.next().await {
         match result {
             Ok(document) => {
-                results.push(document);
+                results.push(vec![document]);
             }
             Err(_) => {
                 return HttpResponse::InternalServerError().finish();
@@ -316,7 +310,7 @@ pub async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     log::info!("Starting HTTP Server...");
 
-    let config = load_rustls_config();
+    // let config = load_rustls_config();
 
     HttpServer::new(move || {
         App::new()
@@ -328,7 +322,8 @@ pub async fn main() -> std::io::Result<()> {
             .service(rhel8)
             .service(rhel9)
     })
-    .bind_rustls("127.0.0.1:7878", config).unwrap()
+    // .bind_rustls("127.0.0.1:7878", config).unwrap()
+    .bind(("127.0.0.1", 7878)).unwrap()
     .run()
     .await
 }

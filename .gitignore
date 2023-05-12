@@ -1,5 +1,5 @@
 /.vscode
-target/
+src/cert/
 src/config/
 src/result/
-src/cert/
+target/

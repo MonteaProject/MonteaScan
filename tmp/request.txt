@@ -1,0 +1,11 @@
+# RHEL6 OVAL 取得
+# curl http://127.0.0.1:7878/rhel6/ | jq .
+
+# RHEL7 OVAL 取得
+# curl http://127.0.0.1:7878/rhel7/ | jq .
+
+# RHEL8 OVAL 取得
+# curl http://127.0.0.1:7878/rhel8/ | jq .
+
+# RHEL9 OVAL 取得
+# curl http://127.0.0.1:7878/rhel9/ | jq .
