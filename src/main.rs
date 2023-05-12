@@ -1,6 +1,13 @@
+use std::vec;
 use hyper::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::{Result, Value, Value::Null};
+
+#[derive(Debug, Clone)]
+struct OvalPkg {
+    pkg: Vec<String>,
+    ver: Vec<String>
+}
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
@@ -16,48 +23,66 @@ async fn main() -> Result<()> {
     let empty_vec: Vec<Value> = Vec::new();
     let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
 
+    let mut ovalpkg = OvalPkg {
+        pkg: vec![],
+        ver: vec![]
+    };
+
     for d in oval_vec {
-        let epty_vec: Vec<Value> = Vec::new();
-        let mut result_vec: Vec<String> = Vec::new();
+        if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+            let epty_vec: Vec<Value> = Vec::new();
+            let mut result_vec: Vec<String> = Vec::new();
 
-        let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
 
-        for i in j {
-            let comment = i["@comment"].as_str().unwrap();
-            result_vec.push(comment.to_string());
-        }
+            for i in j {
+                let comment = i["@comment"].as_str().unwrap();
+                result_vec.push(comment.to_string());
+            }
 
-        let a = result_vec.len();
-        if a == 3 {
-            let reg = &result_vec[0];
-            let regular: &str = &reg[0..7];
+            let count = result_vec.len();
+            if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
 
-            let rev = &result_vec[0];
-            let reverse: String = rev.chars().rev().collect::<String>();
-            let reverse_c = &reverse[0..8];
-            
-            if regular == "Module" && reverse_c == "delbane" {
-                let label = String::from("Module is enabled");
+                if b.len() == 2{
+                    let pkg = b[0].trim();
+                    let ver = b[1].trim();
+                    ovalpkg.pkg.push(pkg.to_string());
+                    ovalpkg.ver.push(ver.to_string());
+                }
             }
         }
         
         if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let ept_vec: Vec<Value> = Vec::new();
+            let epty_vec: Vec<Value> = Vec::new();
             let mut result_vec: Vec<String> = Vec::new();
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &ept_vec);
+
+            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
             for i in j{
                 let comment = i["@comment"].as_str().unwrap();
                 result_vec.push(comment.to_string());
             }
-            let a = result_vec.len();
-            if a == 3 {
-                println!("{:?}", result_vec);
+
+            let count = result_vec.len();
+            if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                if b.len() == 2{
+                    let pkg = b[0].trim();
+                    let ver = b[1].trim();
+                    ovalpkg.pkg.push(pkg.to_string());
+                    ovalpkg.ver.push(ver.to_string());
+                }
             }
         }
+
         if d[1] != Null {
             println!("code[388]:定義されていない新しい値が追加されています: {:?}", d[1]);
         }
     }
+
+    println!("{:#?}", ovalpkg);
 
     Ok(())
 }
