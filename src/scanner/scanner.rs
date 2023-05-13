@@ -125,8 +125,7 @@ fn main() -> Result<()> {
             println!("command system-release Failed");
         }
 
-        // 構造体
-        let mut tmp = ScanResult {
+        let mut localinfo = ScanResult {
             time: time,
             os: os,
             kernel: kernel,
@@ -136,7 +135,7 @@ fn main() -> Result<()> {
             pkg: vec![]
         };
 
-        // IP addr
+        // ip addr
         let mut sess = Session::new().unwrap();
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
@@ -151,7 +150,7 @@ fn main() -> Result<()> {
             let t = i.trim();
             let u = t.split_whitespace().collect::<Vec<&str>>();
             let ipaddr = String::from(u[1]) + ":" + u[3];
-            tmp.ip.push(ipaddr);
+            localinfo.ip.push(ipaddr);
         }
         ch.wait_close();
 
@@ -197,7 +196,7 @@ fn main() -> Result<()> {
                 let name = u[0];
                 let ver  = u[1];
                 let repo = u[2];
-                tmp.update.push(UpdateList { name: name.to_string(), ver: ver.to_string(), repo: repo.to_string() });
+                localinfo.update.push(UpdateList { name: name.to_string(), ver: ver.to_string(), repo: repo.to_string() });
             } else {
                 println!("len 3 Failed");
             }
@@ -231,13 +230,13 @@ fn main() -> Result<()> {
                     let ver     = u[2];
                     let release = u[3];
                     let arch    = u[4];
-                    tmp.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), pkgarch: arch.to_string()});
+                    localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), pkgarch: arch.to_string()});
                 } else {
                     let name    = u[0];
                     let ver     = u[1];
                     let release = u[3];
                     let arch    = u[4];
-                    tmp.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), pkgarch: arch.to_string()});
+                    localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), pkgarch: arch.to_string()});
                 }
             } else {
                 println!("len 5 Failed");
@@ -251,13 +250,11 @@ fn main() -> Result<()> {
             println!("command dnf rpm -qa Failed");
         }
 
-
         std::fs::create_dir_all("result").unwrap();
-
         let filename = String::from(hostname).replace("\n", "") + ".json";
         let dir = String::from("result/") + &filename;
 
-        let serialized = serde_json::to_string(&tmp).unwrap();
+        let serialized = serde_json::to_string(&localinfo).unwrap();
         let mut w = std::fs::OpenOptions::new()
             .write(true)
             .create(true)
