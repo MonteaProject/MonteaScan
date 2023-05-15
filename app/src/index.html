@@ -1,0 +1,31 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <div class="container">
+            <table class="responsive-table">
+                <thead class="responsive-table__head">
+                  <tr class="responsive-table__row">
+                      <th class="responsive-table__head__title responsive-table__head__title--name">Id</th>
+                      <th class="responsive-table__head__title responsive-table__head__title--status">Types</th>
+                      <th class="responsive-table__head__title responsive-table__head__title--types">Name</th>
+                      <th class="responsive-table__head__title responsive-table__head__title--update">Username</th>
+                      <th class="responsive-table__head__title responsive-table__head__title--country">Email</th>
+                  </tr>
+                </thead>
+                <tbody class="responsive-table__body">
+                  <tr *ngFor="let v of vluns" class="responsive-table__row">
+                      <td class="responsive-table__body__text responsive-table__body__text--name">{{v.id}}</td>
+                      <td class="responsive-table__body__text responsive-table__body__text--status">
+                        <span class="status-indicator status-indicator--active"></span>
+                        Active
+                      </td>
+                      <td class="responsive-table__body__text responsive-table__body__text--types">{{v.name}}</td>
+                      <td class="responsive-table__body__text responsive-table__body__text--update">{{v.username}}</td>
+                      <td class="responsive-table__body__text responsive-table__body__text--country">{{v.email}}</td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

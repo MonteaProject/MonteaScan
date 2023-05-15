@@ -4,3 +4,5 @@ src/scan_result/
 src/vluns_result/
 target/
 tmp/cert/
+app/.vscode
+app/node_modules
