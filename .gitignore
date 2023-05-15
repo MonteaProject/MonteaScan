@@ -2,4 +2,5 @@
 src/cert/
 src/config/
 src/result/
+src/detect/
 target/
