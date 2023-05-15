@@ -48,12 +48,12 @@ struct PkgList {
 
 fn main() -> Result<()> {
     let filename = String::from("config") + ".json";
-    let dir = String::from("config/") + &filename;
+    let dir = String::from("../config/") + &filename;
 
     let cnf = {
         let cnf = std::fs::read_to_string(&dir).unwrap();
         serde_json::from_str::<ScanServerList>(&cnf).unwrap()
-    };
+    };  
 
     for index in 0..cnf.server.len() {
         let name   = &cnf.server[index].name;
@@ -250,9 +250,9 @@ fn main() -> Result<()> {
             println!("command dnf rpm -qa Failed");
         }
 
-        std::fs::create_dir_all("result").unwrap();
+        std::fs::create_dir_all("../scan_result/").unwrap();
         let filename = String::from(hostname).replace("\n", "") + ".json";
-        let dir = String::from("result/") + &filename;
+        let dir = String::from("../scan_result/") + &filename;
 
         let serialized = serde_json::to_string(&localinfo).unwrap();
         let mut w = std::fs::OpenOptions::new()

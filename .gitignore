@@ -1,6 +1,6 @@
 /.vscode
-src/cert/
 src/config/
-src/result/
-src/detect/
+src/scan_result/
+src/vluns_result/
 target/
+tmp/cert/

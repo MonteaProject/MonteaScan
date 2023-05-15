@@ -189,7 +189,7 @@ async fn main() -> Result<()> {
 
     let mut file_vec: Vec<String> = Vec::new();
 
-    let path = String::from("./result/");
+    let path = String::from("./src/scan_result/");
     let dir = PathBuf::from(path);
     let files = dir.read_dir().expect("code[387]: フォルダが存在しません.");
 
@@ -374,14 +374,166 @@ async fn main() -> Result<()> {
             }
         }
 
-        println!("{:?}", vluns_l);
+        // CentOS
+        if release[0] == "CentOS" && release[1] == "Linux" && release[2] == "release" {
+            let majorver: Vec<&str> = release[3].split(".").collect();
+            if majorver[0] == "7" {
+                let url = String::from("http://127.0.0.1:7878/rhel7/");
+                let client = Client::new();
+
+                let res = client.get(url.parse().unwrap()).await.unwrap();
+                let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
+                let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
+
+                let v: Value = serde_json::from_str(&data).unwrap();
+
+                let empty_vec: Vec<Value> = Vec::new();
+                let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
+
+                for d in oval_vec {
+                    if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+                        let epty_vec: Vec<Value> = Vec::new();
+                        let mut result_vec: Vec<String> = Vec::new();
+
+                        let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+                        for i in j {
+                            let comment = i["@comment"].as_str().unwrap();
+                            result_vec.push(comment.to_string());
+                        }
+
+                        let count = result_vec.len();
+                        if count == 3 {
+                            let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                            if b.len() == 2{
+                                let pkg = b[0].trim();
+                                let ver = b[1].trim();
+
+                                for scan_p in &scan_r.pkg {
+                                    if pkg == scan_p.pkgname {
+                                        let v: Vec<&str> = ver.split(":").collect();
+        
+                                        let mut p = String::from(&scan_p.pkgver);
+                                        p += "-";
+                                        p += &scan_p.pkgrelease;
+                                        
+                                        if v[1] == p {
+                                            //time
+                                            let utc = OffsetDateTime::now_utc();
+                                            let jct = utc.to_offset(offset!(+9));
+                                            let format = format_description::parse(
+                                                "[year]-[month]-[day] [hour]:[minute]:[second]"
+                                            ).unwrap();
+                                            let time = jct.format(&format).unwrap();
+
+                                            //hostname
+                                            let hostname = String::from(&scan_r.hostname).replace("\n", "");
+
+                                            //ip
+                                            let ip = &scan_r.ip;
+
+                                            //os
+                                            let os = String::from(&scan_r.os).replace("\n", "");
+
+                                            //kernel
+                                            let kernel = String::from(&scan_r.kernel).replace("\n", "");
+
+                                            let mut vluns = VlunsDetect {
+                                                time: time,
+                                                hostname: hostname,
+                                                ip: scan_r.ip.clone(),
+                                                os: os,
+                                                kernel: kernel,
+                                                oval: d.clone()
+                                            };
+
+                                            vluns_l.detect.push(vluns);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
+                        let epty_vec: Vec<Value> = Vec::new();
+                        let mut result_vec: Vec<String> = Vec::new();
+
+                        let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+                        for i in j{
+                            let comment = i["@comment"].as_str().unwrap();
+                            result_vec.push(comment.to_string());
+                        }
+
+                        let count = result_vec.len();
+                        if count == 3 {
+                            let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                            if b.len() == 2{
+                                let pkg = b[0].trim();
+                                let ver = b[1].trim();
+
+                                for scan_p in &scan_r.pkg {
+                                    if pkg == scan_p.pkgname {
+                                        let v: Vec<&str> = ver.split(":").collect();
+        
+                                        let mut p = String::from(&scan_p.pkgver);
+                                        p += "-";
+                                        p += &scan_p.pkgrelease;
+                                        
+                                        if v[1] == p {
+                                            //time
+                                            let utc = OffsetDateTime::now_utc();
+                                            let jct = utc.to_offset(offset!(+9));
+                                            let format = format_description::parse(
+                                                "[year]-[month]-[day] [hour]:[minute]:[second]"
+                                            ).unwrap();
+                                            let time = jct.format(&format).unwrap();
+
+                                            //hostname
+                                            let hostname = String::from(&scan_r.hostname).replace("\n", "");
+
+                                            //ip
+                                            let ip = &scan_r.ip;
+
+                                            //os
+                                            let os = String::from(&scan_r.os).replace("\n", "");
+
+                                            //kernel
+                                            let kernel = String::from(&scan_r.kernel).replace("\n", "");
+
+                                            let mut vluns = VlunsDetect {
+                                                time: time,
+                                                hostname: hostname,
+                                                ip: scan_r.ip.clone(),
+                                                os: os,
+                                                kernel: kernel,
+                                                oval: d.clone()
+                                            };
+
+                                            vluns_l.detect.push(vluns);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if d[1] != Null {
+                        println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+                    }
+                }
+            }
+        }
 
         let d_file: Vec<&str> = f.split("/").collect();
         let d_index = d_file.len()-1;
 
-        std::fs::create_dir_all("detect").unwrap();
+        std::fs::create_dir_all("./src/vluns_result").unwrap();
         let filename = String::from(d_file[d_index]);
-        let dir = String::from("detect/") + &filename;
+        let dir = String::from("./src/vluns_result/") + &filename;
 
         let serialized = serde_json::to_string(&vluns_l).unwrap();
         let mut w = std::fs::OpenOptions::new()
