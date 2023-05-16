@@ -1,16 +1,16 @@
-n --version
+# n --version
 v9.0.0
 
-node -v
+# node -v
 v20.0.0
 
-npm -v
+# npm -v
 9.6.5
 
-npm install -g @angular/cli
-ng new app
-ng serve --host 0.0.0.0
-npm install bootstrap --save
+# npm install -g @angular/cli
+# ng new app
+# ng serve --host 0.0.0.0
+# npm install -g bootstrap
 
 https://morioh.com/p/e4c55d3876d1
 vim angular.json
@@ -32,3 +32,8 @@ https://kodocode.net/design-css-table/
 ■ VSCode拡張機能
 Live Server
 Live Sass Compiler
+
+問題
+Cannot find module '../../../src/test/test.json'. Consider using '--resolveJsonModule' to import module with '.json' extension.ts(2732)
+解決
+tsconfig.jsonの「"compilerOptions"」に「"resolveJsonModule": true」と「"esModuleInterop": true」を追加する。
