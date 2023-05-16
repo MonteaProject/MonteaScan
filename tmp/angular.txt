@@ -33,7 +33,7 @@ https://kodocode.net/design-css-table/
 Live Server
 Live Sass Compiler
 
-問題
+■ 問題
 Cannot find module '../../../src/test/test.json'. Consider using '--resolveJsonModule' to import module with '.json' extension.ts(2732)
-解決
+■ 解決
 tsconfig.jsonの「"compilerOptions"」に「"resolveJsonModule": true」と「"esModuleInterop": true」を追加する。
