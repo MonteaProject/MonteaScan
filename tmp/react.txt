@@ -28,3 +28,9 @@ v20.2.0
 
 # npm -v
 9.6.6
+
+# npx -v
+9.6.6
+
+chakraUI
+# npm i @chakra-ui/react @emotion/react@^11 @emotion/styled@^11 framer-motion@^6
