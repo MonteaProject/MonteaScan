@@ -1,9 +1,9 @@
 import './globals.scss'
 import { Inter } from 'next/font/google'
-import Provider from './Provider';
-import Header from './Header';
-import Main from './Main';
-import Footer from './Footer';
+import Provider from './provider';
+import Header from './header';
+import Main from './main';
+import Footer from './footer';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,7 +18,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="ja">
+      <head />
       <body className={inter.className}>
         <Provider>
           <Header />
