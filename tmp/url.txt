@@ -30,3 +30,6 @@ https://jvndb.jvn.jp/apis/
 
 JVN iPedia データフィード
 https://jvndb.jvn.jp/ja/feed/#jvndbrss
+
+scss テーブル デザイン
+https://kodocode.net/design-css-table/
