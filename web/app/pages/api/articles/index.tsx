@@ -10,29 +10,29 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     await delay(1500);
-    const articles = JSON.parse(fs.readFileSync("articles.json", "utf8"));
-    articles.articles.sort((a: any, b: any) => {
-      return new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf();
-    });
-    res.status(200).json(articles);
-  } else if (req.method === "POST") {
-    await delay(1000);
-    const { title, content } = req.body;
-    const articles = JSON.parse(fs.readFileSync("articles.json", "utf8"));
-    const id = articles.articles.length + 1;
-    const date = new Date();
-    const slug = randomUUID();
-    const newArticle = {
-      id,
-      title,
-      slug,
-      content,
-      createdAt: date,
-      updatedAt: date,
-    };
-    articles.articles.push(newArticle);
-    fs.writeFileSync("articles.json", JSON.stringify(articles));
-    res.status(201).json(newArticle);
+    const tmp = JSON.parse(fs.readFileSync("jameslist.json", "utf8"));
+    // tmp.hostname.sort((a: any, b: any) => {
+    //   return new Date(b.time).valueOf() - new Date(a.time).valueOf();
+    // });
+    res.status(200).json(tmp);
+  // } else if (req.method === "POST") {
+  //   await delay(1000);
+  //   const { title, content } = req.body;
+  //   const articles = JSON.parse(fs.readFileSync("jameslist.json", "utf8"));
+  //   const id = articles.articles.length + 1;
+  //   const date = new Date();
+  //   const slug = randomUUID();
+  //   const newArticle = {
+  //     id,
+  //     title,
+  //     slug,
+  //     content,
+  //     createdAt: date,
+  //     updatedAt: date,
+  //   };
+  //   articles.articles.push(newArticle);
+  //   fs.writeFileSync("jameslist.json", JSON.stringify(articles));
+  //   res.status(201).json(newArticle);
   } else {
     res.status(405).end();
   }

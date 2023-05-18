@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Article, Comment } from "../../app/types";
+import { Host, Comment } from "../../app/types";
 import { Suspense } from "react";
 
 const getArticle = async (slug: string) => {
@@ -16,7 +16,7 @@ const getArticle = async (slug: string) => {
     }
 
     const data = await res.json();
-    return data as Article;
+    return data as Host;
 };
 
 const getComments =async (slug: string) => {
@@ -44,8 +44,8 @@ export default async function ArticleDetail({
 
         return (
             <div>
-                <h1>{article.title}</h1>
-                <p>{article.content}</p>
+                <h1>{article.hostname}</h1>
+                <p>{article.os}</p>
                 <h2>Comments</h2>
                 <Suspense fallback={<div>Loading comments...</div>}>
                     {/* @ts-expect-error 現状は jsx が Promise を返すと TypeScript が型エラーを報告するが、将来的には解決される */}

@@ -1,10 +1,9 @@
-export type Article = {
-    id: number;
-    title: string;
-    content: string;
+export type Host = {
+    hostname: string;
+    os: string;
+    kernel: string;
     slug: string;
-    createdAt: string;
-    updatedAt: string;
+    time: string;
 };
 
 export type Comment = {
