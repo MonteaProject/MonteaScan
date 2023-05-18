@@ -1,4 +1,3 @@
-import './globals.scss'
 import { Inter } from 'next/font/google'
 import Provider from './provider';
 import Header from './header';
@@ -19,7 +18,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <head />
       <body className={inter.className}>
         <Provider>
           <Header />
@@ -28,5 +26,5 @@ export default function RootLayout({
         </Provider>
       </body>
     </html>
-  )
+  );
 }

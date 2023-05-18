@@ -19,8 +19,8 @@ export default async function Home() {
   const tmp = await getArticles();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="container">
+    <main>
+      <div>
           <Heading as="h1" mb={4}>サーバ一覧</Heading>
           <ServerList articles={tmp} />
       </div>
