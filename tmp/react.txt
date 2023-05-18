@@ -34,3 +34,13 @@ v20.2.0
 
 chakraUI
 # npm i @chakra-ui/react @emotion/react@^11 @emotion/styled@^11 framer-motion@^6
+
+/about
+pages/about
+
+ルーティング
+app/about/page.js
+
+page.tsx ルーティングに対応する UI を定義するファイル
+layout.tsx すべてのページ共通で使われるナビゲーションヘッダーなどに加えて <html> タグや <body> タグを設定する
+loading.js 特殊ファイル ローディング UI
