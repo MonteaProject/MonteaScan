@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import fs from "fs";
+import {readdirSync, readFileSync} from "fs";
 import { randomUUID } from "crypto";
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -10,11 +10,27 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     await delay(1500);
-    const tmp = JSON.parse(fs.readFileSync("jameslist.json", "utf8"));
+
+    let dirList: string[] = new Array();
+    dirList = readdirSync("../../src/vluns_result/", {
+      withFileTypes: true,
+    }).filter(dirent => dirent.isFile()).map(dirent => dirent.name);
+
+    for (let v of dirList) {
+      const file = JSON.parse(readFileSync(`../../src/vluns_result/${v}`, "utf8"));
+      res.status(200).json(file);
+    }
+    
+    // VVV
+    // const file = JSON.parse(readFileSync("../../src/vluns_result/rocky9.localdomain.json", "utf8"));
+
     // tmp.hostname.sort((a: any, b: any) => {
     //   return new Date(b.time).valueOf() - new Date(a.time).valueOf();
     // });
-    res.status(200).json(tmp);
+
+    // VVV
+    // res.status(200).json(file);
+
   // } else if (req.method === "POST") {
   //   await delay(1000);
   //   const { title, content } = req.body;

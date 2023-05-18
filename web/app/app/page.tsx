@@ -11,18 +11,18 @@ async function getArticles() {
   }
 
   const data = await res.json();
-  return data.articles as Host[];
+  return data.detect as Host[];
 }
 
 export default async function Home() {
 
-  const tmp = await getArticles();
+  const f = await getArticles();
 
   return (
     <main>
       <div>
           <Heading as="h1" mb={4}>サーバ一覧</Heading>
-          <ServerList articles={tmp} />
+          <ServerList detect={f} />
       </div>
     </main>
   );

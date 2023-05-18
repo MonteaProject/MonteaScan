@@ -14,7 +14,7 @@ export default function Footer() {
       >
         <Container maxW="5xl" py={4}>
           <VStack justify='center'>
-            <Text as="small">© 2023 MonteaScan by xxx</Text>
+            <Text as="small">© 2023 MonteaProject</Text>
           </VStack>
         </Container>
       </Flex>

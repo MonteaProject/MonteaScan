@@ -6,7 +6,7 @@ $text-color: #141a4e;
 $table-bg-color: #fefefe;
 $table-head-bg-color: #e1e8f2;
 $table-border-color: #edeef2;
-$hover-bg-color: #fb4f83;
+$hover-bg-color: #68D391; //green.300
 $hover-text-color: #ffffff;
 
 @mixin mobile-xxs {
@@ -33,7 +33,6 @@ $hover-text-color: #ffffff;
   }
 }
 
-
 * {
   margin: 0;
   padding: 0;
@@ -41,7 +40,7 @@ $hover-text-color: #ffffff;
 }
 
 html {
-  font-size: 10px;
+  font-size: 9.5px;
 }
 
 body {
@@ -94,6 +93,7 @@ body {
       align-items: center;
       font-weight: 500;
       text-transform: capitalize;
+      font-weight: bold;
     }
   }
   &__body {
@@ -109,6 +109,7 @@ body {
       }
     }
     &__text {
+      font-weight: bold;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -128,8 +129,8 @@ body {
           margin-bottom: 1rem;
         }
       }
-      &--name {
-        font-weight: 600;
+      &--hostname {
+        // font-weight: 600;
         @include min-tablet {
           &::before {
             display: none;
@@ -141,19 +142,19 @@ body {
         }
       }
       &--status,
-      &--types,
-      &--update {
+      &--os,
+      &--kernel {
         @include tablet-to-desktop {
           grid-column: 2/ 3;
         }
       }
-      &--country {
+      &--time {
         @include tablet-to-desktop {
           grid-column: 3/ -1;
         }
       }
-      &--name,
-      &--country {
+      &--hostname,
+      &--time {
         @include tablet-to-desktop {
           grid-row: 2;
         }
