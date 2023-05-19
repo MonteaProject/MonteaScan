@@ -2,6 +2,7 @@ import Image from 'next/image';
 import type { Host } from "./types";
 import ServerList from './components/ServerList';
 import { Heading } from "./common/components";
+import Drawers from './components/Drawer';
 
 async function getServerList() {
   const res = await fetch("http://localhost:3000/api/serverlist/", {cache: "no-store"});
@@ -23,6 +24,7 @@ export default async function Home() {
       <div>
           <Heading as="h1" mb={4}>サーバ一覧</Heading>
           <ServerList detect={f} />
+          <Drawers />
       </div>
     </main>
   );

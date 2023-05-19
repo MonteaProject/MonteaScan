@@ -8,7 +8,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
-    await delay(1500);
+    await delay(1000);
 
     let dirList: string[] = new Array();
     dirList = readdirSync("../../src/vluns_result/", {withFileTypes: true}).filter(dirent => dirent.isFile()).map(dirent => dirent.name);
@@ -25,6 +25,7 @@ export default async function handler(
     // });
 
     // res.status(200).json(file);
+  
   } else {
     res.status(405).end();
   }
