@@ -7,7 +7,7 @@ async function getServerList() {
   const res = await fetch("http://localhost:3000/api/serverlist/", {cache: "no-store"});
 
   if (!res.ok) {
-    throw new Error("Failed to fetch host list...");
+    throw new Error("Failed to fetch server list...");
   }
 
   const data = await res.json();

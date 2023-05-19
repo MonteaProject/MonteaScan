@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'MonteaScan',
-  description: 'MonteaScan by XXX',
+  description: 'MonteaScan by MonteaProject',
 }
 
 export default function RootLayout({

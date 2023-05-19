@@ -14,7 +14,7 @@ const getServerInfo = async (hostname: string) => {
     }
 
     if (!res.ok) {
-        throw new Error("Failed to fetch article");
+        throw new Error("Failed to fetch server infomation...");
     }
 
     const data = await res.json();
@@ -31,7 +31,7 @@ const getHogeHoge = async (hostname: string) => {
     }
 
     if (!res.ok) {
-        throw new Error("Failed to fetch article");
+        throw new Error("Failed to fetch server infomation...");
     }
 
     const data = await res.json();
@@ -48,33 +48,11 @@ export default async function ArticleDetail({
     const hogehogePromise = getHogeHoge(params.hostname);
 
     return (
-        // <div>
-            <Suspense fallback={<div>Loading infomation...</div>}>
-                {/* @ts-expect-error 現状は jsx が Promise を返すと TypeScript が型エラーを報告するが、将来的には解決される */}
-                <Info infoPromises={infoPromise} />
-            </Suspense>
-        // {/* </div> */}
+        <div>
+            {/* @ts-expect-error 現状は jsx が Promise を返すと TypeScript が型エラーを報告するが、将来的には解決される */}
+            <Info infoPromises={infoPromise} />
+        </div>
     );
-
-    // const [info, hogehoge] = await Promise.all([
-    //     infoPromise,
-    //     hogehogePromise,
-    // ]);
-
-    // return (
-    //     <div>
-    //     <h1>{article.title}</h1>
-    //     <p>{article.content}</p>
-    //     <h2>Comments</h2>
-    //     <ul>
-    //         {comments.map((comment) => (
-    //         <li key={comment.id}>{comment.body}</li>
-    //         ))}
-    //     </ul>
-    //     </div>
-    // );
-
-    // const info = await infoPromise;
 }
 
 async function Info ({
@@ -114,17 +92,3 @@ async function Info ({
         </div>
     );
 }
-
-// async function Comments({
-//     commentPromise,
-// }: {
-//     commentPromise: Promise<Comment[]>;
-// }) {
-//     const comments = await commentPromise;
-// return (
-//     <ul>
-//         {comments.map((comment) => (
-//             <li key={comment.id}>{comment.body}</li>
-//         ))}
-//     </ul>
-// );
