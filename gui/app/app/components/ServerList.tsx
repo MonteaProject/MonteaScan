@@ -16,7 +16,7 @@ export default function ServerList({ detect }: { detect: Host[] }) {
                 <th className="responsive-table__head__title responsive-table__head__title--time">最終スキャン時間</th>
             </tr>
           </thead>
-          <NextLink href={`/articles/${d.hostname}`}>
+          <NextLink href={`/select/${d.hostname}`}>
             <tbody className="responsive-table__body">
               <tr className="responsive-table__row">
                 <td className="responsive-table__body__text responsive-table__body__text--hostname">{d.hostname.substring(0, 35)}</td>
