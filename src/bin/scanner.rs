@@ -4,6 +4,7 @@ use std::io::{Read, Write};
 use time::{OffsetDateTime, macros::offset, format_description};
 use serde_json::{Result};
 
+
 #[derive(Deserialize, Serialize, Debug)]
 struct ScanServerList {
     server: Vec<Server>,
@@ -26,15 +27,7 @@ struct ScanResult {
     ip: Vec<String>,
     os: String,
     kernel: String,
-    update: Vec<UpdateList>,
     pkg: Vec<PkgList>
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-struct UpdateList {
-    name: String,
-    ver: String,
-    repo: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -42,7 +35,21 @@ struct PkgList {
     pkgname: String,
     pkgver: String,
     pkgrelease: String,
+    upver: String,
+    uprelease: String,
     pkgarch: String
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+struct Update {
+    update: Vec<UpdateList>
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+struct UpdateList {
+    name: String,
+    ver: String,
+    repo: String
 }
 
 
@@ -131,7 +138,6 @@ fn main() -> Result<()> {
             kernel: kernel,
             hostname: hostname.clone(),
             ip: vec![],
-            update: vec![],
             pkg: vec![]
         };
 
@@ -177,6 +183,10 @@ fn main() -> Result<()> {
         }
 
         // check-update
+        let mut updateinfo = Update {
+            update: vec![]
+        };
+
         let mut sess = Session::new().unwrap();
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
@@ -196,7 +206,7 @@ fn main() -> Result<()> {
                 let name = u[0];
                 let ver  = u[1];
                 let repo = u[2];
-                localinfo.update.push(UpdateList { name: name.to_string(), ver: ver.to_string(), repo: repo.to_string() });
+                updateinfo.update.push(UpdateList { name: name.to_string(), ver: ver.to_string(), repo: repo.to_string() });
             } else {
                 println!("len 3 Failed");
             }
@@ -230,13 +240,47 @@ fn main() -> Result<()> {
                     let ver     = u[2];
                     let release = u[3];
                     let arch    = u[4];
-                    localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), pkgarch: arch.to_string()});
+
+                    let mut a = String::from(name) + "." + arch;
+                    let mut b = Vec::new();
+                    for i in &updateinfo.update {
+                        if a == i.name {
+                            let c: Vec<&str> = i.ver.split("-").collect();
+                            if c.len() == 2 {
+                                b.push(c);
+                            } else {
+                                println!("バージョン番号とリリース番号の分割に失敗しました...");
+                            }
+                        }
+                    }
+                    if b.len() == 0 {
+                        localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: ver.to_string(), uprelease: ver.to_string(), pkgarch: arch.to_string()});
+                    } else {
+                        localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: b[0][0].to_string(), uprelease: b[0][1].to_string(), pkgarch: arch.to_string()});
+                    }
                 } else {
                     let name    = u[0];
                     let ver     = u[1];
                     let release = u[3];
                     let arch    = u[4];
-                    localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), pkgarch: arch.to_string()});
+                    
+                    let mut a = String::from(name) + "." + arch;
+                    let mut b = Vec::new();
+                    for i in &updateinfo.update {
+                        if a == i.name {
+                            let c: Vec<&str> = i.ver.split("-").collect();
+                            if c.len() == 2 {
+                                b.push(c);
+                            } else {
+                                println!("バージョン番号とリリース番号の分割に失敗しました...");
+                            }
+                        }
+                    }
+                    if b.len() == 0 {
+                        localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: ver.to_string(), uprelease: ver.to_string(), pkgarch: arch.to_string()});
+                    } else {
+                        localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: b[0][0].to_string(), uprelease: b[0][1].to_string(), pkgarch: arch.to_string()});
+                    }
                 }
             } else {
                 println!("len 5 Failed");

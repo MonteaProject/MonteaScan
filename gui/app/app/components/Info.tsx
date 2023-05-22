@@ -1,5 +1,5 @@
 "use client";
-import { Host } from "../types";
+import { Host } from "../hostTypes";
 import {
     Drawer,
     DrawerBody,

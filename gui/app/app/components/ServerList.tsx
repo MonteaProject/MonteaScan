@@ -1,5 +1,5 @@
 import './ServerList.scss'
-import { Host } from "../types";
+import { Host } from "../hostTypes";
 import NextLink from "next/link";
 
 async function getServerList() {
