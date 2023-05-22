@@ -26,24 +26,20 @@ export default async function ServerList() {
           <th className="responsive-table__head__title responsive-table__head__title--time">最終スキャン時間</th>
         </tr>
       </thead>
-      {f.map((d) => {
-        return d.detect.map((v: Host) => {
-          return (
-            <NextLink href={`/select/${v.hostname}`}>
+      {f.map((d) => (
+            <NextLink href={`/select/${d.hostname}`}>
               <tbody className="responsive-table__body">
                 <tr className="responsive-table__row">
-                  <td className="responsive-table__body__text responsive-table__body__text--hostname">{v.hostname}</td>
+                  <td className="responsive-table__body__text responsive-table__body__text--hostname">{d.hostname}</td>
                   <td className="responsive-table__body__text responsive-table__body__text--status">
                   <span className="status-indicator status-indicator--active"></span>Active</td>
-                  <td className="responsive-table__body__text responsive-table__body__text--os">{v.os}</td>
-                  <td className="responsive-table__body__text responsive-table__body__text--kernel">{v.kernel}</td>
-                  <td className="responsive-table__body__text responsive-table__body__text--time">{v.time}</td>
+                  <td className="responsive-table__body__text responsive-table__body__text--os">{d.os}</td>
+                  <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.kernel}</td>
+                  <td className="responsive-table__body__text responsive-table__body__text--time">{d.time}</td>
                 </tr>
               </tbody>
             </NextLink>
-          )
-        })
-      })}
+      ))}
     </table>
   );
 }
