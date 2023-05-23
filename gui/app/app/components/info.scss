@@ -60,7 +60,7 @@ body {
   padding: 0 15px;
 }
 
-.responsive-table {
+.responsive-info-table {
   background-color: $table-bg-color;
   border-collapse: collapse;
   border-radius: 10px;
@@ -73,7 +73,7 @@ body {
     border-bottom: 1px solid $table-border-color;
     padding: 0 1.5rem;
     @include min-tablet {
-      grid-template-columns: 2fr 1fr 2fr 2fr 1fr;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
     }
     @include tablet-to-desktop {
       grid-template-columns: 1fr 2fr 1fr;
@@ -97,7 +97,7 @@ body {
     }
   }
   &__body {
-    .responsive-table__row {
+    .responsive-info-table__row {
       transition: 0.1s linear;
       transition-property: color, background;
       &:last-child {

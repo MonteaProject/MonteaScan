@@ -2,9 +2,8 @@ import { notFound } from "next/navigation";
 import { Pkg } from "../../types/pkgTypes";
 import { Suspense } from "react";
 import NextLink from "next/link";
-import './page.scss'
-
 import Info from "../../components/info";
+
 
 const getServerInfo = async (hostname: string) => {
     const res = await fetch(
