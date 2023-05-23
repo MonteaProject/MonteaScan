@@ -1,7 +1,7 @@
 /.vscode
 src/config/
 src/scan_result/
-src/vluns_result/
+src/vulns_result/
 target/
 tmp/cert/
 app/.vscode

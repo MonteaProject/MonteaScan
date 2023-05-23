@@ -6,34 +6,28 @@ use std::io::{BufReader, Write};
 use time::{OffsetDateTime, macros::offset, format_description};
 
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct ScanResult {
     time: String,
     hostname: String,
     ip: Vec<String>,
     os: String,
     kernel: String,
-    update: Vec<UpdateList>,
     pkg: Vec<PkgList>
 }
 
-#[derive(Deserialize, Serialize, Debug)]
-struct UpdateList {
-    name: String,
-    ver: String,
-    repo: String
-}
-
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct PkgList {
     pkgname: String,
     pkgver: String,
     pkgrelease: String,
+    upver: String,
+    uprelease: String,
     pkgarch: String
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct VlunsList {
+struct VulnsList {
     detect: Vec<VlunsDetect>
 }
 
@@ -206,7 +200,7 @@ async fn main() -> Result<()> {
     for f in file_vec {
         println!("load file: {:?}", f);
 
-        let mut vluns_l = VlunsList {
+        let mut vulns_list = VulnsList {
             detect: vec![]
         };
 
@@ -294,7 +288,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -359,7 +353,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -448,7 +442,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -513,7 +507,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -602,7 +596,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -667,7 +661,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -756,7 +750,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -821,7 +815,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -910,7 +904,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -975,7 +969,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -1064,7 +1058,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -1129,7 +1123,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -1218,7 +1212,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -1283,7 +1277,7 @@ async fn main() -> Result<()> {
                                                 oval: d.clone()
                                             };
 
-                                            vluns_l.detect.push(vluns);
+                                            vulns_list.detect.push(vluns);
                                         }
                                     }
                                 }
@@ -1301,11 +1295,11 @@ async fn main() -> Result<()> {
         let d_file: Vec<&str> = f.split("/").collect();
         let d_index = d_file.len()-1;
 
-        std::fs::create_dir_all("./src/vluns_result").unwrap();
+        std::fs::create_dir_all("./src/vulns_result").unwrap();
         let filename = String::from(d_file[d_index]);
-        let dir = String::from("./src/vluns_result/") + &filename;
+        let dir = String::from("./src/vulns_result/") + &filename;
 
-        let serialized = serde_json::to_string(&vluns_l).unwrap();
+        let serialized = serde_json::to_string(&vulns_list).unwrap();
         let mut w = std::fs::OpenOptions::new()
             .write(true)
             .create(true)

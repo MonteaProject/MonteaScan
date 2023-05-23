@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Host } from "../../types";
+import { Host } from "../../hostTypes";
 import { Suspense } from "react";
 import NextLink from "next/link";
 import './page.scss'

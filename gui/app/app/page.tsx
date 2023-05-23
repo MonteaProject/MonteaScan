@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import type { Host } from "./types";
+import type { Host } from "./hostTypes";
 import ServerList from './components/ServerList';
 import { Heading } from "./common/components";
 
