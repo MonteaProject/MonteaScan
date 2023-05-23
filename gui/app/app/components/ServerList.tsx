@@ -1,5 +1,5 @@
 import './ServerList.scss'
-import { Host } from "../hostTypes";
+import { Host } from "../types/hostTypes";
 import NextLink from "next/link";
 
 async function getServerList() {
@@ -27,18 +27,18 @@ export default async function ServerList() {
         </tr>
       </thead>
       {f.map((d) => (
-            <NextLink href={`/select/${d.hostname}`}>
-              <tbody className="responsive-table__body">
-                <tr className="responsive-table__row">
-                  <td className="responsive-table__body__text responsive-table__body__text--hostname">{d.hostname}</td>
-                  <td className="responsive-table__body__text responsive-table__body__text--status">
-                  <span className="status-indicator status-indicator--active"></span>Active</td>
-                  <td className="responsive-table__body__text responsive-table__body__text--os">{d.os}</td>
-                  <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.kernel}</td>
-                  <td className="responsive-table__body__text responsive-table__body__text--time">{d.time}</td>
-                </tr>
-              </tbody>
-            </NextLink>
+      <tbody className="responsive-table__body">
+        <NextLink href={`/select/${d.hostname}`}>
+        <tr className="responsive-table__row">
+          <td className="responsive-table__body__text responsive-table__body__text--hostname">{d.hostname.substring(0, 35)}</td>
+          <td className="responsive-table__body__text responsive-table__body__text--status">
+          <span className="status-indicator status-indicator--active"></span>Active</td>
+          <td className="responsive-table__body__text responsive-table__body__text--os">{d.os.substring(0, 35)}</td>
+          <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.kernel.substring(0, 35)}</td>
+          <td className="responsive-table__body__text responsive-table__body__text--time">{d.time}</td>
+        </tr>
+        </NextLink>
+      </tbody>
       ))}
     </table>
   );

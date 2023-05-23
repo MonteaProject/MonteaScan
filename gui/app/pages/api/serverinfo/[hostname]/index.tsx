@@ -11,10 +11,13 @@ export default async function handler (
   if (req.method === "GET") {
     await delay(1000);
     
-    const file = JSON.parse(readFileSync(`../../src/vulns_result/${hostname}.json`, "utf8"));   
+    const file = JSON.parse(readFileSync(`../../src/scan_result/${hostname}.json`, "utf8"));
+    
     if (!file) {
       res.status(404).end();
     }
+
+    console.log(file);
 
     res.status(200).json(file);
   }

@@ -1,5 +1,5 @@
 "use client";
-import { Host } from "../hostTypes";
+import { Pkg } from "../types/pkgTypes";
 import {
     Drawer,
     DrawerBody,
@@ -11,7 +11,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react';
 
-export default async function Info ({ infoPromises }: { infoPromises: Host[] }) {
+export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
     const info = infoPromises;
 
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -21,31 +21,32 @@ export default async function Info ({ infoPromises }: { infoPromises: Host[] }) 
 
     return (
         <div>
-            {info.map((d) => (
-                <table className="responsive-table">
+            <table className="responsive-table">
                 <thead className="responsive-table__head">
                     <tr className="responsive-table__row">
-                        <th className="responsive-table__head__title responsive-table__head__title--hostname">ホスト名</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--status">ステータス</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--os">OS</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--kernel">カーネル</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--time">最終スキャン時間</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--hostname">パッケージ名称</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--status">現行バージョン番号</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--os">現行リリース番号</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--kernel">最新バージョン番号</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--kernel">最新リリース番号</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--kernel">アーキテクチャ</th>
                     </tr>
                 </thead>
-                    <tbody className="responsive-table__body">
+                {info.map((d) => (
+                <tbody className="responsive-table__body">
                     <button onClick={() => handleClick()}>
-                        <tr className="responsive-table__row">
-                            <td className="responsive-table__body__text responsive-table__body__text--hostname">{d.hostname.substring(0, 35)}</td>
-                            <td className="responsive-table__body__text responsive-table__body__text--status">
-                            <span className="status-indicator status-indicator--active"></span>Active</td>
-                            <td className="responsive-table__body__text responsive-table__body__text--os">{d.os.substring(0, 35)}</td>
-                            <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.kernel.substring(0, 35)}</td>
-                            <td className="responsive-table__body__text responsive-table__body__text--time">{d.time}</td>
-                        </tr>
+                    <tr className="responsive-table__row">
+                        <td className="responsive-table__body__text responsive-table__body__text--hostname">{d.pkgname.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--os">{d.pkgver.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.pkgrelease.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.upver.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.uprelease.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--time">{d.pkgarch.substring(0, 35)}</td>
+                    </tr>
                     </button>
-                    </tbody>
-                </table>
-            ))}
+                </tbody>
+                ))}
+            </table>
             <Drawer onClose={onClose} isOpen={isOpen} size="xl">
                 <DrawerOverlay />
                 <DrawerContent>
