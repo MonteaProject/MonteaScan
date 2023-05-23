@@ -7,7 +7,7 @@ import Info from "../../components/info";
 
 const getServerInfo = async (hostname: string) => {
     const res = await fetch(
-        `http://localhost:3000/api/serverinfo/${hostname}`, {cache: "no-store"}
+        `http://localhost:3000/api/serverInfo/${hostname}`, {cache: "no-store"}
     );
 
     if (res.status === 404) {

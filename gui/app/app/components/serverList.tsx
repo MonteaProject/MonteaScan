@@ -3,7 +3,7 @@ import { Host } from "../types/hostTypes";
 import NextLink from "next/link";
 
 async function getServerList() {
-  const res = await fetch("http://localhost:3000/api/serverlist/", {cache: "no-store"});
+  const res = await fetch("http://localhost:3000/api/serverList/", {cache: "no-store"});
 
   if (!res.ok) {
     throw new Error("Failed to fetch server list...");
