@@ -10,6 +10,7 @@ import {
     DrawerCloseButton,
     useDisclosure
 } from '@chakra-ui/react';
+import "./info.scss"
 
 export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
     const info = infoPromises;
@@ -24,28 +25,28 @@ export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
             <table className="responsive-table">
                 <thead className="responsive-table__head">
                     <tr className="responsive-table__row">
-                        <th className="responsive-table__head__title responsive-table__head__title--hostname">パッケージ名称</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--status">現行バージョン番号</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--os">現行リリース番号</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--kernel">最新バージョン番号</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--kernel">最新リリース番号</th>
-                        <th className="responsive-table__head__title responsive-table__head__title--kernel">アーキテクチャ</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--pkgname">パッケージ名称</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--pkgver">現行バージョン番号</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--pkgrelease">現行リリース番号</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--upver">最新バージョン番号</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--uprelease">最新リリース番号</th>
+                        <th className="responsive-table__head__title responsive-table__head__title--pkgarch">アーキテクチャ</th>
                     </tr>
                 </thead>
+                <button onClick={() => handleClick()}>
                 {info.map((d) => (
                 <tbody className="responsive-table__body">
-                    <button onClick={() => handleClick()}>
                     <tr className="responsive-table__row">
-                        <td className="responsive-table__body__text responsive-table__body__text--hostname">{d.pkgname.substring(0, 35)}</td>
-                        <td className="responsive-table__body__text responsive-table__body__text--os">{d.pkgver.substring(0, 35)}</td>
-                        <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.pkgrelease.substring(0, 35)}</td>
-                        <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.upver.substring(0, 35)}</td>
-                        <td className="responsive-table__body__text responsive-table__body__text--kernel">{d.uprelease.substring(0, 35)}</td>
-                        <td className="responsive-table__body__text responsive-table__body__text--time">{d.pkgarch.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--pkgname">{d.pkgname.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--pkgver">{d.pkgver.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--pkgrelease">{d.pkgrelease.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--upver">{d.upver.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--uprelease">{d.uprelease.substring(0, 35)}</td>
+                        <td className="responsive-table__body__text responsive-table__body__text--pkgarch">{d.pkgarch.substring(0, 35)}</td>
                     </tr>
-                    </button>
                 </tbody>
                 ))}
+                </button>
             </table>
             <Drawer onClose={onClose} isOpen={isOpen} size="xl">
                 <DrawerOverlay />

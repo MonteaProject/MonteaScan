@@ -1,8 +1,7 @@
 import Image from 'next/image';
 import type { Host } from "./types/hostTypes";
-import ServerList from './components/ServerList';
+import ServerList from './components/serverList';
 import { Heading } from "./common/components";
-
 
 export default async function Home() {
   return (

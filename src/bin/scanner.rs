@@ -253,8 +253,8 @@ fn main() -> Result<()> {
                             }
                         }
                     }
-                    if b.len() == 0 {
-                        localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: ver.to_string(), uprelease: ver.to_string(), pkgarch: arch.to_string()});
+                    if b.is_empty() == true {
+                        localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: ver.to_string(), uprelease: release.to_string(), pkgarch: arch.to_string()});
                     } else {
                         localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: b[0][0].to_string(), uprelease: b[0][1].to_string(), pkgarch: arch.to_string()});
                     }
@@ -276,8 +276,8 @@ fn main() -> Result<()> {
                             }
                         }
                     }
-                    if b.len() == 0 {
-                        localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: ver.to_string(), uprelease: ver.to_string(), pkgarch: arch.to_string()});
+                    if b.is_empty() == true {
+                        localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: ver.to_string(), uprelease: release.to_string(), pkgarch: arch.to_string()});
                     } else {
                         localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), upver: b[0][0].to_string(), uprelease: b[0][1].to_string(), pkgarch: arch.to_string()});
                     }

@@ -129,7 +129,7 @@ body {
           margin-bottom: 1rem;
         }
       }
-      &--hostname {
+      &--pkgname {
         // font-weight: 600;
         @include min-tablet {
           &::before {
@@ -141,20 +141,21 @@ body {
           flex-direction: column;
         }
       }
-      &--status,
-      &--os,
-      &--kernel {
+      &--pkgver,
+      &--pkgrelease,
+      &--upver,
+      &--uprelease {
         @include tablet-to-desktop {
           grid-column: 2/ 3;
         }
       }
-      &--time {
+      &--pkgarch {
         @include tablet-to-desktop {
           grid-column: 3/ -1;
         }
       }
-      &--hostname,
-      &--time {
+      &--pkgname,
+      &--pkgarch {
         @include tablet-to-desktop {
           grid-row: 2;
         }

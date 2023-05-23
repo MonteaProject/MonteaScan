@@ -1,4 +1,4 @@
-import './ServerList.scss'
+import './serverList.scss'
 import { Host } from "../types/hostTypes";
 import NextLink from "next/link";
 

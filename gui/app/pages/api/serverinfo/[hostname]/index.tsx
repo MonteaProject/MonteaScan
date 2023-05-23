@@ -17,8 +17,6 @@ export default async function handler (
       res.status(404).end();
     }
 
-    console.log(file);
-
     res.status(200).json(file);
   }
 }
