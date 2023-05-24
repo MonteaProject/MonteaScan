@@ -34,6 +34,7 @@ v20.2.0
 
 chakraUI
 # npm i @chakra-ui/react @emotion/react@^11 @emotion/styled@^11 framer-motion@^6
+# npm i @chakra-ui/react @emotion/react @emotion/styled framer-motion
 
 /about
 pages/about
