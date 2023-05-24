@@ -5,4 +5,4 @@ export type Pkg = {
     upver: string,
     uprelease: string,
     pkgarch: string
-}
+};

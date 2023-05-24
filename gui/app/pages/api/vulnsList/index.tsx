@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import {readdirSync, readFileSync} from "fs";
+import { Detects } from "../../../app/types/cveTypes";
+import { Impact } from "../../../app/types/impactTypes";
 
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -14,14 +16,48 @@ export default async function handler(
     let dirList: string[] = new Array();
     dirList = readdirSync("../../src/vulns_result/", {withFileTypes: true}).filter(dirent => dirent.isFile()).map(dirent => dirent.name);
 
-    let files = new Array();
+    let impactList: Impact[] = new Array();
+
+    let total = 0;
+    let critical = 0;
+    let important = 0;
+    let moderate = 0;
+    let low = 0;
 
     for (let v of dirList) {
-      const file = JSON.parse(readFileSync(`../../src/vulns_result/${v}`, "utf8"));
-      files.push(file);
+      const json = JSON.parse(readFileSync(`../../src/vulns_result/${v}`, "utf8")) as Detects;
+      for(let i = 0; i < json.detect.length; i++) {
+        for(let c = 0; c < json.detect[i].oval.length; c++) {
+          for(let p = 0; p < json.detect[i].oval[c].metadata.advisory.cve.length; p++) {
+            if (json.detect[i].oval[c].metadata.advisory.cve[p]["@impact"] === "critical") {
+              critical += 1;
+            } else if (json.detect[i].oval[c].metadata.advisory.cve[p]["@impact"] === "important") {
+              important += 1;
+            } else if (json.detect[i].oval[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
+              moderate += 1;
+            } else if (json.detect[i].oval[c].metadata.advisory.cve[p]["@impact"] === "low") {
+              low += 1;
+            } else {
+              console.log("新たなImpactが追加されています...");
+            }
+          }
+        }
+      }
     }
 
-    return res.status(200).json(files);
+    total = critical + important + moderate + low;
+
+    let impact: Impact = {
+      total: total,
+      critical: critical,
+      important: important,
+      moderate: moderate,
+      low: low
+    };
+    
+    impactList.push(impact);
+
+    return res.status(200).json(impactList);
 
   } else {
     res.status(405).end();
