@@ -1,6 +1,5 @@
-import { Impact } from "../types/impactTypes";
+import { VulnsList } from "../types/impactTypes";
 import NextLink from "next/link";
-import { CircularProgress, CircularProgressLabel } from "../common/components";
 import {
   Stat,
   StatLabel,
@@ -8,6 +7,8 @@ import {
   StatHelpText,
   StatArrow,
   StatGroup,
+  CircularProgress,
+  CircularProgressLabel
 } from "../common/components";
 
 async function getVulnsList() {
@@ -18,126 +19,131 @@ async function getVulnsList() {
   }
 
   const data = await res.json();
-  return data as Impact[];
+  return data as VulnsList;
 }
 
 type decrease = any;
 
 export default async function VulnsList() {
   const v = await getVulnsList();
+  const v1 = v.impact;
+  const v2 = v.sum;
 
   let a: number = 30;
   let c: decrease = "increase";
 
   return (
     <div>
-      {v.map((d) => (
-        <div>
-          <StatGroup mb={4}>
-            <Stat>
-              <StatLabel>Total</StatLabel>
-              <CircularProgress value={a} size='140px' thickness='10px' color='green.400'>
-                <CircularProgressLabel>{d.total}</CircularProgressLabel>
-              </CircularProgress>
-              <StatHelpText>
-                <StatArrow type={c} />
-                前回差異: 23件
-              </StatHelpText>
-            </Stat>
-            
-            <Stat>
-              <StatLabel>Critical</StatLabel>
-              <CircularProgress value={a} size='140px' thickness='10px' color='red.700'>
-                <CircularProgressLabel>{d.critical}</CircularProgressLabel>
-              </CircularProgress>
-              <StatHelpText>
-                <StatArrow type='decrease' />
-                前回差異: 23件
-              </StatHelpText>
-            </Stat>
+      <div>
+        {v2.map((s) => (
+        <StatGroup mb={4}>
+          <Stat>
+            <StatLabel>Total</StatLabel>
+            <CircularProgress value={a} size='140px' thickness='10px' color='green.400'>
+              <CircularProgressLabel>{s.total_sum}</CircularProgressLabel>
+            </CircularProgress>
+            <StatHelpText>
+              <StatArrow type={c} />
+              前回差異: 23件
+            </StatHelpText>
+          </Stat>
           
-            <Stat>
-              <StatLabel>High</StatLabel>
-              <CircularProgress value={a} size='140px' thickness='10px' color='orange.400'>
-                <CircularProgressLabel>{d.important}</CircularProgressLabel>
-              </CircularProgress>
-              <StatHelpText>
-                <StatArrow type='increase' />
-                前回差異: -23件
-              </StatHelpText>
-            </Stat>
+          <Stat>
+            <StatLabel>Critical</StatLabel>
+            <CircularProgress value={a} size='140px' thickness='10px' color='red.700'>
+              <CircularProgressLabel>{s.critical_sum}</CircularProgressLabel>
+            </CircularProgress>
+            <StatHelpText>
+              <StatArrow type='decrease' />
+              前回差異: 23件
+            </StatHelpText>
+          </Stat>
+        
+          <Stat>
+            <StatLabel>High</StatLabel>
+            <CircularProgress value={a} size='140px' thickness='10px' color='orange.400'>
+              <CircularProgressLabel>{s.important_sum}</CircularProgressLabel>
+            </CircularProgress>
+            <StatHelpText>
+              <StatArrow type='increase' />
+              前回差異: -23件
+            </StatHelpText>
+          </Stat>
 
-            <Stat>
-              <StatLabel>Medium</StatLabel>
-              <CircularProgress value={a} size='140px' thickness='10px' color='yellow.400'>
-                <CircularProgressLabel>{d.moderate}</CircularProgressLabel>
-              </CircularProgress>
-              <StatHelpText>
-                <StatArrow type='increase' />
-                前回差異: -23件
-              </StatHelpText>
-            </Stat>
+          <Stat>
+            <StatLabel>Medium</StatLabel>
+            <CircularProgress value={a} size='140px' thickness='10px' color='yellow.400'>
+              <CircularProgressLabel>{s.moderate_sum}</CircularProgressLabel>
+            </CircularProgress>
+            <StatHelpText>
+              <StatArrow type='increase' />
+              前回差異: -23件
+            </StatHelpText>
+          </Stat>
 
-            <Stat>
-              <StatLabel>Low</StatLabel>
-              <CircularProgress value={a} size='140px' thickness='10px' color='blue.400'>
-                <CircularProgressLabel>{d.low}</CircularProgressLabel>
-              </CircularProgress>
-              <StatHelpText>
-                <StatArrow type='increase' />
-                前回差異: -23件
-              </StatHelpText>
-            </Stat>
-          </StatGroup>
-
-          <StatGroup>
-            <Stat>
-              <StatLabel>{d.hostname}</StatLabel>
-              <StatNumber>{d.total}</StatNumber>
-              <StatHelpText>
-                <StatArrow type={c} />
-                前回差異: 23件
-              </StatHelpText>
-            </Stat>
-            
-            <Stat>
-              <StatLabel>{d.hostname}</StatLabel>
-              <StatNumber>{d.critical}</StatNumber>
-              <StatHelpText>
-                <StatArrow type='decrease' />
-                前回差異: 23件
-              </StatHelpText>
-            </Stat>
+          <Stat>
+            <StatLabel>Low</StatLabel>
+            <CircularProgress value={a} size='140px' thickness='10px' color='blue.400'>
+              <CircularProgressLabel>{s.low_sum}</CircularProgressLabel>
+            </CircularProgress>
+            <StatHelpText>
+              <StatArrow type='increase' />
+              前回差異: -23件
+            </StatHelpText>
+          </Stat>
+        </StatGroup>
+        ))}
+      </div>
+      <div>
+        {v1.map((d) => (
+        <StatGroup>
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <StatNumber>{d.total}</StatNumber>
+            <StatHelpText>
+              <StatArrow type={c} />
+              前回差異: 23件
+            </StatHelpText>
+          </Stat>
           
-            <Stat>
-              <StatLabel>{d.hostname}</StatLabel>
-              <StatNumber>{d.important}</StatNumber>
-              <StatHelpText>
-                <StatArrow type='increase' />
-                前回差異: -23件
-              </StatHelpText>
-            </Stat>
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <StatNumber>{d.critical}</StatNumber>
+            <StatHelpText>
+              <StatArrow type='decrease' />
+              前回差異: 23件
+            </StatHelpText>
+          </Stat>
+        
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <StatNumber>{d.important}</StatNumber>
+            <StatHelpText>
+              <StatArrow type='increase' />
+              前回差異: -23件
+            </StatHelpText>
+          </Stat>
 
-            <Stat>
-              <StatLabel>{d.hostname}</StatLabel>
-              <StatNumber>{d.moderate}</StatNumber>
-              <StatHelpText>
-                <StatArrow type='increase' />
-                前回差異: -23件
-              </StatHelpText>
-            </Stat>
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <StatNumber>{d.moderate}</StatNumber>
+            <StatHelpText>
+              <StatArrow type='increase' />
+              前回差異: -23件
+            </StatHelpText>
+          </Stat>
 
-            <Stat>
-              <StatLabel>{d.hostname}</StatLabel>
-              <StatNumber>{d.low}</StatNumber>
-              <StatHelpText>
-                <StatArrow type='increase' />
-                前回差異: -23件
-              </StatHelpText>
-            </Stat>
-          </StatGroup>
-        </div>
-      ))}
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <StatNumber>{d.low}</StatNumber>
+            <StatHelpText>
+              <StatArrow type='increase' />
+              前回差異: -23件
+            </StatHelpText>
+          </Stat>
+        </StatGroup>
+        ))}
+      </div>
     </div>
   );
 }
