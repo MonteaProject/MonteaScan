@@ -12,7 +12,7 @@ export default function Footer() {
         borderStyle="solid"
         borderColor="gray.200"
       >
-        <Container maxW="5xl" py={4}>
+        <Container maxW="5xl" py={1}>
           <VStack justify='center'>
             <Text as="small">© 2023 MonteaProject</Text>
           </VStack>

@@ -14,7 +14,7 @@ export default function Header() {
         borderColor="gray.200"
       >
         <Flex flex={1} justify="space-between" maxW="8xl" mx="auto">
-          <Heading as="h1" size="lg">
+          <Heading as='h4' size='md' fontFamily='Menlo'>
             <NextLink href="/">MonteaScan</NextLink>
           </Heading>
         </Flex>

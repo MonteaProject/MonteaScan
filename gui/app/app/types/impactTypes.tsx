@@ -1,4 +1,5 @@
 export type Impact = {
+    hostname: string,
     total: number,
     critical: number,
     important: number,
