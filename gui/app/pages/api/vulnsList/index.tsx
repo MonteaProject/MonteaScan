@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import {fstat, readdirSync, readFileSync, writeFileSync} from "fs";
+import {existsSync, fstat, mkdirSync, readdirSync, readFileSync, writeFileSync} from "fs";
 import { Detects } from "../../../app/types/cveTypes";
 import { Impact, VulnsList, Sum, Diff, HostDiff } from "../../../app/types/impactTypes";
 import { arrayBuffer } from "stream/consumers";
@@ -65,6 +65,7 @@ export default async function handler(
         } else {
           let hostname = "null";
           let total = 0;
+          let total_diff = 0;
           let critical = 0;
           let important = 0;
           let moderate = 0;
@@ -94,6 +95,7 @@ export default async function handler(
           let hostDiff: HostDiff[] = new Array();
           try {
             const save = JSON.parse(readFileSync(`../../save/${v}`, "utf8"));
+            total = critical + important + moderate + low;
             let totalHostDiff = total - save.lastVulnsCount.total_diff
             let criticalHostDiff = critical - save.lastVulnsCount.critical_diff
             let importantHostDiff = important - save.lastVulnsCount.important_diff
@@ -108,6 +110,9 @@ export default async function handler(
               low_diff: low
             }
             let tmp3 = JSON.stringify({lastVulnsCount: tmp2});
+            if (!existsSync("../../save/")) {
+              mkdirSync("../../save/");
+            }
             writeFileSync(`../../save/${v}`, tmp3);
 
             let tmp0: HostDiff = {
@@ -128,14 +133,18 @@ export default async function handler(
               low_diff: 0
             }
             let tmp3 = JSON.stringify({lastVulnsCount: tmp2});
+            if (!existsSync("../../save/")) {
+              mkdirSync("../../save/");
+            }
             writeFileSync(`../../save/${v}`, tmp3);
 
+            total_diff = critical + important + moderate + low;
             let tmp0: HostDiff = {
-              totalHostDiff: 0,
-              criticalHostDiff: 0,
-              importantHostDiff: 0,
-              moderateHostDiff: 0,
-              lowHostDiff: 0
+              totalHostDiff: total_diff,
+              criticalHostDiff: critical,
+              importantHostDiff: important,
+              moderateHostDiff: moderate,
+              lowHostDiff: low
             }
             hostDiff.push(tmp0);
           }
@@ -164,12 +173,12 @@ export default async function handler(
       vulnsCount.push(count);
 
       try {
-        const lastVulnsCount = JSON.parse(readFileSync("../../save/vlunsCount.json", "utf8")) as Diff[];
-        let t = total_sum - lastVulnsCount[0].total_diff;
-        let c = critical_sum - lastVulnsCount[0].critical_diff;
-        let i = important_sum - lastVulnsCount[0].important_diff;
-        let m = moderate_sum - lastVulnsCount[0].moderate_diff;
-        let l = low_sum - lastVulnsCount[0].low_diff;
+        const bbb = JSON.parse(readFileSync("../../save/vulnsCount.json", "utf8"));
+        let t = total_sum - bbb.lastVulnsCount.total_diff;
+        let c = critical_sum - bbb.lastVulnsCount.critical_diff;
+        let i = important_sum - bbb.lastVulnsCount.important_diff;
+        let m = moderate_sum - bbb.lastVulnsCount.moderate_diff;
+        let l = low_sum - bbb.lastVulnsCount.low_diff;
 
         let vulnsC: Diff = {
           total_diff: t,
@@ -187,27 +196,25 @@ export default async function handler(
           moderate_diff: moderate_sum,
           low_diff: low_sum
         }
-        lastCount.push(newVulnsC);
-        let vc_json = JSON.stringify({lastVulnsCount: lastCount});
-        writeFileSync("../../save/vlunsCount.json", vc_json);
-      } catch {
-        let total_diff = 0;
-        let critical_diff = 0;
-        let important_diff = 0;
-        let moderate_diff = 0;
-        let low_diff = 0;
-
-        let vulnsC: Diff = {
-          total_diff: total_diff,
-          critical_diff: critical_diff,
-          important_diff: important_diff,
-          moderate_diff: moderate_diff,
-          low_diff: low_diff
+        let aaa = JSON.stringify({lastVulnsCount: newVulnsC});
+        if (!existsSync("../../save/")) {
+          mkdirSync("../../save/");
         }
-        lastCount.push(vulnsC);
+        writeFileSync("../../save/vulnsCount.json", aaa);
+      } catch (e) {
+        let vulnsC: Diff = {
+          total_diff: total_sum,
+          critical_diff: critical_sum,
+          important_diff: important_sum,
+          moderate_diff: moderate_sum,
+          low_diff: low_sum
+        }
         lastCountData.push(vulnsC);
-        let vc_json = JSON.stringify({lastVulnsCount: lastCount});
-        writeFileSync("../../save/vlunsCount.json", vc_json);
+        let aaa = JSON.stringify({lastVulnsCount: vulnsC});
+        if (!existsSync("../../save/")) {
+          mkdirSync("../../save/");
+        }
+        writeFileSync("../../save/vulnsCount.json", aaa);
       }
     }
 
@@ -216,7 +223,6 @@ export default async function handler(
       sum: vulnsCount,
       last: lastCountData
     }
-
     return res.status(200).json(vulns);
 
   } else {

@@ -105,116 +105,113 @@ export default async function VulnsList() {
 
   return (
     <Box>
-      <Box>
-        {v2.map((s) => (
-        <StatGroup mb={4}>
-          <Stat>
-            <StatLabel>Total</StatLabel>
-            <CircularProgress max={total_per} value={total_per} size='140px' thickness='10px' color='green.400'>
-              <CircularProgressLabel>{s.total_sum}</CircularProgressLabel>
-            </CircularProgress>
-            <StatHelpText>
-              {icon1}
-              前回差異: {v3[0].total_diff}件
-            </StatHelpText>
-          </Stat>
-          
-          <Stat>
-            <StatLabel>Critical</StatLabel>
-            <CircularProgress max={total_per} value={critical_per} size='140px' thickness='10px' color='red.700'>
-              <CircularProgressLabel>{s.critical_sum}</CircularProgressLabel>
-            </CircularProgress>
-            <StatHelpText>
-              {icon2}
-              前回差異: {v3[0].critical_diff}件
-            </StatHelpText>
-          </Stat>
+      {v2.map((s) => (
+      <StatGroup mb={4}>
+        <Stat>
+          <StatLabel>Total</StatLabel>
+          <CircularProgress max={total_per} value={total_per} size='140px' thickness='10px' color='green.400'>
+            <CircularProgressLabel>{s.total_sum}</CircularProgressLabel>
+          </CircularProgress>
+          <StatHelpText>
+            {icon1}
+            前回差異: {v3[0].total_diff}件
+          </StatHelpText>
+        </Stat>
         
-          <Stat>
-            <StatLabel>High</StatLabel>
-            <CircularProgress max={total_per} value={important_per} size='140px' thickness='10px' color='orange.400'>
-              <CircularProgressLabel>{s.important_sum}</CircularProgressLabel>
-            </CircularProgress>
-            <StatHelpText>
-              {icon3}
-              前回差異: {v3[0].important_diff}件
-            </StatHelpText>
-          </Stat>
+        <Stat>
+          <StatLabel>Critical</StatLabel>
+          <CircularProgress max={total_per} value={critical_per} size='140px' thickness='10px' color='red.700'>
+            <CircularProgressLabel>{s.critical_sum}</CircularProgressLabel>
+          </CircularProgress>
+          <StatHelpText>
+            {icon2}
+            前回差異: {v3[0].critical_diff}件
+          </StatHelpText>
+        </Stat>
+      
+        <Stat>
+          <StatLabel>High</StatLabel>
+          <CircularProgress max={total_per} value={important_per} size='140px' thickness='10px' color='orange.400'>
+            <CircularProgressLabel>{s.important_sum}</CircularProgressLabel>
+          </CircularProgress>
+          <StatHelpText>
+            {icon3}
+            前回差異: {v3[0].important_diff}件
+          </StatHelpText>
+        </Stat>
 
-          <Stat>
-            <StatLabel>Medium</StatLabel>
-            <CircularProgress max={total_per} value={moderate_per} size='140px' thickness='10px' color='yellow.400'>
-              <CircularProgressLabel>{s.moderate_sum}</CircularProgressLabel>
-            </CircularProgress>
-            <StatHelpText>
-              {icon4}
-              前回差異: {v3[0].moderate_diff}件
-            </StatHelpText>
-          </Stat>
+        <Stat>
+          <StatLabel>Medium</StatLabel>
+          <CircularProgress max={total_per} value={moderate_per} size='140px' thickness='10px' color='yellow.400'>
+            <CircularProgressLabel>{s.moderate_sum}</CircularProgressLabel>
+          </CircularProgress>
+          <StatHelpText>
+            {icon4}
+            前回差異: {v3[0].moderate_diff}件
+          </StatHelpText>
+        </Stat>
 
-          <Stat>
-            <StatLabel>Low</StatLabel>
-            <CircularProgress max={total_per} value={low_per} size='140px' thickness='10px' color='blue.400'>
-              <CircularProgressLabel>{s.low_sum}</CircularProgressLabel>
-            </CircularProgress>
-            <StatHelpText>
-              {icon5}
-              前回差異: {v3[0].low_diff}件
-            </StatHelpText>
-          </Stat>
-        </StatGroup>
-        ))}
-      </Box>
-      <Box>
-        {v1.map((d) => (
-        <StatGroup>
-          <Stat>
-            <StatLabel>{d.hostname}</StatLabel>
-            <StatNumber>{d.total}</StatNumber>
-            <StatHelpText>
-              <Judg isNew={d.hostDiff[0].totalHostDiff} />
-              前回差異: {d.hostDiff[0].totalHostDiff}件
-            </StatHelpText>
-          </Stat>
-          
-          <Stat>
-            <StatLabel>{d.hostname}</StatLabel>
-            <StatNumber>{d.critical}</StatNumber>
-            <StatHelpText>
-              <Judg isNew={d.hostDiff[0].criticalHostDiff} />
-              前回差異: {d.hostDiff[0].criticalHostDiff}件
-            </StatHelpText>
-          </Stat>
+        <Stat>
+          <StatLabel>Low</StatLabel>
+          <CircularProgress max={total_per} value={low_per} size='140px' thickness='10px' color='blue.400'>
+            <CircularProgressLabel>{s.low_sum}</CircularProgressLabel>
+          </CircularProgress>
+          <StatHelpText>
+            {icon5}
+            前回差異: {v3[0].low_diff}件
+          </StatHelpText>
+        </Stat>
+      </StatGroup>
+      ))}
+      
+      {v1.map((d) => (
+      <StatGroup>
+        <Stat>
+          <StatLabel>{d.hostname}</StatLabel>
+          <StatNumber>{d.total}</StatNumber>
+          <StatHelpText>
+            <Judg isNew={d.hostDiff[0].totalHostDiff} />
+            前回差異: {d.hostDiff[0].totalHostDiff}件
+          </StatHelpText>
+        </Stat>
         
-          <Stat>
-            <StatLabel>{d.hostname}</StatLabel>
-            <StatNumber>{d.important}</StatNumber>
-            <StatHelpText>
-              <Judg isNew={d.hostDiff[0].importantHostDiff} />
-              前回差異: {d.hostDiff[0].importantHostDiff}件
-            </StatHelpText>
-          </Stat>
+        <Stat>
+          <StatLabel>{d.hostname}</StatLabel>
+          <StatNumber>{d.critical}</StatNumber>
+          <StatHelpText>
+            <Judg isNew={d.hostDiff[0].criticalHostDiff} />
+            前回差異: {d.hostDiff[0].criticalHostDiff}件
+          </StatHelpText>
+        </Stat>
+      
+        <Stat>
+          <StatLabel>{d.hostname}</StatLabel>
+          <StatNumber>{d.important}</StatNumber>
+          <StatHelpText>
+            <Judg isNew={d.hostDiff[0].importantHostDiff} />
+            前回差異: {d.hostDiff[0].importantHostDiff}件
+          </StatHelpText>
+        </Stat>
 
-          <Stat>
-            <StatLabel>{d.hostname}</StatLabel>
-            <StatNumber>{d.moderate}</StatNumber>
-            <StatHelpText>
-              <Judg isNew={d.hostDiff[0].moderateHostDiff} />
-              前回差異: {d.hostDiff[0].moderateHostDiff}件
-            </StatHelpText>
-          </Stat>
+        <Stat>
+          <StatLabel>{d.hostname}</StatLabel>
+          <StatNumber>{d.moderate}</StatNumber>
+          <StatHelpText>
+            <Judg isNew={d.hostDiff[0].moderateHostDiff} />
+            前回差異: {d.hostDiff[0].moderateHostDiff}件
+          </StatHelpText>
+        </Stat>
 
-          <Stat>
-            <StatLabel>{d.hostname}</StatLabel>
-            <StatNumber>{d.low}</StatNumber>
-            <StatHelpText>
-              <Judg isNew={d.hostDiff[0].lowHostDiff} />
-              前回差異: {d.hostDiff[0].lowHostDiff}件
-            </StatHelpText>
-          </Stat>
-        </StatGroup>
-        ))}
-      </Box>
+        <Stat>
+          <StatLabel>{d.hostname}</StatLabel>
+          <StatNumber>{d.low}</StatNumber>
+          <StatHelpText>
+            <Judg isNew={d.hostDiff[0].lowHostDiff} />
+            前回差異: {d.hostDiff[0].lowHostDiff}件
+          </StatHelpText>
+        </Stat>
+      </StatGroup>
+      ))}
     </Box>
   );
 }
