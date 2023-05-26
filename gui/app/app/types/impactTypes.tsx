@@ -1,6 +1,7 @@
 export type VulnsList = {
     impact: Impact[],
-    sum: Sum[]
+    sum: Sum[],
+    last: Diff[]
 };
 
 export type Impact = {
@@ -9,7 +10,8 @@ export type Impact = {
     critical: number,
     important: number,
     moderate: number,
-    low: number
+    low: number,
+    hostDiff: HostDiff[]
 };
 
 export type Sum = {
@@ -19,3 +21,19 @@ export type Sum = {
     moderate_sum: number,
     low_sum: number
 };
+
+export type Diff = {
+    total_diff: number,
+    critical_diff: number,
+    important_diff: number,
+    moderate_diff: number,
+    low_diff: number
+};
+
+export type HostDiff = {
+    totalHostDiff: number,
+    criticalHostDiff: number,
+    importantHostDiff: number,
+    moderateHostDiff: number,
+    lowHostDiff: number
+}

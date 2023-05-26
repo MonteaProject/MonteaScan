@@ -8,8 +8,9 @@ import {
     DrawerOverlay,
     DrawerContent,
     DrawerCloseButton,
-    useDisclosure
-} from '@chakra-ui/react';
+    useDisclosure,
+    Box
+} from "../common/components";
 import "./info.scss"
 
 export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
@@ -21,7 +22,7 @@ export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
     }
 
     return (
-        <div>
+        <Box>
             <table className="responsive-info-table">
                 <thead className="responsive-info-table__head">
                     <tr className="responsive-info-table__row">
@@ -67,6 +68,6 @@ export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
                     <DrawerFooter>{"end"}</DrawerFooter>
                 </DrawerContent>
             </Drawer>
-        </div>
+        </Box>
     );
 }

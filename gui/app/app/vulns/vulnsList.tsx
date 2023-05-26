@@ -8,7 +8,8 @@ import {
   StatArrow,
   StatGroup,
   CircularProgress,
-  CircularProgressLabel
+  CircularProgressLabel,
+  Box
 } from "../common/components";
 
 async function getVulnsList() {
@@ -26,6 +27,7 @@ export default async function VulnsList() {
   const v = await getVulnsList();
   const v1 = v.impact;
   const v2 = v.sum;
+  const v3 = v.last;
 
   let total_per = v2[0].total_sum / v2[0].total_sum;
   let critical_per = v2[0].critical_sum / v2[0].total_sum;
@@ -45,9 +47,65 @@ export default async function VulnsList() {
   let up = <StatArrow type={increase} color={increase_color} />;
   let down = <StatArrow type={decrease} color={decrease_color} />;
 
+  let icon1: JSX.Element;
+  let icon2: JSX.Element;
+  let icon3: JSX.Element;
+  let icon4: JSX.Element;
+  let icon5: JSX.Element;
+
+  if (Math.sign(v3[0].total_diff) === 1) {
+    let icon1 = up;
+  } else if (Math.sign(v3[0].total_diff) === -1) {
+    let icon1 = down;
+  } else {
+    let icon1 = stay;
+  }
+
+  if (Math.sign(v3[0].critical_diff) === 1) {
+    let icon2 = up;
+  } else if (Math.sign(v3[0].critical_diff) === -1) {
+    let icon2 = down;
+  } else {
+    let icon2 = stay;
+  }
+
+  if (Math.sign(v3[0].important_diff) === 1) {
+    let icon3 = up;
+  } else if (Math.sign(v3[0].important_diff) === -1) {
+    let icon3 = down;
+  } else {
+    let icon3 = stay;
+  }
+
+  if (Math.sign(v3[0].moderate_diff) === 1) {
+    let icon4 = up;
+  } else if (Math.sign(v3[0].moderate_diff) === -1) {
+    let icon4 = down;
+  } else {
+    let icon4 = stay;
+  }
+
+  if (Math.sign(v3[0].low_diff) === 1) {
+    let icon5 = up;
+  } else if (Math.sign(v3[0].low_diff) === -1) {
+    let icon5 = down;
+  } else {
+    let icon5 = stay;
+  }
+
+  const Judg = (isNew: number) => {
+    if (Math.sign(isNew) === 1) {
+      return up
+    } else if (Math.sign(isNew) === -1) {
+      return down
+    } else {
+      return stay
+    }
+  }
+
   return (
-    <div>
-      <div>
+    <Box>
+      <Box>
         {v2.map((s) => (
         <StatGroup mb={4}>
           <Stat>
@@ -56,8 +114,8 @@ export default async function VulnsList() {
               <CircularProgressLabel>{s.total_sum}</CircularProgressLabel>
             </CircularProgress>
             <StatHelpText>
-              {stay}
-              前回差異: 23件
+              {icon1}
+              前回差異: {v3[0].total_diff}件
             </StatHelpText>
           </Stat>
           
@@ -67,8 +125,8 @@ export default async function VulnsList() {
               <CircularProgressLabel>{s.critical_sum}</CircularProgressLabel>
             </CircularProgress>
             <StatHelpText>
-              <StatArrow type={decrease} color={decrease_color} />
-              前回差異: 23件
+              {icon2}
+              前回差異: {v3[0].critical_diff}件
             </StatHelpText>
           </Stat>
         
@@ -78,8 +136,8 @@ export default async function VulnsList() {
               <CircularProgressLabel>{s.important_sum}</CircularProgressLabel>
             </CircularProgress>
             <StatHelpText>
-              <StatArrow type='increase' />
-              前回差異: -23件
+              {icon3}
+              前回差異: {v3[0].important_diff}件
             </StatHelpText>
           </Stat>
 
@@ -89,8 +147,8 @@ export default async function VulnsList() {
               <CircularProgressLabel>{s.moderate_sum}</CircularProgressLabel>
             </CircularProgress>
             <StatHelpText>
-              <StatArrow type='increase' />
-              前回差異: -23件
+              {icon4}
+              前回差異: {v3[0].moderate_diff}件
             </StatHelpText>
           </Stat>
 
@@ -100,22 +158,22 @@ export default async function VulnsList() {
               <CircularProgressLabel>{s.low_sum}</CircularProgressLabel>
             </CircularProgress>
             <StatHelpText>
-              <StatArrow type='increase' />
-              前回差異: -23件
+              {icon5}
+              前回差異: {v3[0].low_diff}件
             </StatHelpText>
           </Stat>
         </StatGroup>
         ))}
-      </div>
-      <div>
+      </Box>
+      <Box>
         {v1.map((d) => (
         <StatGroup>
           <Stat>
             <StatLabel>{d.hostname}</StatLabel>
             <StatNumber>{d.total}</StatNumber>
             <StatHelpText>
-              <StatArrow type='decrease' />
-              前回差異: 23件
+              <Judg isNew={d.hostDiff[0].totalHostDiff} />
+              前回差異: {d.hostDiff[0].totalHostDiff}件
             </StatHelpText>
           </Stat>
           
@@ -123,8 +181,8 @@ export default async function VulnsList() {
             <StatLabel>{d.hostname}</StatLabel>
             <StatNumber>{d.critical}</StatNumber>
             <StatHelpText>
-              <StatArrow type='decrease' />
-              前回差異: 23件
+              <Judg isNew={d.hostDiff[0].criticalHostDiff} />
+              前回差異: {d.hostDiff[0].criticalHostDiff}件
             </StatHelpText>
           </Stat>
         
@@ -132,8 +190,8 @@ export default async function VulnsList() {
             <StatLabel>{d.hostname}</StatLabel>
             <StatNumber>{d.important}</StatNumber>
             <StatHelpText>
-              <StatArrow type='increase' />
-              前回差異: -23件
+              <Judg isNew={d.hostDiff[0].importantHostDiff} />
+              前回差異: {d.hostDiff[0].importantHostDiff}件
             </StatHelpText>
           </Stat>
 
@@ -141,8 +199,8 @@ export default async function VulnsList() {
             <StatLabel>{d.hostname}</StatLabel>
             <StatNumber>{d.moderate}</StatNumber>
             <StatHelpText>
-              <StatArrow type='increase' />
-              前回差異: -23件
+              <Judg isNew={d.hostDiff[0].moderateHostDiff} />
+              前回差異: {d.hostDiff[0].moderateHostDiff}件
             </StatHelpText>
           </Stat>
 
@@ -150,13 +208,13 @@ export default async function VulnsList() {
             <StatLabel>{d.hostname}</StatLabel>
             <StatNumber>{d.low}</StatNumber>
             <StatHelpText>
-              <StatArrow type='increase' />
-              前回差異: -23件
+              <Judg isNew={d.hostDiff[0].lowHostDiff} />
+              前回差異: {d.hostDiff[0].lowHostDiff}件
             </StatHelpText>
           </Stat>
         </StatGroup>
         ))}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

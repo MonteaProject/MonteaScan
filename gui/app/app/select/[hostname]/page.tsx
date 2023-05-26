@@ -3,6 +3,7 @@ import { Pkg } from "../../types/pkgTypes";
 import { Suspense } from "react";
 import NextLink from "next/link";
 import Info from "../../components/info";
+import { Box } from "../../common/components";
 
 
 const getServerInfo = async (hostname: string) => {
@@ -51,9 +52,9 @@ export default async function ArticleDetail({
     const info = await infoPromise;
 
     return (
-        <div>
+        <Box>
             {/* @ts-expect-error 現状は jsx が Promise を返すと TypeScript が型エラーを報告するが、将来的には解決される */}
             <Info infoPromises={info} />
-        </div>
+        </Box>
     );
 }

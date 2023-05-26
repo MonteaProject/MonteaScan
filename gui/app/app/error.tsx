@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { Heading, Button } from "./common/components";
+import { Heading, Button, Box } from "./common/components";
 
 export default function Error ({
     error,
@@ -14,9 +14,9 @@ export default function Error ({
     }, [error]);
 
     return (
-        <div>
+        <Box>
             <Heading mb={4}>情報の取得に失敗しました</Heading>
             <Button onClick={() => reset()}>Try again</Button>
-        </div>
+        </Box>
     );
 }
