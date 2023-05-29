@@ -1,13 +1,7 @@
 $bg-color: #f2f6f9;
-$active-color: #25be64;
-$inactive-color: #dadde4;
-$new-color: #febf02;
-$text-color: #141a4e;
 $table-bg-color: #fefefe;
 $table-head-bg-color: #e1e8f2;
-$table-border-color: #edeef2;
-$hover-bg-color: #68D391; //green.300
-$hover-text-color: #ffffff;
+$hover-text-color: #48BB78;
 
 @mixin mobile-xxs {
   @media (max-width: 400px) {
@@ -40,79 +34,56 @@ $hover-text-color: #ffffff;
 }
 
 body {
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  font-family: "Poppins", sans-serif;
-  color: $text-color;
   background-color: $bg-color;
   font-size: 16px;
 }
 
-.container {
+.responsive-serverlist-table {
+  display: grid;
   width: 100%;
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 0 15px;
-}
-
-.responsive-table {
+  overflow-x: scroll;
+  overflow-y: scroll;
+  width: 1200px;
+  margin: 2rem 0;
   background-color: $table-bg-color;
   border-collapse: collapse;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.02);
-  width: 100%;
-  margin: 2rem 0;
-  overflow: hidden;
-  &__row {
-    display: grid;
-    border-bottom: 1px solid $table-border-color;
-    padding: 0 1.5rem;
-    @include min-tablet {
-      grid-template-columns: 2fr 1fr 2fr 2fr 1fr;
-    }
-    @include tablet-to-desktop {
-      grid-template-columns: 1fr 2fr 1fr;
-    }
-    th,
-    td {
-      padding: 1rem;
-    }
+
+  @include min-tablet {
+    grid-template-columns: repeat(8, auto);
   }
+  @include tablet-to-desktop {
+    grid-template-columns: repeat(8, auto);
+  }
+
   &__head {
-    background-color: $table-head-bg-color;
+    display: contents;
     @include desktop {
       display: none;
     }
     &__title {
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-      text-transform: capitalize;
+      background-color: $table-head-bg-color;
+      font-weight: 400;
       font-weight: bold;
     }
   }
   &__body {
-    .responsive-table__row {
+    display: contents;
+    .responsive-info-table__row {
       transition: 0.1s linear;
       transition-property: color, background;
       &:last-child {
         border-bottom: none;
       }
-      &:hover {
-        color: $hover-text-color;
-        background-color: $hover-bg-color;
-      }
     }
     &__text {
-      font-weight: bold;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
+      text-align: left;
+      &:hover {
+        color: $hover-text-color;
+      }
       &::before {
         margin-right: 1rem;
         font-weight: 600;
-        text-transform: capitalize;
       }
       @include desktop {
         &::before {
@@ -125,67 +96,24 @@ body {
           margin-bottom: 1rem;
         }
       }
-      &--hostname {
-        // font-weight: 600;
-        @include min-tablet {
-          &::before {
-            display: none;
-          }
-        }
-        @include tablet-to-desktop {
-          grid-column: 1 / 2;
-          flex-direction: column;
-        }
-      }
-      &--status,
-      &--os,
-      &--kernel {
-        @include tablet-to-desktop {
-          grid-column: 2/ 3;
-        }
-      }
-      &--time {
-        @include tablet-to-desktop {
-          grid-column: 3/ -1;
-        }
-      }
-      &--hostname,
-      &--time {
-        @include tablet-to-desktop {
-          grid-row: 2;
-        }
-      }
     }
   }
-}
-
-.up-arrow {
-  height: 100%;
-  max-height: 1.8rem;
-  margin-left: 1rem;
-}
-
-.user-icon {
-  width: 100%;
-  max-width: 4rem;
-  height: auto;
-  margin-right: 1rem;
-}
-
-.status-indicator {
-  display: inline-block;
-  width: 1.8rem;
-  height: 1.8rem;
-  border-radius: 50%;
-  background: #222222;
-  margin-right: 0.5rem;
-  &--active {
-    background: $active-color;
+  &__link {
+    display: contents;
   }
-  &--inactive {
-    background: $inactive-color;
-  }
-  &--new {
-    background: $new-color;
+  &__row {
+    display: contents;
+    th {
+      position: sticky;
+      top: 0;
+    }
+    th,
+    td {
+      display: block;
+      padding: 1rem;
+      white-space: nowrap;
+      border: 1px solid;
+      border-color: #E2E8F0;
+    }
   }
 }
