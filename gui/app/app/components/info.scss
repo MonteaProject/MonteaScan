@@ -6,7 +6,7 @@ $text-color: #141a4e;
 $table-bg-color: #fefefe;
 $table-head-bg-color: #e1e8f2;
 $table-border-color: #edeef2;
-$hover-bg-color: #68D391; //green.300
+$hover-bg-color: #68D391;
 $hover-text-color: #ffffff;
 
 @mixin mobile-xxs {
@@ -36,89 +36,65 @@ $hover-text-color: #ffffff;
 * {
   margin: 0;
   padding: 0;
-  // box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-  // align-items: center;
-  // justify-content: center;
   min-height: 100vh;
   color: $text-color;
   background-color: $bg-color;
   font-size: 16px;
 }
 
-.container {
-  
-  // max-width: 1140px;
-  // margin: 0 auto;
-  // padding: 0 15px;
-
-  // display: block;
-  // overflow:auto;
-  overflow-y: scroll;
-  overflow-x: scroll;
-  width: 1200px;
-  height: 800px;
-}
-
 .responsive-info-table {
   display: grid;
   width: 100%;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  width: 1200px;
+  height: 800px;
+  margin: 2rem 0;
+  background-color: $table-bg-color;
+  border-collapse: collapse;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.02);
 
-  // background-color: $table-bg-color;
-  // border-collapse: collapse;
-  // border-radius: 10px;
-  // overflow: hidden;
-  // box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.02);
-  // width: 100%;
+  @include min-tablet {
+    grid-template-columns: repeat(9, auto);
+  }
+  @include tablet-to-desktop {
+    grid-template-columns: repeat(9, auto);
+  }
 
-  // @include min-tablet {
-  //   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  // }
-  // @include tablet-to-desktop {
-  //   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  // }
-
-  // margin: 2rem 0;
   &__row {
-    
-    // width: 100%;
-    // border-bottom: 1px solid $table-border-color;
-    // padding: 0 1.5rem;
-
-    @include min-tablet {
-      grid-template-columns: auto auto auto auto auto auto auto auto auto;
-    }
-    @include tablet-to-desktop {
-      grid-template-columns: auto auto auto auto auto auto auto auto auto;
-    }
+    display: contents;
     th {
-      // position: sticky;
-      // top: 0;
-      // left: 0;
-      white-space: nowrap;
-      padding: 1rem;
+      position: sticky;
+      top: 0;
     }
+    th,
     td {
+      display: block;
       padding: 1rem;
       white-space: nowrap;
     }
   }
   &__head {
+    display: contents;
     background-color: $table-head-bg-color;
     @include desktop {
       display: none;
     }
     &__title {
-      // display: flex;
-      // align-items: center;
       font-weight: 400;
-      // text-transform: capitalize;
       font-weight: bold;
     }
   }
+  &__button {
+    display: contents;
+  }
   &__body {
+    display: contents;
     .responsive-info-table__row {
       transition: 0.1s linear;
       transition-property: color, background;
@@ -131,15 +107,10 @@ body {
       }
     }
     &__text {
-      // font-weight: bold;
-      // display: flex;
-      // flex-wrap: wrap;
-      // align-items: center;
       text-align: left;
       &::before {
         margin-right: 1rem;
         font-weight: 600;
-        // text-transform: capitalize;
       }
       @include desktop {
         &::before {
@@ -152,71 +123,6 @@ body {
           margin-bottom: 1rem;
         }
       }
-      // &--cve {
-      //   // font-weight: 600;
-      //   @include min-tablet {
-      //     &::before {
-      //       display: none;
-      //     }
-      //   }
-      //   @include tablet-to-desktop {
-      //     grid-column: 1 / 2;
-      //     flex-direction: column;
-      //   }
-      // }
-      // &--update,
-      // &--pkgname,
-      // &--impact,
-      // &--pkgver,
-      // &--pkgrelease,
-      // &--upver,
-      // &--uprelease {
-      //   @include tablet-to-desktop {
-      //     grid-column: 2/ 3;
-      //   }
-      // }
-      // &--pkgarch {
-      //   @include tablet-to-desktop {
-      //     grid-column: 3/ -1;
-      //   }
-      // }
-      // &--cve,
-      // &--pkgarch {
-      //   @include tablet-to-desktop {
-      //     grid-row: 2;
-      //   }
-      // }
     }
   }
 }
-
-// .up-arrow {
-//   height: 100%;
-//   max-height: 1.8rem;
-//   margin-left: 1rem;
-// }
-
-// .user-icon {
-//   width: 100%;
-//   max-width: 4rem;
-//   height: auto;
-//   margin-right: 1rem;
-// }
-
-// .status-indicator {
-//   display: inline-block;
-//   width: 1.8rem;
-//   height: 1.8rem;
-//   border-radius: 50%;
-//   background: #222222;
-//   margin-right: 0.5rem;
-//   &--active {
-//     background: $active-color;
-//   }
-//   &--inactive {
-//     background: $inactive-color;
-//   }
-//   &--new {
-//     background: $new-color;
-//   }
-// }
