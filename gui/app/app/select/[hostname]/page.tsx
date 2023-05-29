@@ -1,9 +1,7 @@
-import { notFound } from "next/navigation";
-import { Pkg } from "../../types/pkgTypes";
-import { Suspense } from "react";
-import NextLink from "next/link";
 import Info from "../../components/info";
+import { Pkg } from "../../types/pkgTypes";
 import { Box } from "../../common/components";
+import { notFound } from "next/navigation";
 
 
 const getServerInfo = async (hostname: string) => {

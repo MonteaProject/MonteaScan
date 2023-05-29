@@ -25,7 +25,7 @@ export default function Header() {
         </Box>
         <Box w="60px" h="60px" pt={6}>
           <Heading fontSize="12px">
-            <NextLink href="/">設定</NextLink>
+            <NextLink href="/settings/">設定</NextLink>
           </Heading>
         </Box>
       </HStack>
