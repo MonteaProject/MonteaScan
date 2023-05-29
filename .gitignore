@@ -6,4 +6,3 @@ target/
 tmp/cert/
 app/.vscode
 app/node_modules
-save/

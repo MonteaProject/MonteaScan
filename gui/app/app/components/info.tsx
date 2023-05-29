@@ -23,9 +23,12 @@ export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
 
     return (
         <Box>
+            <div className="table">
             <table className="responsive-info-table">
                 <thead className="responsive-info-table__head">
                     <tr className="responsive-info-table__row">
+                        <th className="responsive-info-table__head__title responsive-table__head__title--cve">CVE番号</th>
+                        <th className="responsive-info-table__head__title responsive-table__head__title--update">アップデート有無</th>
                         <th className="responsive-info-table__head__title responsive-table__head__title--pkgname">パッケージ名称</th>
                         <th className="responsive-info-table__head__title responsive-table__head__title--pkgver">現行バージョン番号</th>
                         <th className="responsive-info-table__head__title responsive-table__head__title--pkgrelease">現行リリース番号</th>
@@ -38,6 +41,8 @@ export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
                 {info.map((d) => (
                 <tbody className="responsive-info-table__body">
                     <tr className="responsive-info-table__row">
+                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">CVE-2023-XXXX</td>
+                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
                         <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkgname.substring(0, 35)}</td>
                         <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkgver.substring(0, 20)}</td>
                         <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkgrelease.substring(0, 20)}</td>
@@ -49,6 +54,7 @@ export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
                 ))}
                 </button>
             </table>
+            </div>
             <Drawer onClose={onClose} isOpen={isOpen} size="xl">
                 <DrawerOverlay />
                 <DrawerContent>
