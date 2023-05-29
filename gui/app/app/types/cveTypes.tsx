@@ -3,48 +3,48 @@ export type Detects = {
 };
 
 export type Detect = {
-    time: string,
+    time    : string,
     hostname: string,
-    ip: string[],
-    os: string,
-    kernel: string,
-    oval: Oval[]
+    ip      : string[],
+    os      : string,
+    kernel  : string,
+    oval    : Oval[]
 };
 
 export type Oval = {
-    '@id': string,
+    '@id'   : string,
     '@class': string,
     metadata: Metadata,
     criteria: Criteria
 };
 
 export type Metadata = {
-    title: string,
-    affected: Affected,
-    reference: Reference[],
+    title      : string,
+    affected   : Affected,
+    reference  : Reference[],
     description: string,
-    advisory: Advisory
+    advisory   : Advisory
 };
 
 export type Affected = {
     '@family': string,
-    platform: string[]
+    platform : string[]
 };
 
 export type Reference = {
-    '@ref_id': string,
+    '@ref_id' : string,
     '@ref_url': string,
-    '@source': string
+    '@source' : string
 };
 
 export type Advisory = {
-    "@from": string,
-    severity: string,
-    rights: string,
-    issued: Issued,
-    updated: Updated,
-    cve: Cve[],
-    bugzilla: Bugzilla[],
+    "@from"          : string,
+    severity         : string,
+    rights           : string,
+    issued           : Issued,
+    updated          : Updated,
+    cve              : Cve[],
+    bugzilla         : Bugzilla[],
     affected_cpe_list: Cpe
 };
 
@@ -57,18 +57,18 @@ export type Updated = {
 };
 
 export type Cve = {
-    "@cvss2": string,
-    "@cvss3": string,
-    "@cwe": string,
-    "@href": string,
+    "@cvss2" : string,
+    "@cvss3" : string,
+    "@cwe"   : string,
+    "@href"  : string,
     "@impact": string,
     "@public": string,
-    "$value": string
+    "$value" : string
 };
 
 export type Bugzilla = {
-    "@href": string,
-    "@id": string,
+    "@href" : string,
+    "@id"   : string,
     "$value": string
 };
 
@@ -78,21 +78,21 @@ export type Cpe = {
 
 export type Criteria = {
     "@operator": string,
-    criterion: Criterion[],
-    criteria: Criteria2[]
+    criterion  : Criterion[],
+    criteria   : Criteria2[]
 };
 
 export type Criterion = {
-    "@comment": string,
+    "@comment" : string,
     "@test_ref": string
 };
 
 export type Criteria2 = {
     "@operator": string,
-    criterion: Criterion2[]
+    criterion  : Criterion2[]
 };
 
 export type Criterion2 = {
-    "@comment": string,
+    "@comment" : string,
     "@test_ref": string
 };

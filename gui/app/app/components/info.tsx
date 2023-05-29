@@ -42,13 +42,13 @@ export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
                     <tr className="responsive-info-table__row">
                         <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">CVE-2023-XXXX</td>
                         <td className="responsive-info-table__body__text responsive-table__body__text--impact">Critical</td>
-                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkgname.substring(0, 35)}</td>
-                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkgver.substring(0, 20)}</td>
-                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkgrelease.substring(0, 20)}</td>
+                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkgname}</td>
+                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkgver}</td>
+                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkgrelease}</td>
                         <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
-                        <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.upver.substring(0, 20)}</td>
-                        <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.uprelease.substring(0, 20)}</td>
-                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkgarch.substring(0, 20)}</td>
+                        <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.upver}</td>
+                        <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.uprelease}</td>
+                        <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkgarch}</td>
                     </tr>
                     </button>
                 </tbody>

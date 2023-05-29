@@ -15,7 +15,7 @@ export default function Error ({
 
     return (
         <Box>
-            <Heading mb={4}>情報の取得に失敗しました</Heading>
+            <Heading as='h3' size='lg'>情報の取得に失敗しました</Heading>
             <Button onClick={() => reset()}>Try again</Button>
         </Box>
     );

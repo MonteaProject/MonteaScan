@@ -35,13 +35,13 @@ export default async function ServerList() {
         <tbody className="responsive-serverlist-table__body">
           <NextLink className="responsive-serverlist-table__link" href={`/select/${d.hostname}`}>
           <tr className="responsive-serverlist-table__row">
-            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--hostname">{d.hostname.substring(0, 35)}</td>
+            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--hostname">{d.hostname}</td>
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-1">5</td>
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-2">5</td>
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-3">5</td>
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-4">5</td>
-            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--os">{d.os.substring(0, 35)}</td>
-            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--kernel">{d.kernel.substring(0, 35)}</td>
+            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--os">{d.os}</td>
+            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--kernel">{d.kernel}</td>
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--time">{d.time}</td>
           </tr>
           </NextLink>
