@@ -6,7 +6,21 @@ import {
   Heading,
   Stack,
   HStack,
-  VStack
+  VStack,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuItemOption,
+  MenuGroup,
+  MenuOptionGroup,
+  MenuDivider,
+  IconButton,
+
+  ExternalLinkIcon,
+  SettingsIcon,
+  LinkIcon,
+  ChevronDownIcon
 } from "./common/components";
 
 export default function Header() {
@@ -18,16 +32,26 @@ export default function Header() {
             <Image src="/icon.png" width={64} height={64} alt="icon" />
           </NextLink>
         </Box>
-        <Box w="60px" h="60px" pt={6}>
-          <Heading fontSize='12px'>
-            <NextLink href="/components/">サーバ一覧</NextLink>
-          </Heading>
-        </Box>
-        <Box w="60px" h="60px" pt={6}>
-          <Heading fontSize="12px">
-            <NextLink href="/settings/">設定</NextLink>
-          </Heading>
-        </Box>
+
+        <Menu>
+          <MenuButton><ChevronDownIcon /> メニュー</MenuButton>
+          <MenuList>
+            <MenuGroup title="メニュー">
+              <MenuItem as='a' href="/components/" icon={<ExternalLinkIcon />}>
+                サーバ一覧
+              </MenuItem>
+              <MenuItem as='a' href="/settings/" icon={<SettingsIcon />}>
+                設定
+              </MenuItem>
+            </MenuGroup>
+            <MenuDivider />
+            <MenuGroup title="ヘルプ">
+              <MenuItem as='a' href='#' icon={<LinkIcon />}>
+                ドキュメント
+              </MenuItem>
+            </MenuGroup>
+          </MenuList>
+        </Menu>
       </HStack>
     </Flex>
   );
