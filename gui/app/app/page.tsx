@@ -1,7 +1,5 @@
-import Image from 'next/image';
-import type { Host } from "./types/hostTypes";
 import VulnsList from './vulns/vulnsList';
-import { Heading, Box } from "./common/components";
+import { Box } from "./common/components";
 
 export default async function Home() {
   return (

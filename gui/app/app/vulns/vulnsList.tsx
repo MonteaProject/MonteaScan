@@ -4,8 +4,6 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  StatHelpText,
-  StatArrow,
   StatGroup,
   CircularProgress,
   CircularProgressLabel,
