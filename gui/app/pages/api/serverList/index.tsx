@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import {readdirSync, readFileSync} from "fs";
 
-
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export default async function handler(

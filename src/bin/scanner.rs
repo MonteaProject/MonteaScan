@@ -12,9 +12,7 @@ struct ScanServerList {
 
 #[derive(Deserialize, Serialize, Debug)]
 struct Server {
-    name: String,
-    usr : String,
-    pwd : String,
+    user : String,
     host: String,
     port: String,
     key : String
@@ -63,9 +61,7 @@ fn main() -> Result<()> {
     };  
 
     for index in 0..cnf.server.len() {
-        let name   = &cnf.server[index].name;
-        let usr    = &cnf.server[index].usr;
-        let pwd    = &cnf.server[index].pwd;
+        let user    = &cnf.server[index].user;
         let host   = &cnf.server[index].host;
         let port   = &cnf.server[index].port;
         let key    = &cnf.server[index].key;
@@ -78,7 +74,7 @@ fn main() -> Result<()> {
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
         sess.handshake().unwrap();
-        sess.userauth_pubkey_file(usr, None, prikey.as_path(), None).unwrap();
+        sess.userauth_pubkey_file(user, None, prikey.as_path(), None).unwrap();
         let mut ch = sess.channel_session().unwrap();
         ch.exec("hostname").unwrap();
         let mut hostname = String::new();
@@ -103,7 +99,7 @@ fn main() -> Result<()> {
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
         sess.handshake().unwrap();
-        sess.userauth_pubkey_file(usr, None, prikey.as_path(), None).unwrap();
+        sess.userauth_pubkey_file(user, None, prikey.as_path(), None).unwrap();
         let mut ch = sess.channel_session().unwrap();
         ch.exec("uname -r").unwrap();
         let mut kernel = String::new();
@@ -120,7 +116,7 @@ fn main() -> Result<()> {
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
         sess.handshake().unwrap();
-        sess.userauth_pubkey_file(usr, None, prikey.as_path(), None).unwrap();
+        sess.userauth_pubkey_file(user, None, prikey.as_path(), None).unwrap();
         let mut ch = sess.channel_session().unwrap();
         ch.exec("cat /etc/system-release").unwrap();
         let mut os = String::new();
@@ -146,7 +142,7 @@ fn main() -> Result<()> {
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
         sess.handshake().unwrap();
-        sess.userauth_pubkey_file(usr, None, prikey.as_path(), None).unwrap();
+        sess.userauth_pubkey_file(user, None, prikey.as_path(), None).unwrap();
         let mut ch = sess.channel_session().unwrap();
         ch.exec("/sbin/ip -o addr").unwrap();
         let mut ip = String::new();
@@ -170,7 +166,7 @@ fn main() -> Result<()> {
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
         sess.handshake().unwrap();
-        sess.userauth_pubkey_file(usr, None, prikey.as_path(), None).unwrap();
+        sess.userauth_pubkey_file(user, None, prikey.as_path(), None).unwrap();
         let mut ch = sess.channel_session().unwrap();
         ch.exec("dnf makecache --assumeyes").unwrap();
         let mut makecache = String::new();
@@ -191,7 +187,7 @@ fn main() -> Result<()> {
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
         sess.handshake().unwrap();
-        sess.userauth_pubkey_file(usr, None, prikey.as_path(), None).unwrap();
+        sess.userauth_pubkey_file(user, None, prikey.as_path(), None).unwrap();
         let mut ch = sess.channel_session().unwrap();
         ch.exec("dnf check-update --assumeyes").unwrap();
         let mut check_update = String::new();
@@ -224,7 +220,7 @@ fn main() -> Result<()> {
         let tcp = std::net::TcpStream::connect(host_port.clone()).unwrap();
         sess.set_tcp_stream(tcp);
         sess.handshake().unwrap();
-        sess.userauth_pubkey_file(usr, None, prikey.as_path(), None).unwrap();
+        sess.userauth_pubkey_file(user, None, prikey.as_path(), None).unwrap();
         let mut ch = sess.channel_session().unwrap();
         ch.exec("rpm -qa --queryformat \"%{NAME} %{EPOCHNUM} %{VERSION} %{RELEASE} %{ARCH}\n\"").unwrap();
         let mut s = String::new();
