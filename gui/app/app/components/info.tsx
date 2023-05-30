@@ -1,5 +1,6 @@
 "use client";
 import { Pkg } from "../types/pkgTypes";
+import "./info.scss"
 import {
     Drawer,
     DrawerBody,
@@ -11,7 +12,6 @@ import {
     useDisclosure,
     Box
 } from "../common/components";
-import "./info.scss"
 
 export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
     const info = infoPromises;
