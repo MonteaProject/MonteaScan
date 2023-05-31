@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
+import { Settings } from "../types/settingTypes";
 import {
     Input,
     Button,
@@ -31,7 +32,19 @@ import {
     TableContainer
 } from "../common/components";
 
+async function getConfig() {
+    const res = await fetch("http://localhost:3000/api/configList/", {cache: "no-store"});
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch config list...");
+    }
+    const data = await res.json();
+    return data as Settings;
+}
+
 export default async function ServerList() {
+    const config = await getConfig();
+
     const [ip,   setIP]   = useState('');
     const [port, setPORT] = useState('');
     const [user, setUSER] = useState('');

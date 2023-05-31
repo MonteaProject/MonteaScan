@@ -1,9 +1,7 @@
 {
     "server": [
         {
-            "name": "",
-            "usr" : "",
-            "pwd" : "",
+            "user": "",
             "host": "",
             "port": "",
             "key" : ""
