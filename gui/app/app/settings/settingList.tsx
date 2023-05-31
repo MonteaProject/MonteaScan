@@ -32,45 +32,36 @@ import {
     TableContainer
 } from "../common/components";
 
-async function getConfig() {
-    const res = await fetch("http://localhost:3000/api/configList/", {cache: "no-store"});
 
-    if (!res.ok) {
-        throw new Error("Failed to fetch config list...");
-    }
-    const data = await res.json();
-    return data as Settings;
-}
+export default async function SettingList({ configPromise }: { configPromise: Settings[] }) {
+    const config = configPromise;
 
-export default async function ServerList() {
-    const config = await getConfig();
-
-    const [ip,   setIP]   = useState('');
+    const [host, setHOST] = useState('');
     const [port, setPORT] = useState('');
     const [user, setUSER] = useState('');
     const [key,  setKEY]  = useState('');
 
-    // const handleInputChangeIP   = (e: any) => setIP(e.target.value)
+    // const handleInputChangeIP   = (e: any) => setHOST(e.target.value)
     // const handleInputChangePORT = (e: any) => setPORT(e.target.value)
     // const handleInputChangeUSER = (e: any) => setUSER(e.target.value)
     // const handleInputChangeKEY  = (e: any) => setKEY(e.target.value)
 
-    // const isIpError   = ip   === '';
+    // const isIpError   = host   === '';
     // const isPortError = port === '';
     // const isUserError = user === '';
     // const isKeyError  = key  === '';
 
     const createClick = () => {
-        console.log("Create:", { ip, port, user, key });
-        setIP('');
+        console.log("Create:", { host, port, user, key });
+        setHOST('');
         setPORT('');
         setUSER('');
         setKEY('');
     };
 
     const deleteClick = () => {
-        console.log("Delete:", { ip, port, user, key });
-        setIP('');
+        console.log("Delete:", { host, port, user, key });
+        setHOST('');
         setPORT('');
         setUSER('');
         setKEY('');
@@ -78,8 +69,8 @@ export default async function ServerList() {
     };
 
     const addClick = () => {
-        console.log("Create:", { ip, port, user, key });
-        setIP('');
+        console.log("Create:", { host, port, user, key });
+        setHOST('');
         setPORT('');
         setUSER('');
         setKEY('');
@@ -115,13 +106,15 @@ export default async function ServerList() {
                         <Td></Td>
                         <Td><Button onClick={onModalAddOpen} ref={finalRef} colorScheme="teal">追加</Button></Td>
                     </Tr>
+                    {config.map((v) => (
                     <Tr>
-                        <Td>127.0.0.1</Td>
-                        <Td>montea</Td>
-                        <Td isNumeric>22</Td>
-                        <Td>/home/montea/id_ed25519</Td>
+                        <Td>{v.host}</Td>
+                        <Td>{v.user}</Td>
+                        <Td isNumeric>{v.port}</Td>
+                        <Td>{v.key}</Td>
                         <Td><Button onClick={onModalOpen} ref={finalRef} colorScheme="gray">編集</Button></Td>
                     </Tr>
+                    ))}
                 </Tbody>
             </Table>
         </TableContainer>
@@ -145,11 +138,11 @@ export default async function ServerList() {
                 <ModalBody pb={6}>
                     {/* <FormControl isInvalid={isIpError}> */}
                     <FormControl isRequired>
-                        <FormLabel htmlFor="ip">IPアドレス</FormLabel>
+                        <FormLabel htmlFor="host">IPアドレス</FormLabel>
                         <Input
-                            id="ip"
+                            id="host"
                             placeholder="127.0.0.1"
-                            value={ip}
+                            value={host}
                             // onChange={handleInputChangeIP}
                         />
                         <FormHelperText>
@@ -251,11 +244,11 @@ export default async function ServerList() {
                 <ModalBody pb={6}>
                     {/* <FormControl isInvalid={isIpError}> */}
                     <FormControl isRequired>
-                        <FormLabel htmlFor="ip">IPアドレス</FormLabel>
+                        <FormLabel htmlFor="host">IPアドレス</FormLabel>
                         <Input
-                            id="ip"
+                            id="host"
                             placeholder="127.0.0.1"
-                            value={ip}
+                            value={host}
                             // onChange={handleInputChangeIP}
                         />
                         <FormHelperText>
