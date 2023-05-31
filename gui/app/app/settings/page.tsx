@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Settings } from "../types/settingTypes";
 
 const getConfig = async() => {
-  const res = await fetch("http://localhost:3000/api/configList/", {cache: "no-store"});
+  const res = await fetch("http://localhost:3000/api/getConfig/", {cache: "no-store"});
 
   if (res.status === 404) {
     notFound();
