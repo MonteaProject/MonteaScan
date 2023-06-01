@@ -37,6 +37,7 @@ import {
 
 export default async function SettingList({ configPromise }: { configPromise: Settings[] }) {
     const config = configPromise;
+    const router = useRouter();
 
     const [host, setHOST] = useState('');
     const [port, setPORT] = useState('');
@@ -53,7 +54,14 @@ export default async function SettingList({ configPromise }: { configPromise: Se
     // const isUserError = user === '';
     // const isKeyError  = key  === '';
 
-    const createClick = () => {
+    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
+    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
+    const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
+    const cancelRef  = useRef<HTMLButtonElement>(null);
+    const initialRef = useRef(null);
+    const finalRef   = useRef(null);
+
+    const putClick = () => {
         console.log("Create:", { host, port, user, key });
         setHOST('');
         setPORT('');
@@ -70,15 +78,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
         onModalClose();
     };
 
-    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
-    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
-    const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
-    const cancelRef  = useRef<HTMLButtonElement>(null);
-    const initialRef = useRef(null);
-    const finalRef   = useRef(null);
-
-    const router = useRouter();
-    async function addClick() {
+    async function postClick() {
         await fetch("/api/postConfig/", {
             method: "POST",
             headers: {
@@ -91,11 +91,12 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                 key : key
             }),
         }).then((res) => {
-            if (res.ok) {
+            if (res.status === 200) {
                 onModalAddClose();
                 router.push("/settings/");
             } else {
-                throw new Error("Failed to write config list...");
+                onModalAddClose();
+                throw new Error("Failed to save config list...");
             }
         })
     };
@@ -232,7 +233,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             </AlertDialogOverlay>
                         </AlertDialog>
 
-                        <Button colorScheme="teal" onClick={createClick} mr={3}>
+                        <Button colorScheme="teal" onClick={putClick} mr={3}>
                             保存
                         </Button>
                     </ModalFooter>
@@ -312,7 +313,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                         <Button colorScheme="gray" onClick={onModalAddClose} mr={3}>
                             キャンセル
                         </Button>
-                        <Button colorScheme="teal" onClick={addClick} mr={3}>
+                        <Button colorScheme="teal" onClick={postClick} mr={3}>
                             保存
                         </Button>
                     </ModalFooter>
