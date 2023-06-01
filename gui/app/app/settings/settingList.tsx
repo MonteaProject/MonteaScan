@@ -37,7 +37,6 @@ import {
 
 export default async function SettingList({ configPromise }: { configPromise: Settings[] }) {
     const config = configPromise;
-    const router = useRouter();
 
     const [host, setHOST] = useState('');
     const [port, setPORT] = useState('');
@@ -71,43 +70,16 @@ export default async function SettingList({ configPromise }: { configPromise: Se
         onModalClose();
     };
 
-    // const addClick = () => {
-    //     console.log("Create:", { host, port, user, key });
-    //     setHOST('');
-    //     setPORT('');
-    //     setUSER('');
-    //     setKEY('');
+    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
+    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
+    const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
+    const cancelRef  = useRef<HTMLButtonElement>(null);
+    const initialRef = useRef(null);
+    const finalRef   = useRef(null);
 
-    //     useEffect(() => {
-    //         const postData = async() => {
-    //             await fetch("http://localhost:3000/api/postConfig/", {
-    //                 method: "POST",
-    //                 headers: {
-    //                     "Content-Type": "application/json"
-    //                 },
-    //                 body: JSON.stringify({
-    //                     user: user,
-    //                     host: host,
-    //                     port: port,
-    //                     key : key
-    //                 }),
-    //             });
-    //         };
-    //         postData();
-    //     }, []);
-
-    //     onModalAddClose();
-
-    // };
-    
+    const router = useRouter();
     const addClick = async() => {
-        console.log("addClick", {
-            user: user,
-            host: host,
-            port: port,
-            key : key
-        });
-        await fetch("http://localhost:3000/api/postConfig/", {
+        await fetch("/api/postConfig/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -118,16 +90,14 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                 port: port,
                 key : key
             }),
-        });
-        router.push("/");
-    };
-
-    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
-    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
-    const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
-    const cancelRef  = useRef<HTMLButtonElement>(null);
-    const initialRef = useRef(null);
-    const finalRef   = useRef(null);
+        }).then((res) => {
+            if (res.ok) {
+                router.push("/");
+            } else {
+                throw new Error("Failed to write config list...");
+            }
+        })
+    }
 
     return (
         <Box>
