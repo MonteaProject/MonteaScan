@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect, useCallback, startTransition } from "react";
+import React, { useState, useRef, useEffect, useCallback, startTransition } from "react";
 import { Settings } from "../types/settingTypes";
 import { useRouter } from "next/navigation";
 import {
@@ -44,10 +44,19 @@ export default async function SettingList({ configPromise }: { configPromise: Se
     const [user, setUSER] = useState('');
     const [key,  setKEY]  = useState('');
 
-    const handleInputChangeAddHOST = (e: any) => setHOST(e.target.value);
-    const handleInputChangeAddPORT = (e: any) => setPORT(e.target.value);
-    const handleInputChangeAddUSER = (e: any) => setUSER(e.target.value);
-    const handleInputChangeAddKEY  = (e: any) => setKEY(e.target.value);
+    const handleInputChangeHOST = useCallback((e: any) => {
+        setHOST(e.target.value);
+    },[]);
+
+    const handleInputChangePORT = useCallback(
+        (e: any) => setPORT(e.target.value),[]
+    )
+    const handleInputChangeUSER = useCallback(
+        (e: any) => setUSER(e.target.value),[]
+    )
+    const handleInputChangeKEY  = useCallback(
+        (e: any) => setKEY(e.target.value),[]
+    )
 
     // const isIpError   = host   === '';
     // const isPortError = port === '';
@@ -151,14 +160,13 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                     <ModalHeader>スキャン対象サーバ</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={6}>
-                        {/* <FormControl isInvalid={isIpError}> */}
                         <FormControl isRequired>
                             <FormLabel htmlFor="host">IPアドレス</FormLabel>
                             <Input
                                 id="host"
                                 placeholder="127.0.0.1"
                                 value={host}
-                                // onChange={handleInputChangeIP}
+                                onChange={handleInputChangeHOST}
                             />
                             <FormHelperText>
                                 スキャン対象サーバーのIPアドレスを入力してください。
@@ -166,38 +174,35 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             </FormHelperText>
                         </FormControl>
 
-                        {/* <FormControl isInvalid={isUserError}> */}
                         <FormControl isRequired>
                             <FormLabel htmlFor="user">ユーザー名</FormLabel>
                             <Input
                                 id="user"
                                 placeholder="montea"
                                 value={user}
-                                // onChange={handleInputChangeUSER}
+                                onChange={handleInputChangeUSER}
                             />
                             <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
                         </FormControl>
 
-                        {/* <FormControl isInvalid={isPortError}> */}
                         <FormControl isRequired>
                             <FormLabel htmlFor="port">ポート番号</FormLabel>
                             <Input
                                 id="port"
                                 placeholder="22"
                                 value={port}
-                                // onChange={handleInputChangePORT}
+                                onChange={handleInputChangePORT}
                             />
                             <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
                         </FormControl>
 
-                        {/* <FormControl isInvalid={isKeyError}> */}
                         <FormControl isRequired>
                             <FormLabel htmlFor="key">SSH秘密鍵ファイルパス</FormLabel>
                             <Input
                                 id="key"
                                 placeholder="/home/montea/id_ed25519"
                                 value={key}
-                                // onChange={handleInputChangeKEY}
+                                onChange={handleInputChangeKEY}
                             />
                             <FormHelperText>
                                 スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。
@@ -255,14 +260,13 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                     <ModalHeader>スキャン対象サーバ</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={6}>
-                        {/* <FormControl isInvalid={isIpError}> */}
                         <FormControl isRequired>
                             <FormLabel htmlFor="host">IPアドレス</FormLabel>
                             <Input
                                 id="host"
                                 placeholder="127.0.0.1"
                                 value={host}
-                                onChange={handleInputChangeAddHOST}
+                                onChange={e => setHOST(e.target.value)}
                             />
                             <FormHelperText>
                                 スキャン対象サーバーのIPアドレスを入力してください。
@@ -270,38 +274,41 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             </FormHelperText>
                         </FormControl>
 
-                        {/* <FormControl isInvalid={isUserError}> */}
                         <FormControl isRequired>
                             <FormLabel htmlFor="user">ユーザー名</FormLabel>
                             <Input
                                 id="user"
                                 placeholder="montea"
                                 value={user}
-                                onChange={handleInputChangeAddUSER}
+                                // onChange={
+                                //     (e: React.ChangeEvent<HTMLInputElement>) => 
+                                //         useCallback(() => {
+                                //             setUSER(e.target.value);
+                                //     }, [])
+                                // }
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setUSER(e.target.value)}}
                             />
                             <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
                         </FormControl>
 
-                        {/* <FormControl isInvalid={isPortError}> */}
                         <FormControl isRequired>
                             <FormLabel htmlFor="port">ポート番号</FormLabel>
                             <Input
                                 id="port"
                                 placeholder="22"
                                 value={port}
-                                onChange={handleInputChangeAddPORT}
+                                onChange={e => setPORT(e.target.value)}
                             />
                             <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
                         </FormControl>
 
-                        {/* <FormControl isInvalid={isKeyError}> */}
                         <FormControl isRequired>
                             <FormLabel htmlFor="key">SSH秘密鍵ファイルパス</FormLabel>
                             <Input
                                 id="key"
                                 placeholder="/home/montea/id_ed25519"
                                 value={key}
-                                onChange={handleInputChangeAddKEY}
+                                onChange={e => setKEY(e.target.value)}
                             />
                             <FormHelperText>
                                 スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。

@@ -3,14 +3,14 @@ import { readdirSync, readFileSync } from "fs";
 import { Detects } from "../../../app/types/cveTypes";
 import { Impact, VulnsList, Sum } from "../../../app/types/impactTypes";
 
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+// const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
-    await delay(1000);
+    // await delay(1000);
 
     let dirList: string[] = new Array();
     dirList = readdirSync("../../src/vulns_result/", {withFileTypes: true}).filter(dirent => dirent.isFile()).map(dirent => dirent.name);
