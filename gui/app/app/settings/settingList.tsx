@@ -39,29 +39,39 @@ export default async function SettingList({ configPromise }: { configPromise: Se
     const config = configPromise;
     const router = useRouter();
 
-    const [host, setHOST] = useState('');
-    const [port, setPORT] = useState('');
-    const [user, setUSER] = useState('');
-    const [key,  setKEY]  = useState('');
+    const [host, setHost] = useState('');
+    const [port, setPort] = useState('');
+    const [user, setUser] = useState('');
+    const [key,  setKey]  = useState('');
 
-    const handleInputChangeHOST = useCallback((e: any) => {
-        setHOST(e.target.value);
-    },[]);
+    const inputHost = useRef<HTMLInputElement>(null);
+    const inputPort = useRef<HTMLInputElement>(null);
+    const inputUser = useRef<HTMLInputElement>(null);
+    const inputKey  = useRef<HTMLInputElement>(null);
 
-    const handleInputChangePORT = useCallback(
-        (e: any) => setPORT(e.target.value),[]
-    )
-    const handleInputChangeUSER = useCallback(
-        (e: any) => setUSER(e.target.value),[]
-    )
-    const handleInputChangeKEY  = useCallback(
-        (e: any) => setKEY(e.target.value),[]
-    )
+    useEffect(() => {
+        if (inputHost.current != null) {
+            inputHost.current.focus();
+        }
+    }, []);
 
-    // const isIpError   = host   === '';
-    // const isPortError = port === '';
-    // const isUserError = user === '';
-    // const isKeyError  = key  === '';
+    useEffect(() => {
+        if (inputPort.current != null) {
+            inputPort.current.focus();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (inputUser.current != null) {
+            inputUser.current.focus();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (inputKey.current != null) {
+            inputKey.current.focus();
+        }
+    }, []);
 
     const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
     const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
@@ -72,19 +82,24 @@ export default async function SettingList({ configPromise }: { configPromise: Se
 
     const putClick = () => {
         console.log("Create:", { host, port, user, key });
-        setHOST('');
-        setPORT('');
-        setUSER('');
-        setKEY('');
+        setHost('');
+        setPort('');
+        setUser('');
+        setKey('');
     };
 
-    const deleteClick = () => {
-        console.log("Delete:", { host, port, user, key });
-        setHOST('');
-        setPORT('');
-        setUSER('');
-        setKEY('');
-        onModalClose();
+    const deleteClick = (host) => {
+        fetch("/api/deleteConfig/", {
+            method: "DELETE"
+        }).then((res) => {
+            if (res.status === 200) {
+                onModalClose();
+                router.push("/settings/");
+            } else {
+                onModalClose();
+                throw new Error("Failed to delete config list...");
+            }
+        })
     };
 
     async function postClick() {
@@ -94,10 +109,10 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                user: user,
-                host: host,
-                port: port,
-                key : key
+                user: inputUser.current.value,
+                host: inputHost.current.value,
+                port: inputPort.current.value,
+                key : inputKey.current.value
             }),
         }).then((res) => {
             if (res.status === 200) {
@@ -133,7 +148,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Td><Button onClick={onModalAddOpen} ref={finalRef} colorScheme="teal">追加</Button></Td>
                         </Tr>
                         {config.map((v) => (
-                        <Tr>
+                        <Tr key={v.host}>
                             <Td>{v.host}</Td>
                             <Td>{v.user}</Td>
                             <Td>{v.port}</Td>
@@ -166,7 +181,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                                 id="host"
                                 placeholder="127.0.0.1"
                                 value={host}
-                                onChange={handleInputChangeHOST}
+                                // onChange={handleInputChangeHOST}
                             />
                             <FormHelperText>
                                 スキャン対象サーバーのIPアドレスを入力してください。
@@ -180,7 +195,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                                 id="user"
                                 placeholder="montea"
                                 value={user}
-                                onChange={handleInputChangeUSER}
+                                // onChange={handleInputChangeUSER}
                             />
                             <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
                         </FormControl>
@@ -191,7 +206,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                                 id="port"
                                 placeholder="22"
                                 value={port}
-                                onChange={handleInputChangePORT}
+                                // onChange={handleInputChangePORT}
                             />
                             <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
                         </FormControl>
@@ -202,7 +217,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                                 id="key"
                                 placeholder="/home/montea/id_ed25519"
                                 value={key}
-                                onChange={handleInputChangeKEY}
+                                // onChange={handleInputChangeKEY}
                             />
                             <FormHelperText>
                                 スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。
@@ -230,7 +245,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                                         <Button ref={cancelRef} onClick={onAlertClose}>
                                             キャンセル
                                         </Button>
-                                        <Button colorScheme="red" onClick={deleteClick} ml={3}>
+                                        <Button colorScheme="red" onClick={(e) => deleteClick(v.host, e)} ml={3}>
                                             削除
                                         </Button>
                                     </AlertDialogFooter>
@@ -265,8 +280,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="host"
                                 placeholder="127.0.0.1"
-                                value={host}
-                                onChange={e => setHOST(e.target.value)}
+                                ref={inputHost}
                             />
                             <FormHelperText>
                                 スキャン対象サーバーのIPアドレスを入力してください。
@@ -279,14 +293,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="user"
                                 placeholder="montea"
-                                value={user}
-                                // onChange={
-                                //     (e: React.ChangeEvent<HTMLInputElement>) => 
-                                //         useCallback(() => {
-                                //             setUSER(e.target.value);
-                                //     }, [])
-                                // }
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setUSER(e.target.value)}}
+                                ref={inputUser}
                             />
                             <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
                         </FormControl>
@@ -296,8 +303,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="port"
                                 placeholder="22"
-                                value={port}
-                                onChange={e => setPORT(e.target.value)}
+                                ref={inputPort}
                             />
                             <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
                         </FormControl>
@@ -307,8 +313,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="key"
                                 placeholder="/home/montea/id_ed25519"
-                                value={key}
-                                onChange={e => setKEY(e.target.value)}
+                                ref={inputKey}
                             />
                             <FormHelperText>
                                 スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。
