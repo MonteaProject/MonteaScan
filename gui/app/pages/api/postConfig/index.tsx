@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         let save = JSON.stringify(json, null, 2);
         writeFileSync("../../src/config/config.json", save);
 
-        return res.status(200);
+        return res.status(200).end();
     } else {
         return res.status(405).end();
     }

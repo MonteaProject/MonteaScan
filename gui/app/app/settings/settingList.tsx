@@ -78,7 +78,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
     const finalRef   = useRef(null);
 
     const router = useRouter();
-    const addClick = async() => {
+    async function addClick() {
         await fetch("/api/postConfig/", {
             method: "POST",
             headers: {
@@ -92,12 +92,13 @@ export default async function SettingList({ configPromise }: { configPromise: Se
             }),
         }).then((res) => {
             if (res.ok) {
-                router.push("/");
+                onModalAddClose();
+                router.push("/settings/");
             } else {
                 throw new Error("Failed to write config list...");
             }
         })
-    }
+    };
 
     return (
         <Box>
