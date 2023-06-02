@@ -47,11 +47,6 @@ export default async function SettingList({ configPromise }: { configPromise: Se
         key : ""
     });
 
-    const [host, setHost] = useState('');
-    const [port, setPort] = useState('');
-    const [user, setUser] = useState('');
-    const [key,  setKey]  = useState('');
-
     const inputHost = useRef<HTMLInputElement>(null);
     const inputPort = useRef<HTMLInputElement>(null);
     const inputUser = useRef<HTMLInputElement>(null);
@@ -88,50 +83,84 @@ export default async function SettingList({ configPromise }: { configPromise: Se
         }
     }, []);
 
-    const putClick = () => {
-        console.log("Create:", { host, port, user, key });
-        setHost('');
-        setPort('');
-        setUser('');
-        setKey ('');
+    async function patchClick() {
+        try {
+            await fetch("/api/patchConfig/", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user: inputUser.current.value,
+                    host: inputHost.current.value,
+                    port: inputPort.current.value,
+                    key : inputKey.current.value
+                }),
+                cache: "no-store"
+            }).then((res) => {
+                if (res.status === 200) {
+                    onModalClose();
+                    router.push("/settings/");
+                    router.refresh();
+                } else {
+                    onModalClose();
+                    throw new Error("Failed to patch config list...");
+                }
+            });
+        } catch(e) {
+            onModalClose();
+            throw new Error("Failed to patch config list...");
+        }
     };
 
     async function deleteClick(host: string) {
-        await fetch(`/api/deleteConfig/${host}`, {
-            method: "DELETE"
-        }).then((res) => {
-            console.log(res.status);
-            if (res.status === 200) {
-                onModalClose();
-                router.push("/");
-            } else {
-                onModalClose();
-                throw new Error("Failed to delete config list...");
-            }
-        })
+        try {
+            await fetch(`/api/deleteConfig/${host}`, {
+                method: "DELETE",
+                cache: "no-store"
+            }).then((res) => {
+                if (res.status === 200) {
+                    onModalClose();
+                    router.push("/settings/");
+                    router.refresh();
+                } else {
+                    onModalClose();
+                    throw new Error("Failed to delete config list...");
+                }
+            });
+        } catch(e) {
+            onModalClose();
+            throw new Error("Failed to delete config list...");
+        }
     };
 
     async function postClick() {
-        await fetch("/api/postConfig/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                user: inputUser.current.value,
-                host: inputHost.current.value,
-                port: inputPort.current.value,
-                key : inputKey.current.value
-            }),
-        }).then((res) => {
-            if (res.status === 200) {
-                onModalAddClose();
-                router.push("/settings/");
-            } else {
-                onModalAddClose();
-                throw new Error("Failed to save config list...");
-            }
-        })
+        try {
+            await fetch("/api/postConfig/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user: inputUser.current.value,
+                    host: inputHost.current.value,
+                    port: inputPort.current.value,
+                    key : inputKey.current.value
+                }),
+                cache: "no-store"
+            }).then((res) => {
+                if (res.status === 200) {
+                    onModalAddClose();
+                    router.push("/settings/");
+                } else {
+                    onModalAddClose();
+                    throw new Error("Failed to post config list...");
+                }
+            });
+        } catch(e) {
+            onModalAddClose();
+            throw new Error("Failed to post config list...");
+        }
     };
 
     function modalOpen() {
@@ -201,6 +230,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="host"
                                 defaultValue={value.host}
+                                ref={inputHost}
                             />
                             <FormHelperText>
                                 スキャン対象サーバーのIPアドレスを入力してください。
@@ -213,6 +243,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="user"
                                 defaultValue={value.user}
+                                ref={inputUser}
                             />
                             <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
                         </FormControl>
@@ -222,6 +253,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="port"
                                 defaultValue={value.port}
+                                ref={inputPort}
                             />
                             <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
                         </FormControl>
@@ -231,6 +263,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="key"
                                 defaultValue={value.key}
+                                ref={inputKey}
                             />
                             <FormHelperText>
                                 スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。
@@ -266,7 +299,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             </AlertDialogOverlay>
                         </AlertDialog>
 
-                        <Button colorScheme="teal" onClick={putClick} mr={3}>
+                        <Button colorScheme="teal" mr={3} onClick={patchClick}>
                             保存
                         </Button>
                     </ModalFooter>

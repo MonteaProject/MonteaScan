@@ -4,13 +4,16 @@ import { Setting } from "../../../app/types/settingTypes";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse){
-    if (req.method === "DELETE") {
+    if (req.method === "PATCH"){
         try {
-            const { host } = req.query;
+            const tmp = req.body;
             const json = JSON.parse(readFileSync("../../src/config/config.json", "utf8")) as Setting;
-            const deleteJson = json.server.filter((v) => v.host !== host);
-            const newJson = {server: deleteJson}
-            let save = JSON.stringify(newJson, null, 2);
+            json.server.filter((v, index, array) => {
+                if (v.host === tmp.host) {
+                    array[index] = tmp;
+                };
+            });
+            let save = JSON.stringify(json, null, 2);
             writeFileSync("../../src/config/config.json", save);
             return res.status(200).end();
         } catch(e) {
