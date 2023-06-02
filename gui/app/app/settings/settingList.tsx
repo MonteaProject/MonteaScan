@@ -36,15 +36,15 @@ import {
 
 
 export default async function SettingList({ configPromise }: { configPromise: Settings[] }) {
-    const [config, setConfig] = useState(configPromise);
-    // const config = configPromise;
+    // const [config, setConfig] = useState(configPromise);
+    const config = configPromise;
     const router = useRouter();
 
-    const[value, setValue] = useState({
+    const[value, setEdit] = useState({
         user: "",
         host: "",
         port: "",
-        key:  ""
+        key : ""
     });
 
     const [host, setHost] = useState('');
@@ -56,6 +56,13 @@ export default async function SettingList({ configPromise }: { configPromise: Se
     const inputPort = useRef<HTMLInputElement>(null);
     const inputUser = useRef<HTMLInputElement>(null);
     const inputKey  = useRef<HTMLInputElement>(null);
+    
+    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
+    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
+    const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
+    const cancelRef  = useRef<HTMLButtonElement>(null);
+    const initialRef = useRef(null);
+    const finalRef   = useRef(null);
 
     useEffect(() => {
         if (inputHost.current != null) {
@@ -81,40 +88,27 @@ export default async function SettingList({ configPromise }: { configPromise: Se
         }
     }, []);
 
-    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
-    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
-    const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
-    const cancelRef  = useRef<HTMLButtonElement>(null);
-    const initialRef = useRef(null);
-    const finalRef   = useRef(null);
-
-    
-
     const putClick = () => {
         console.log("Create:", { host, port, user, key });
         setHost('');
         setPort('');
         setUser('');
-        setKey('');
+        setKey ('');
     };
 
-    function deleteClick(host) {
-        console.log(host);
-        onModalClose();
-
-        const newConfig = config.filter((v) => v.host !== host);
-        setConfig(newConfig);
-        // fetch("/api/deleteConfig/", {
-        //     method: "DELETE"
-        // }).then((res) => {
-        //     if (res.status === 200) {
-        //         onModalClose();
-        //         router.push("/settings/");
-        //     } else {
-        //         onModalClose();
-        //         throw new Error("Failed to delete config list...");
-        //     }
-        // })
+    async function deleteClick(host: string) {
+        await fetch(`/api/deleteConfig/${host}`, {
+            method: "DELETE"
+        }).then((res) => {
+            console.log(res.status);
+            if (res.status === 200) {
+                onModalClose();
+                router.push("/");
+            } else {
+                onModalClose();
+                throw new Error("Failed to delete config list...");
+            }
+        })
     };
 
     async function postClick() {
@@ -175,7 +169,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Td>
                                 <Button onClick={() => {
                                     modalOpen();
-                                    setValue({ ...value, user: v.user, host: v.host, port: v.port, key: v.key});
+                                    setEdit({ ...value, user: v.user, host: v.host, port: v.port, key: v.key});
                                 }}
                                 ref={finalRef}
                                 colorScheme="gray">編集
@@ -207,7 +201,6 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="host"
                                 defaultValue={value.host}
-                                // onChange={handleInputChangeHOST}
                             />
                             <FormHelperText>
                                 スキャン対象サーバーのIPアドレスを入力してください。
@@ -220,7 +213,6 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="user"
                                 defaultValue={value.user}
-                                // onChange={handleInputChangeUSER}
                             />
                             <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
                         </FormControl>
@@ -230,7 +222,6 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="port"
                                 defaultValue={value.port}
-                                // onChange={handleInputChangePORT}
                             />
                             <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
                         </FormControl>
@@ -240,7 +231,6 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Input
                                 id="key"
                                 defaultValue={value.key}
-                                // onChange={handleInputChangeKEY}
                             />
                             <FormHelperText>
                                 スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。
@@ -268,7 +258,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                                         <Button ref={cancelRef} onClick={onAlertClose}>
                                             キャンセル
                                         </Button>
-                                        <Button colorScheme="red" ml={3} onClick={() => deleteClick(host)}>
+                                        <Button colorScheme="red" ml={3} onClick={() => deleteClick(value.host)}>
                                             削除
                                         </Button>
                                     </AlertDialogFooter>
