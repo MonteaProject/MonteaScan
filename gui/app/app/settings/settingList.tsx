@@ -36,8 +36,16 @@ import {
 
 
 export default async function SettingList({ configPromise }: { configPromise: Settings[] }) {
-    const config = configPromise;
+    const [config, setConfig] = useState(configPromise);
+    // const config = configPromise;
     const router = useRouter();
+
+    const[value, setValue] = useState({
+        user: "",
+        host: "",
+        port: "",
+        key:  ""
+    });
 
     const [host, setHost] = useState('');
     const [port, setPort] = useState('');
@@ -80,6 +88,8 @@ export default async function SettingList({ configPromise }: { configPromise: Se
     const initialRef = useRef(null);
     const finalRef   = useRef(null);
 
+    
+
     const putClick = () => {
         console.log("Create:", { host, port, user, key });
         setHost('');
@@ -88,18 +98,23 @@ export default async function SettingList({ configPromise }: { configPromise: Se
         setKey('');
     };
 
-    const deleteClick = (host) => {
-        fetch("/api/deleteConfig/", {
-            method: "DELETE"
-        }).then((res) => {
-            if (res.status === 200) {
-                onModalClose();
-                router.push("/settings/");
-            } else {
-                onModalClose();
-                throw new Error("Failed to delete config list...");
-            }
-        })
+    function deleteClick(host) {
+        console.log(host);
+        onModalClose();
+
+        const newConfig = config.filter((v) => v.host !== host);
+        setConfig(newConfig);
+        // fetch("/api/deleteConfig/", {
+        //     method: "DELETE"
+        // }).then((res) => {
+        //     if (res.status === 200) {
+        //         onModalClose();
+        //         router.push("/settings/");
+        //     } else {
+        //         onModalClose();
+        //         throw new Error("Failed to delete config list...");
+        //     }
+        // })
     };
 
     async function postClick() {
@@ -124,6 +139,10 @@ export default async function SettingList({ configPromise }: { configPromise: Se
             }
         })
     };
+
+    function modalOpen() {
+        onModalOpen();
+    }
 
     return (
         <Box>
@@ -153,14 +172,22 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Td>{v.user}</Td>
                             <Td>{v.port}</Td>
                             <Td>{v.key}</Td>
-                            <Td><Button onClick={onModalOpen} ref={finalRef} colorScheme="gray">編集</Button></Td>
+                            <Td>
+                                <Button onClick={() => {
+                                    modalOpen();
+                                    setValue({ ...value, user: v.user, host: v.host, port: v.port, key: v.key});
+                                }}
+                                ref={finalRef}
+                                colorScheme="gray">編集
+                                </Button>
+                            </Td>
                         </Tr>
                         ))}
                     </Tbody>
                 </Table>
             </TableContainer>
 
-            {/* 編集 */}
+            {/* 編集/削除 */}
             <Modal
                 size={"xl"}
                 blockScrollOnMount={false}
@@ -179,8 +206,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <FormLabel htmlFor="host">IPアドレス</FormLabel>
                             <Input
                                 id="host"
-                                placeholder="127.0.0.1"
-                                value={host}
+                                defaultValue={value.host}
                                 // onChange={handleInputChangeHOST}
                             />
                             <FormHelperText>
@@ -193,8 +219,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <FormLabel htmlFor="user">ユーザー名</FormLabel>
                             <Input
                                 id="user"
-                                placeholder="montea"
-                                value={user}
+                                defaultValue={value.user}
                                 // onChange={handleInputChangeUSER}
                             />
                             <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
@@ -204,8 +229,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <FormLabel htmlFor="port">ポート番号</FormLabel>
                             <Input
                                 id="port"
-                                placeholder="22"
-                                value={port}
+                                defaultValue={value.port}
                                 // onChange={handleInputChangePORT}
                             />
                             <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
@@ -215,8 +239,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <FormLabel htmlFor="key">SSH秘密鍵ファイルパス</FormLabel>
                             <Input
                                 id="key"
-                                placeholder="/home/montea/id_ed25519"
-                                value={key}
+                                defaultValue={value.key}
                                 // onChange={handleInputChangeKEY}
                             />
                             <FormHelperText>
@@ -245,7 +268,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                                         <Button ref={cancelRef} onClick={onAlertClose}>
                                             キャンセル
                                         </Button>
-                                        <Button colorScheme="red" onClick={(e) => deleteClick(v.host, e)} ml={3}>
+                                        <Button colorScheme="red" ml={3} onClick={() => deleteClick(host)}>
                                             削除
                                         </Button>
                                     </AlertDialogFooter>

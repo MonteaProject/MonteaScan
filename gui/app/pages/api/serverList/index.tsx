@@ -14,9 +14,6 @@ export default async function handler(
 
     for (let v of dirList) {
       const file = JSON.parse(readFileSync(`../../src/scan_result/${v}`, "utf8"));
-      // tmp.hostname.sort((a: any, b: any) => {
-      //   return new Date(b.time).valueOf() - new Date(a.time).valueOf();
-      // });
       files.push(file);
     }
 
