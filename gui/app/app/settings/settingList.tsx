@@ -36,18 +36,28 @@ import {
 
 
 export default async function SettingList({ configPromise }: { configPromise: Settings[] }) {
+    // const [config, setConfig] = useState(configPromise);
     const config = configPromise;
     const router = useRouter();
 
-    const [host, setHost] = useState('');
-    const [port, setPort] = useState('');
-    const [user, setUser] = useState('');
-    const [key,  setKey]  = useState('');
+    const[value, setEdit] = useState({
+        user: "",
+        host: "",
+        port: "",
+        key : ""
+    });
 
     const inputHost = useRef<HTMLInputElement>(null);
     const inputPort = useRef<HTMLInputElement>(null);
     const inputUser = useRef<HTMLInputElement>(null);
     const inputKey  = useRef<HTMLInputElement>(null);
+    
+    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
+    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
+    const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
+    const cancelRef  = useRef<HTMLButtonElement>(null);
+    const initialRef = useRef(null);
+    const finalRef   = useRef(null);
 
     useEffect(() => {
         if (inputHost.current != null) {
@@ -73,57 +83,89 @@ export default async function SettingList({ configPromise }: { configPromise: Se
         }
     }, []);
 
-    const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
-    const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
-    const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
-    const cancelRef  = useRef<HTMLButtonElement>(null);
-    const initialRef = useRef(null);
-    const finalRef   = useRef(null);
-
-    const putClick = () => {
-        console.log("Create:", { host, port, user, key });
-        setHost('');
-        setPort('');
-        setUser('');
-        setKey('');
+    async function patchClick() {
+        try {
+            await fetch("/api/patchConfig/", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user: inputUser.current.value,
+                    host: inputHost.current.value,
+                    port: inputPort.current.value,
+                    key : inputKey.current.value
+                }),
+                cache: "no-store"
+            }).then((res) => {
+                if (res.status === 200) {
+                    onModalClose();
+                    router.push("/settings/");
+                    router.refresh();
+                } else {
+                    onModalClose();
+                    throw new Error("Failed to patch config list...");
+                }
+            });
+        } catch(e) {
+            onModalClose();
+            throw new Error("Failed to patch config list...");
+        }
     };
 
-    const deleteClick = (host) => {
-        fetch("/api/deleteConfig/", {
-            method: "DELETE"
-        }).then((res) => {
-            if (res.status === 200) {
-                onModalClose();
-                router.push("/settings/");
-            } else {
-                onModalClose();
-                throw new Error("Failed to delete config list...");
-            }
-        })
+    async function deleteClick(host: string) {
+        try {
+            await fetch(`/api/deleteConfig/${host}`, {
+                method: "DELETE",
+                cache: "no-store"
+            }).then((res) => {
+                if (res.status === 200) {
+                    onModalClose();
+                    router.push("/settings/");
+                    router.refresh();
+                } else {
+                    onModalClose();
+                    throw new Error("Failed to delete config list...");
+                }
+            });
+        } catch(e) {
+            onModalClose();
+            throw new Error("Failed to delete config list...");
+        }
     };
 
     async function postClick() {
-        await fetch("/api/postConfig/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                user: inputUser.current.value,
-                host: inputHost.current.value,
-                port: inputPort.current.value,
-                key : inputKey.current.value
-            }),
-        }).then((res) => {
-            if (res.status === 200) {
-                onModalAddClose();
-                router.push("/settings/");
-            } else {
-                onModalAddClose();
-                throw new Error("Failed to save config list...");
-            }
-        })
+        try {
+            await fetch("/api/postConfig/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user: inputUser.current.value,
+                    host: inputHost.current.value,
+                    port: inputPort.current.value,
+                    key : inputKey.current.value
+                }),
+                cache: "no-store"
+            }).then((res) => {
+                if (res.status === 200) {
+                    onModalAddClose();
+                    router.push("/settings/");
+                } else {
+                    onModalAddClose();
+                    throw new Error("Failed to post config list...");
+                }
+            });
+        } catch(e) {
+            onModalAddClose();
+            throw new Error("Failed to post config list...");
+        }
     };
+
+    function modalOpen() {
+        onModalOpen();
+    }
 
     return (
         <Box>
@@ -153,14 +195,22 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <Td>{v.user}</Td>
                             <Td>{v.port}</Td>
                             <Td>{v.key}</Td>
-                            <Td><Button onClick={onModalOpen} ref={finalRef} colorScheme="gray">編集</Button></Td>
+                            <Td>
+                                <Button onClick={() => {
+                                    modalOpen();
+                                    setEdit({ ...value, user: v.user, host: v.host, port: v.port, key: v.key});
+                                }}
+                                ref={finalRef}
+                                colorScheme="gray">編集
+                                </Button>
+                            </Td>
                         </Tr>
                         ))}
                     </Tbody>
                 </Table>
             </TableContainer>
 
-            {/* 編集 */}
+            {/* 編集/削除 */}
             <Modal
                 size={"xl"}
                 blockScrollOnMount={false}
@@ -179,9 +229,8 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <FormLabel htmlFor="host">IPアドレス</FormLabel>
                             <Input
                                 id="host"
-                                placeholder="127.0.0.1"
-                                value={host}
-                                // onChange={handleInputChangeHOST}
+                                defaultValue={value.host}
+                                ref={inputHost}
                             />
                             <FormHelperText>
                                 スキャン対象サーバーのIPアドレスを入力してください。
@@ -193,9 +242,8 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <FormLabel htmlFor="user">ユーザー名</FormLabel>
                             <Input
                                 id="user"
-                                placeholder="montea"
-                                value={user}
-                                // onChange={handleInputChangeUSER}
+                                defaultValue={value.user}
+                                ref={inputUser}
                             />
                             <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
                         </FormControl>
@@ -204,9 +252,8 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <FormLabel htmlFor="port">ポート番号</FormLabel>
                             <Input
                                 id="port"
-                                placeholder="22"
-                                value={port}
-                                // onChange={handleInputChangePORT}
+                                defaultValue={value.port}
+                                ref={inputPort}
                             />
                             <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
                         </FormControl>
@@ -215,9 +262,8 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             <FormLabel htmlFor="key">SSH秘密鍵ファイルパス</FormLabel>
                             <Input
                                 id="key"
-                                placeholder="/home/montea/id_ed25519"
-                                value={key}
-                                // onChange={handleInputChangeKEY}
+                                defaultValue={value.key}
+                                ref={inputKey}
                             />
                             <FormHelperText>
                                 スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。
@@ -245,7 +291,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                                         <Button ref={cancelRef} onClick={onAlertClose}>
                                             キャンセル
                                         </Button>
-                                        <Button colorScheme="red" onClick={(e) => deleteClick(v.host, e)} ml={3}>
+                                        <Button colorScheme="red" ml={3} onClick={() => deleteClick(value.host)}>
                                             削除
                                         </Button>
                                     </AlertDialogFooter>
@@ -253,7 +299,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
                             </AlertDialogOverlay>
                         </AlertDialog>
 
-                        <Button colorScheme="teal" onClick={putClick} mr={3}>
+                        <Button colorScheme="teal" mr={3} onClick={patchClick}>
                             保存
                         </Button>
                     </ModalFooter>

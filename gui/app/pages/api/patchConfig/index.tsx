@@ -4,10 +4,15 @@ import { Setting } from "../../../app/types/settingTypes";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse){
-    if (req.method === "POST"){
+    if (req.method === "PATCH"){
         try {
-            let json = JSON.parse(readFileSync("../../src/config/config.json", "utf8")) as Setting;
-            json.server.push(req.body);
+            const tmp = req.body;
+            const json = JSON.parse(readFileSync("../../src/config/config.json", "utf8")) as Setting;
+            json.server.filter((v, index, array) => {
+                if (v.host === tmp.host) {
+                    array[index] = tmp;
+                };
+            });
             let save = JSON.stringify(json, null, 2);
             writeFileSync("../../src/config/config.json", save);
             return res.status(200).end();
