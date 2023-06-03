@@ -1,4 +1,4 @@
-import { Heading, Button, Box } from "../../common/components";
+import { Heading, Button, Box } from "./common/components";
 import NextLink from "next/link";
 
 export default function NotFound() {

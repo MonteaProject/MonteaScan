@@ -2,12 +2,17 @@ import "./serverList.scss";
 import { Host } from "../types/hostTypes";
 import NextLink from "next/link";
 import { Box } from "../common/components";
+import { notFound } from "next/navigation";
 
 async function getServerList() {
   const res = await fetch("http://localhost:3000/api/serverList/", {cache: "no-store"});
 
   if (!res.ok) {
     throw new Error("Failed to fetch server list...");
+  }
+
+  if (res.status === 404) {
+    notFound();
   }
 
   const data = await res.json();

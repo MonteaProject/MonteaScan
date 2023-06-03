@@ -1,6 +1,7 @@
 "use client";
-import { Pkg } from "../types/pkgTypes";
 import "./info.scss"
+import { Pkg } from "../../types/pkgTypes";
+import { notFound } from "next/navigation";
 import {
     Drawer,
     DrawerBody,
@@ -11,15 +12,34 @@ import {
     DrawerCloseButton,
     useDisclosure,
     Box
-} from "../common/components";
+} from "../../common/components";
 
-export default async function Info ({ infoPromises }: { infoPromises: Pkg[] }) {
-    const info = infoPromises;
 
+const getServerInfo = async (hostname: string) => {
+    const res = await fetch(
+        `/api/serverInfo/${hostname}`, {cache: "no-store"}
+    );
+
+    if (res.status === 404) {
+        notFound();
+    }
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch server infomation...");
+    }
+
+    const data = await res.json();
+    return data.pkg as Pkg[];
+}
+
+export default async function Info ({ infoPass }: { infoPass: string }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const handleClick = () => {
         onOpen()
     }
+    
+    const info = await getServerInfo(infoPass);
+    
     return (
         <Box>
             <table className="responsive-info-table">
