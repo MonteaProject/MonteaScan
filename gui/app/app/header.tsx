@@ -30,10 +30,10 @@ export default function Header() {
           <MenuButton><ChevronDownIcon /> メニュー</MenuButton>
           <MenuList>
             <MenuGroup title="メニュー">
-              <MenuItem as='a' href="/components/" icon={<ExternalLinkIcon />}>
+              <MenuItem as='a' href="/server/" icon={<ExternalLinkIcon />}>
                 サーバ一覧
               </MenuItem>
-              <MenuItem as='a' href="/settings/" icon={<SettingsIcon />}>
+              <MenuItem as='a' href="/config/" icon={<SettingsIcon />}>
                 設定
               </MenuItem>
             </MenuGroup>

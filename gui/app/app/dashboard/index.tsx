@@ -21,7 +21,7 @@ async function getVulnsList() {
   return data as VulnsList;
 }
 
-export default async function VulnsList() {
+export default async function Dashboard() {
   const v       = await getVulnsList();
   const vImpact = v.impact;
   const vSum    = v.sum;
@@ -39,7 +39,7 @@ export default async function VulnsList() {
         <Stat>
           <StatLabel>Total</StatLabel>
           <CircularProgress max={total_per} value={total_per} size='140px' thickness='10px' color='green.400'>
-          <NextLink href="/components/">
+          <NextLink href="/server/">
             <CircularProgressLabel _hover={{color: 'green.400'}}>{s.totalTotal}</CircularProgressLabel>
           </NextLink>
           </CircularProgress>
@@ -48,7 +48,7 @@ export default async function VulnsList() {
         <Stat>
           <StatLabel>Critical</StatLabel>
           <CircularProgress max={total_per} value={critical_per} size='140px' thickness='10px' color='red.700'>
-          <NextLink href="/components/">
+          <NextLink href="/server/">
             <CircularProgressLabel _hover={{color: 'green.400'}}>{s.criticalTotal}</CircularProgressLabel>
           </NextLink>
           </CircularProgress>
@@ -57,7 +57,7 @@ export default async function VulnsList() {
         <Stat>
           <StatLabel>High</StatLabel>
           <CircularProgress max={total_per} value={important_per} size='140px' thickness='10px' color='orange.400'>
-          <NextLink href="/components/">
+          <NextLink href="/server/">
             <CircularProgressLabel _hover={{color: 'green.400'}}>{s.importantTotal}</CircularProgressLabel>
           </NextLink>
           </CircularProgress>
@@ -66,7 +66,7 @@ export default async function VulnsList() {
         <Stat>
           <StatLabel>Medium</StatLabel>
           <CircularProgress max={total_per} value={moderate_per} size='140px' thickness='10px' color='yellow.400'>
-          <NextLink href="/components/">
+          <NextLink href="/server/">
             <CircularProgressLabel _hover={{color: 'green.400'}}>{s.moderateTotal}</CircularProgressLabel>
           </NextLink>
           </CircularProgress>
@@ -75,7 +75,7 @@ export default async function VulnsList() {
         <Stat>
           <StatLabel>Low</StatLabel>
           <CircularProgress max={total_per} value={low_per} size='140px' thickness='10px' color='blue.400'>
-          <NextLink href="/components/">
+          <NextLink href="/server/">
             <CircularProgressLabel _hover={{color: 'green.400'}}>{s.lowTotal}</CircularProgressLabel>
           </NextLink>
           </CircularProgress>
@@ -87,35 +87,35 @@ export default async function VulnsList() {
       <StatGroup>
         <Stat>
           <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/select/${d.hostname}`}>
+          <NextLink href={`/info/${d.hostname}`}>
             <StatNumber _hover={{color: 'green.400'}}>{d.total}</StatNumber>
           </NextLink>
         </Stat>
         
         <Stat>
           <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/select/${d.hostname}`}>
+          <NextLink href={`/info/${d.hostname}`}>
             <StatNumber _hover={{color: 'green.400'}}>{d.critical}</StatNumber>
           </NextLink>
         </Stat>
       
         <Stat>
           <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/select/${d.hostname}`}>
+          <NextLink href={`/info/${d.hostname}`}>
             <StatNumber _hover={{color: 'green.400'}}>{d.important}</StatNumber>
           </NextLink>
         </Stat>
 
         <Stat>
           <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/select/${d.hostname}`}>
+          <NextLink href={`/info/${d.hostname}`}>
             <StatNumber _hover={{color: 'green.400'}}>{d.moderate}</StatNumber>
           </NextLink>
         </Stat>
 
         <Stat>
           <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/select/${d.hostname}`}>
+          <NextLink href={`/info/${d.hostname}`}>
             <StatNumber _hover={{color: 'green.400'}}>{d.low}</StatNumber>
           </NextLink>
         </Stat>

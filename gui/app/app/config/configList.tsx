@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useRef, useEffect, useCallback, startTransition } from "react";
-import { Settings } from "../types/settingTypes";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { notFound } from 'next/navigation';
+import { EachConfig } from "../types/configTypes";
 import {
     Input,
     Button,
@@ -35,9 +36,21 @@ import {
 } from "../common/components";
 
 
-export default async function SettingList({ configPromise }: { configPromise: Settings[] }) {
-    // const [config, setConfig] = useState(configPromise);
-    const config = configPromise;
+async function getConfig() {
+    const res = await fetch("/api/getConfig/", {cache: "no-store"});
+
+    if (res.status === 404) {
+        notFound();
+    }
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch config list...");
+    }
+    const data = await res.json();
+    return data.server as EachConfig[];
+}
+
+export default async function ConfigList() {
     const router = useRouter();
 
     const[value, setEdit] = useState({
@@ -100,8 +113,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
             }).then((res) => {
                 if (res.status === 200) {
                     onModalClose();
-                    router.push("/settings/");
-                    router.refresh();
+                    router.push("/config/");
                 } else {
                     onModalClose();
                     throw new Error("Failed to patch config list...");
@@ -121,8 +133,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
             }).then((res) => {
                 if (res.status === 200) {
                     onModalClose();
-                    router.push("/settings/");
-                    router.refresh();
+                    router.push("/config/");
                 } else {
                     onModalClose();
                     throw new Error("Failed to delete config list...");
@@ -151,7 +162,7 @@ export default async function SettingList({ configPromise }: { configPromise: Se
             }).then((res) => {
                 if (res.status === 200) {
                     onModalAddClose();
-                    router.push("/settings/");
+                    router.push("/config/");
                 } else {
                     onModalAddClose();
                     throw new Error("Failed to post config list...");
@@ -166,6 +177,8 @@ export default async function SettingList({ configPromise }: { configPromise: Se
     function modalOpen() {
         onModalOpen();
     }
+
+    const config = await getConfig();
 
     return (
         <Box>
