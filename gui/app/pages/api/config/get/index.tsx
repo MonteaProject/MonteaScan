@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { readFileSync } from "fs";
-import { Config } from "../../../app/types/configTypes";
+import { Config } from "../../../../app/types/configTypes";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse){

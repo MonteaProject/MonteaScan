@@ -37,7 +37,7 @@ import {
 
 
 async function getConfig() {
-    const res = await fetch("/api/getConfig/", {cache: "no-store"});
+    const res = await fetch("/api/config/get/", {cache: "no-store"});
 
     if (res.status === 404) {
         notFound();
@@ -98,7 +98,7 @@ export default async function ConfigList() {
 
     async function patchClick() {
         try {
-            await fetch("/api/patchConfig/", {
+            await fetch("/api/config/patch/", {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json"
@@ -127,7 +127,7 @@ export default async function ConfigList() {
 
     async function deleteClick(host: string) {
         try {
-            await fetch(`/api/deleteConfig/${host}`, {
+            await fetch(`/api/config/delete/${host}`, {
                 method: "DELETE",
                 cache: "no-store"
             }).then((res) => {
@@ -147,7 +147,7 @@ export default async function ConfigList() {
 
     async function postClick() {
         try {
-            await fetch("/api/postConfig/", {
+            await fetch("/api/config/post/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -1,5 +1,5 @@
 import "./serverList.scss";
-import { Host } from "../types/hostTypes";
+import { Server } from "../types/serverTypes";
 import NextLink from "next/link";
 import { Box } from "../common/components";
 import { notFound } from "next/navigation";
@@ -16,11 +16,12 @@ async function getServerList() {
   }
 
   const data = await res.json();
-  return data as Host[];
+  return data as Server[];
 }
 
 export default async function ServerList() {
   const f = await getServerList();
+  
   return (
     <Box>
       <table className="responsive-serverlist-table">
@@ -41,10 +42,10 @@ export default async function ServerList() {
           <NextLink className="responsive-serverlist-table__link" href={`/info/${d.hostname}`}>
           <tr className="responsive-serverlist-table__row">
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--hostname">{d.hostname}</td>
-            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-1">5</td>
-            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-2">5</td>
-            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-3">5</td>
-            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-4">5</td>
+            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-1">{d.critical}</td>
+            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-2">{d.important}</td>
+            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-3">{d.moderate}</td>
+            <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--impact-4">{d.low}</td>
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--os">{d.os}</td>
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--kernel">{d.kernel}</td>
             <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--time">{d.time}</td>
