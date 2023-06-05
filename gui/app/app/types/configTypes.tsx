@@ -1,8 +1,8 @@
-export type Setting = {
-    server: Settings[]
+export type Config = {
+    server: EachConfig[]
 };
 
-export type Settings = {
+export type EachConfig = {
     user: string,
     host: string,
     port: string,

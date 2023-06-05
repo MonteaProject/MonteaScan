@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useRef, useEffect, useCallback, startTransition } from "react";
-import { Settings } from "../types/settingTypes";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { notFound } from 'next/navigation';
+import { Settings } from "../types/configTypes";
 import {
     Input,
     Button,
@@ -35,9 +36,21 @@ import {
 } from "../common/components";
 
 
-export default async function SettingList({ configPromise }: { configPromise: Settings[] }) {
-    // const [config, setConfig] = useState(configPromise);
-    const config = configPromise;
+async function getConfig() {
+    const res = await fetch("http://localhost:3000/api/getConfig/", {cache: "no-store"});
+
+    if (res.status === 404) {
+        notFound();
+    }
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch config list...");
+    }
+    const data = await res.json();
+    return data.server as Settings[];
+}
+
+export default async function SettingList() {
     const router = useRouter();
 
     const[value, setEdit] = useState({
@@ -166,6 +179,8 @@ export default async function SettingList({ configPromise }: { configPromise: Se
     function modalOpen() {
         onModalOpen();
     }
+
+    const config = await getConfig();
 
     return (
         <Box>
