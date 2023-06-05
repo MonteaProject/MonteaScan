@@ -129,9 +129,9 @@ fn main() -> Result<()> {
         }
 
         let mut localinfo = ScanResult {
-            time: time,
-            os: os,
-            kernel: kernel,
+            time,
+            os,
+            kernel,
             hostname: hostname.clone(),
             ip: vec![],
             pkg: vec![]
@@ -237,11 +237,11 @@ fn main() -> Result<()> {
                     let release = u[3];
                     let arch    = u[4];
 
-                    let mut a = String::from(name) + "." + arch;
+                    let a = String::from(name) + "." + arch;
                     let mut b = Vec::new();
                     for i in &updateinfo.update {
                         if a == i.name {
-                            let c: Vec<&str> = i.ver.split("-").collect();
+                            let c: Vec<&str> = i.ver.split('-').collect();
                             if c.len() == 2 {
                                 b.push(c);
                             } else {
@@ -260,11 +260,11 @@ fn main() -> Result<()> {
                     let release = u[3];
                     let arch    = u[4];
                     
-                    let mut a = String::from(name) + "." + arch;
+                    let a = String::from(name) + "." + arch;
                     let mut b = Vec::new();
                     for i in &updateinfo.update {
                         if a == i.name {
-                            let c: Vec<&str> = i.ver.split("-").collect();
+                            let c: Vec<&str> = i.ver.split('-').collect();
                             if c.len() == 2 {
                                 b.push(c);
                             } else {
@@ -291,7 +291,7 @@ fn main() -> Result<()> {
         }
 
         std::fs::create_dir_all("./src/scan_result/").unwrap();
-        let filename = String::from(hostname).replace("\n", "") + ".json";
+        let filename = String::from(hostname).replace('\n', "") + ".json";
         let dir = String::from("./src/scan_result/") + &filename;
 
         let serialized = serde_json::to_string(&localinfo).unwrap();

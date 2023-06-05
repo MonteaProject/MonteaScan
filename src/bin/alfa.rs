@@ -8,172 +8,49 @@ use time::{OffsetDateTime, macros::offset, format_description};
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct ScanResult {
-    time: String,
+    time:     String,
     hostname: String,
-    ip: Vec<String>,
-    os: String,
-    kernel: String,
-    pkg: Vec<PkgList>
+    ip:       Vec<String>,
+    os:       String,
+    kernel:   String,
+    pkg:      Vec<PkgList>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct PkgList {
-    pkgname: String,
-    pkgver: String,
+    pkgname:    String,
+    pkgver:     String,
     pkgrelease: String,
-    upver: String,
-    uprelease: String,
-    pkgarch: String
+    upver:      String,
+    uprelease:  String,
+    pkgarch:    String
+}
+
+//
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Vulns {
+    vulns: Vec<VulnsList>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct VulnsList {
-    detect: Vec<VlunsDetect>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct VlunsDetect {
-    time: String,
+    time:     String,
     hostname: String,
-    ip: Vec<String>,
-    os: String,
-    kernel: String,
-    oval: Value
+    ip:       Vec<String>,
+    os:       String,
+    kernel:   String,
+    pkg:      DetectList
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Vluns {
-    time: String,
-    hostname: String,
-    ip: Vec<String>,
-    os: String,
-    kernel: String,
-    detect: Ovalinfo
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Ovalinfo {
-    #[serde(rename = "@id")]
-    id: Option<String>,
-    #[serde(rename = "@class")]
-    class: Option<String>,
-    metadata: Option<Metadata>,
-    criteria: Option<Criteria>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Metadata {
-    title: Option<String>,
-    affected: Option<Affected>,
-    reference: Option<Vec<Reference>>,
-    description: Option<String>,
-    advisory: Option<Advisory>,
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Affected {
-    #[serde(rename = "@family")]
-    family: Option<String>,
-    platform: Option<Vec<String>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Reference {
-    #[serde(rename = "@ref_id")]
-    ref_id: Option<String>,
-    #[serde(rename = "@ref_url")]
-    ref_url: Option<String>,
-    #[serde(rename = "@source")]
-    source: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Advisory{
-    #[serde(rename = "@from")]
-    from: Option<String>,
-    severity: Option<String>,
-    rights: Option<String>,
-    issued: Option<Issued>,
-    updated: Option<Updated>,
-    cve: Option<Vec<Cve>>,
-    bugzilla: Option<Vec<Bugzilla>>,
-    affected_cpe_list: Option<AffectedCpeList>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Issued {
-    #[serde(rename = "@date")]
-    date: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Updated {
-    #[serde(rename = "@date")]
-    date: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Cve {
-    #[serde(rename = "@cvss2")]
-    cvss2: Option<String>,
-    #[serde(rename = "@cvss3")]
-    cvss3: Option<String>,
-    #[serde(rename = "@cwe")]
-    cwe: Option<String>,
-    #[serde(rename = "@href")]
-    href: Option<String>,
-    #[serde(rename = "@impact")]
-    impact: Option<String>,
-    #[serde(rename = "@public")]
-    public: Option<String>,
-    #[serde(rename = "$value")]
-    cve: Option<String>,
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Bugzilla {
-    #[serde(rename = "@href")]
-    href: Option<String>,
-    #[serde(rename = "@id")]
-    id: Option<String>,
-    #[serde(rename = "$value")]
-    bugzilla: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct AffectedCpeList {
-    cpe: Option<Vec<String>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Criteria {
-    #[serde(rename = "@operator")]
-    operator: Option<String>,
-    criterion: Option<Vec<Criterion>>,
-    criteria: Option<Vec<Criteria2>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Criterion {
-    #[serde(rename = "@comment")]
-    comment: Option<String>,
-    #[serde(rename = "@test_ref")]
-    test_ref: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Criteria2 {
-    #[serde(rename = "@operator")]
-    operator: Option<String>,
-    criterion: Option<Vec<Criterion2>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Criterion2 {
-    #[serde(rename = "@comment")]
-    comment: Option<String>,
-    #[serde(rename = "@test_ref")]
-    test_ref: Option<String>
+struct DetectList {
+    pkgname:    String,
+    pkgver:     String,
+    pkgrelease: String,
+    upver:      String,
+    uprelease:  String,
+    pkgarch:    String,
+    detect:     Value
 }
 
 
@@ -200,8 +77,8 @@ async fn main() -> Result<()> {
   for f in file_vec {
     println!("load file: {:?}", f);
 
-    let mut vulns_list = VulnsList {
-      detect: vec![]
+    let mut vulns_vec = Vulns {
+      vulns: vec![]
     };
 
     let file = match File::open(&f) {
@@ -214,9 +91,10 @@ async fn main() -> Result<()> {
 
     let release = &scan_r.os.split_whitespace().collect::<Vec<_>>();
 
-      // RockyLinux 9
+    // RockyLinux 9
     if release[0] == "Rocky" && release[1] == "Linux" && release[2] == "release" {
       let majorver: Vec<&str> = release[3].split('.').collect();
+      // 9
       if majorver[0] == "9" {
         let url = String::from("http://127.0.0.1:7878/rhel9/");
         let client = Client::new();
@@ -279,16 +157,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -344,16 +232,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -366,11 +264,8 @@ async fn main() -> Result<()> {
           }
         }
       }
-    }
 
-    // RockyLinux 8
-    if release[0] == "Rocky" && release[1] == "Linux" && release[2] == "release" {
-      let majorver: Vec<&str> = release[3].split('.').collect();
+      // 8
       if majorver[0] == "8" {
         let url = String::from("http://127.0.0.1:7878/rhel8/");
         let client = Client::new();
@@ -433,16 +328,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -498,16 +403,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -522,9 +437,10 @@ async fn main() -> Result<()> {
       }
     }
 
-    // AlmaLinux 9
+    // AlmaLinux
     if release[0] == "AlmaLinux" && release[1] == "release" {
       let majorver: Vec<&str> = release[2].split('.').collect();
+      // 9
       if majorver[0] == "9" {
         let url = String::from("http://127.0.0.1:7878/rhel9/");
         let client = Client::new();
@@ -587,16 +503,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -652,16 +578,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -674,11 +610,8 @@ async fn main() -> Result<()> {
           }
         }
       }
-    }
 
-    // AlmaLinux 8
-    if release[0] == "AlmaLinux" && release[1] == "release" {
-      let majorver: Vec<&str> = release[2].split('.').collect();
+      // 8
       if majorver[0] == "8" {
         let url = String::from("http://127.0.0.1:7878/rhel8/");
         let client = Client::new();
@@ -741,16 +674,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -806,16 +749,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -830,9 +783,10 @@ async fn main() -> Result<()> {
       }
     }
 
-    // CentOS 8
+    // CentOS
     if release[0] == "CentOS" && release[1] == "Linux" && release[2] == "release" {
       let majorver: Vec<&str> = release[3].split('.').collect();
+      // 8
       if majorver[0] == "8" {
         let url = String::from("http://127.0.0.1:7878/rhel8/");
         let client = Client::new();
@@ -895,16 +849,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -960,16 +924,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -982,11 +956,8 @@ async fn main() -> Result<()> {
           }
         }
       }
-    }
 
-    // CentOS 7
-    if release[0] == "CentOS" && release[1] == "Linux" && release[2] == "release" {
-      let majorver: Vec<&str> = release[3].split('.').collect();
+      // 7
       if majorver[0] == "7" {
         let url = String::from("http://127.0.0.1:7878/rhel7/");
         let client = Client::new();
@@ -1049,16 +1020,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -1114,16 +1095,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -1136,11 +1127,8 @@ async fn main() -> Result<()> {
           }
         }
       }
-    }
 
-    // CentOS 6
-    if release[0] == "CentOS" && release[1] == "Linux" && release[2] == "release" {
-      let majorver: Vec<&str> = release[3].split('.').collect();
+      // 6
       if majorver[0] == "6" {
         let url = String::from("http://127.0.0.1:7878/rhel6/");
         let client = Client::new();
@@ -1203,16 +1191,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -1268,16 +1266,26 @@ async fn main() -> Result<()> {
                       //kernel
                       let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
                       };
 
-                      vulns_list.detect.push(vluns);
+                      let vulns_list = VulnsList {
+                        time,
+                        hostname,
+                        ip:  scan_r.ip.clone(),
+                        os,
+                        kernel,
+                        pkg: detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
                   }
                 }
@@ -1299,7 +1307,7 @@ async fn main() -> Result<()> {
     let filename = String::from(d_file[d_index]);
     let dir = String::from("./src/vulns_result/") + &filename;
 
-    let serialized = serde_json::to_string(&vulns_list).unwrap();
+    let serialized = serde_json::to_string(&vulns_vec).unwrap();
     let mut w = std::fs::OpenOptions::new()
       .write(true)
       .create(true)
