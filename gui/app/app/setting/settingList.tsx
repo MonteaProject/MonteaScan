@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { notFound } from 'next/navigation';
-import { Settings } from "../types/configTypes";
+import { EachConfig } from "../types/configTypes";
 import {
     Input,
     Button,
@@ -47,7 +47,7 @@ async function getConfig() {
         throw new Error("Failed to fetch config list...");
     }
     const data = await res.json();
-    return data.server as Settings[];
+    return data.server as EachConfig[];
 }
 
 export default async function SettingList() {

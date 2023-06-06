@@ -207,7 +207,6 @@ fn main() -> Result<()> {
                 println!("len 3 Failed");
             }
         }
-
         ch.wait_close();
         
         if ch.exit_status().unwrap() == 0 {
@@ -282,7 +281,6 @@ fn main() -> Result<()> {
                 println!("len 5 Failed");
             }
         }
-
         ch.wait_close();
         
         if ch.exit_status().unwrap() == 0 {
