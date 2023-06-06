@@ -235,7 +235,7 @@ async fn main() -> Result<()> {
             let epty_vec: Vec<Value> = Vec::new();
             let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or(&epty_vec);
 
             for i in j {
                 let comment = i["@comment"].as_str().unwrap();
@@ -300,7 +300,7 @@ async fn main() -> Result<()> {
             let epty_vec: Vec<Value> = Vec::new();
             let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or(&epty_vec);
 
             for i in j{
               let comment = i["@comment"].as_str().unwrap();
@@ -382,14 +382,14 @@ async fn main() -> Result<()> {
         let v: Value = serde_json::from_str(&data).unwrap();
 
         let empty_vec: Vec<Value> = Vec::new();
-        let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
+        let oval_vec = v.as_array().unwrap_or(&empty_vec);
 
         for d in oval_vec {
           if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
             let epty_vec: Vec<Value> = Vec::new();
             let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or(&epty_vec);
 
             for i in j {
               let comment = i["@comment"].as_str().unwrap();
