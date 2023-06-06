@@ -8,49 +8,49 @@ use time::{OffsetDateTime, macros::offset, format_description};
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct ScanResult {
-    time:     String,
-    hostname: String,
-    ip:       Vec<String>,
-    os:       String,
-    kernel:   String,
-    pkg:      Vec<PkgList>
+  time:     String,
+  hostname: String,
+  ip:       Vec<String>,
+  os:       String,
+  kernel:   String,
+  pkg:      Vec<PkgList>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct PkgList {
-    pkgname:    String,
-    pkgver:     String,
-    pkgrelease: String,
-    upver:      String,
-    uprelease:  String,
-    pkgarch:    String
+  pkgname:    String,
+  pkgver:     String,
+  pkgrelease: String,
+  upver:      String,
+  uprelease:  String,
+  pkgarch:    String
 }
 
 //
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct Vulns {
-    vulns: Vec<VulnsList>
+  vulns: Vec<VulnsList>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct VulnsList {
-    time:     String,
-    hostname: String,
-    ip:       Vec<String>,
-    os:       String,
-    kernel:   String,
-    pkg:      DetectList
+  time:     String,
+  hostname: String,
+  ip:       Vec<String>,
+  os:       String,
+  kernel:   String,
+  pkg:      DetectList
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct DetectList {
-    pkgname:    String,
-    pkgver:     String,
-    pkgrelease: String,
-    upver:      String,
-    uprelease:  String,
-    pkgarch:    String,
-    detect:     Value
+  pkgname:    String,
+  pkgver:     String,
+  pkgrelease: String,
+  upver:      String,
+  uprelease:  String,
+  pkgarch:    String,
+  detect:     Value
 }
 
 
@@ -108,27 +108,172 @@ async fn main() -> Result<()> {
         let empty_vec: Vec<Value> = Vec::new();
         let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
 
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+        for scan_p in &scan_r.pkg {
+          let utc = OffsetDateTime::now_utc();
+          let jct = utc.to_offset(offset!(+9));
+          let format = format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+          let time = jct.format(&format).unwrap();
+          let hostname = String::from(&scan_r.hostname).replace('\n', "");
+          let ip = &scan_r.ip;
+          let os = String::from(&scan_r.os).replace('\n', "");
+          let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-            for i in j {
+          for d in oval_vec {
+            if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
+
+              let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+              for i in j {
+                  let comment = i["@comment"].as_str().unwrap();
+                  result_vec.push(comment.to_string());
+              }
+
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
+
+                  if pkg == scan_p.pkgname {
+                    let v: Vec<&str> = ver.split(':').collect();
+
+                    let mut p = String::from(&scan_p.pkgver);
+                    p += "-";
+                    p += &scan_p.pkgrelease;
+                    
+                    if v[1] == p {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     d.clone()
+                      };
+
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
+
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
+
+              let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+              for i in j{
                 let comment = i["@comment"].as_str().unwrap();
                 result_vec.push(comment.to_string());
-            }
+              }
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
 
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
 
-                for scan_p in &scan_r.pkg {
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -137,26 +282,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -168,70 +293,16 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
-              }
-            }
-          }
-            
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
+                    } else {
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -239,28 +310,112 @@ async fn main() -> Result<()> {
                         upver:      scan_p.upver.clone(),
                         uprelease:  scan_p.uprelease.clone(),
                         pkgarch:    scan_p.pkgarch.clone(),
-                        detect:     d.clone()
+                        detect:     Null
                       };
-
+      
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
-
+      
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
-              }
-            }
-          }
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+    
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+    
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+  
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+  
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
 
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else {
+              let detect_list = DetectList {
+                pkgname:    scan_p.pkgname.clone(),
+                pkgver:     scan_p.pkgver.clone(),
+                pkgrelease: scan_p.pkgrelease.clone(),
+                upver:      scan_p.upver.clone(),
+                uprelease:  scan_p.uprelease.clone(),
+                pkgarch:    scan_p.pkgarch.clone(),
+                detect:     Null
+              };
+
+              let vulns_list = VulnsList {
+                time:     time.clone(),
+                hostname: hostname.clone(),
+                ip:       scan_r.ip.clone(),
+                os:       os.clone(),
+                kernel:   kernel.clone(),
+                pkg:      detect_list
+              };
+
+              vulns_vec.vulns.push(vulns_list);
+            };
+
+            if d[1] != Null {
+              println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+            }
           }
         }
       }
@@ -279,27 +434,37 @@ async fn main() -> Result<()> {
         let empty_vec: Vec<Value> = Vec::new();
         let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
 
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+        for scan_p in &scan_r.pkg {
+          let utc = OffsetDateTime::now_utc();
+          let jct = utc.to_offset(offset!(+9));
+          let format = format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+          let time = jct.format(&format).unwrap();
+          let hostname = String::from(&scan_r.hostname).replace('\n', "");
+          let ip = &scan_r.ip;
+          let os = String::from(&scan_r.os).replace('\n', "");
+          let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+          for d in oval_vec {
+            if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
 
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
+              for i in j {
+                  let comment = i["@comment"].as_str().unwrap();
+                  result_vec.push(comment.to_string());
+              }
 
-                for scan_p in &scan_r.pkg {
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
+
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -308,26 +473,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -339,42 +484,122 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
+
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
+
+              let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+              for i in j{
+                let comment = i["@comment"].as_str().unwrap();
+                result_vec.push(comment.to_string());
               }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
 
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -383,26 +608,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -414,24 +619,129 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
-              }
-            }
-          }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+      
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+      
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+    
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+    
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+  
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+  
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
 
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else {
+              let detect_list = DetectList {
+                pkgname:    scan_p.pkgname.clone(),
+                pkgver:     scan_p.pkgver.clone(),
+                pkgrelease: scan_p.pkgrelease.clone(),
+                upver:      scan_p.upver.clone(),
+                uprelease:  scan_p.uprelease.clone(),
+                pkgarch:    scan_p.pkgarch.clone(),
+                detect:     Null
+              };
+
+              let vulns_list = VulnsList {
+                time:     time.clone(),
+                hostname: hostname.clone(),
+                ip:       scan_r.ip.clone(),
+                os:       os.clone(),
+                kernel:   kernel.clone(),
+                pkg:      detect_list
+              };
+
+              vulns_vec.vulns.push(vulns_list);
+            };
+
+            if d[1] != Null {
+              println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+            }
           }
         }
       }
@@ -454,27 +764,37 @@ async fn main() -> Result<()> {
         let empty_vec: Vec<Value> = Vec::new();
         let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
 
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+        for scan_p in &scan_r.pkg {
+          let utc = OffsetDateTime::now_utc();
+          let jct = utc.to_offset(offset!(+9));
+          let format = format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+          let time = jct.format(&format).unwrap();
+          let hostname = String::from(&scan_r.hostname).replace('\n', "");
+          let ip = &scan_r.ip;
+          let os = String::from(&scan_r.os).replace('\n', "");
+          let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+          for d in oval_vec {
+            if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
 
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
+              for i in j {
+                  let comment = i["@comment"].as_str().unwrap();
+                  result_vec.push(comment.to_string());
+              }
 
-                for scan_p in &scan_r.pkg {
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
+
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -483,26 +803,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -514,42 +814,122 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
+
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
+
+              let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+              for i in j{
+                let comment = i["@comment"].as_str().unwrap();
+                result_vec.push(comment.to_string());
               }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
 
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -558,26 +938,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -589,24 +949,129 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
-              }
-            }
-          }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+      
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+      
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+    
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+    
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+  
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+  
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
 
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else {
+              let detect_list = DetectList {
+                pkgname:    scan_p.pkgname.clone(),
+                pkgver:     scan_p.pkgver.clone(),
+                pkgrelease: scan_p.pkgrelease.clone(),
+                upver:      scan_p.upver.clone(),
+                uprelease:  scan_p.uprelease.clone(),
+                pkgarch:    scan_p.pkgarch.clone(),
+                detect:     Null
+              };
+
+              let vulns_list = VulnsList {
+                time:     time.clone(),
+                hostname: hostname.clone(),
+                ip:       scan_r.ip.clone(),
+                os:       os.clone(),
+                kernel:   kernel.clone(),
+                pkg:      detect_list
+              };
+
+              vulns_vec.vulns.push(vulns_list);
+            };
+
+            if d[1] != Null {
+              println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+            }
           }
         }
       }
@@ -625,27 +1090,37 @@ async fn main() -> Result<()> {
         let empty_vec: Vec<Value> = Vec::new();
         let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
 
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+        for scan_p in &scan_r.pkg {
+          let utc = OffsetDateTime::now_utc();
+          let jct = utc.to_offset(offset!(+9));
+          let format = format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+          let time = jct.format(&format).unwrap();
+          let hostname = String::from(&scan_r.hostname).replace('\n', "");
+          let ip = &scan_r.ip;
+          let os = String::from(&scan_r.os).replace('\n', "");
+          let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+          for d in oval_vec {
+            if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
 
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
+              for i in j {
+                  let comment = i["@comment"].as_str().unwrap();
+                  result_vec.push(comment.to_string());
+              }
 
-                for scan_p in &scan_r.pkg {
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
+
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -654,26 +1129,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -685,42 +1140,122 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
+
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
+
+              let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+              for i in j{
+                let comment = i["@comment"].as_str().unwrap();
+                result_vec.push(comment.to_string());
               }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
 
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -729,26 +1264,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -760,24 +1275,129 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
-              }
-            }
-          }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+      
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+      
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+    
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+    
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+  
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+  
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
 
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else {
+              let detect_list = DetectList {
+                pkgname:    scan_p.pkgname.clone(),
+                pkgver:     scan_p.pkgver.clone(),
+                pkgrelease: scan_p.pkgrelease.clone(),
+                upver:      scan_p.upver.clone(),
+                uprelease:  scan_p.uprelease.clone(),
+                pkgarch:    scan_p.pkgarch.clone(),
+                detect:     Null
+              };
+
+              let vulns_list = VulnsList {
+                time:     time.clone(),
+                hostname: hostname.clone(),
+                ip:       scan_r.ip.clone(),
+                os:       os.clone(),
+                kernel:   kernel.clone(),
+                pkg:      detect_list
+              };
+
+              vulns_vec.vulns.push(vulns_list);
+            };
+
+            if d[1] != Null {
+              println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+            }
           }
         }
       }
@@ -800,27 +1420,37 @@ async fn main() -> Result<()> {
         let empty_vec: Vec<Value> = Vec::new();
         let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
 
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+        for scan_p in &scan_r.pkg {
+          let utc = OffsetDateTime::now_utc();
+          let jct = utc.to_offset(offset!(+9));
+          let format = format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+          let time = jct.format(&format).unwrap();
+          let hostname = String::from(&scan_r.hostname).replace('\n', "");
+          let ip = &scan_r.ip;
+          let os = String::from(&scan_r.os).replace('\n', "");
+          let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+          for d in oval_vec {
+            if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
 
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
+              for i in j {
+                  let comment = i["@comment"].as_str().unwrap();
+                  result_vec.push(comment.to_string());
+              }
 
-                for scan_p in &scan_r.pkg {
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
+
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -829,26 +1459,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -860,42 +1470,122 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
+
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
+
+              let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+              for i in j{
+                let comment = i["@comment"].as_str().unwrap();
+                result_vec.push(comment.to_string());
               }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
 
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -904,26 +1594,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -935,24 +1605,129 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
-              }
-            }
-          }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+      
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+      
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+    
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+    
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+  
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+  
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
 
-          if d[1] != Null {
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else {
+              let detect_list = DetectList {
+                pkgname:    scan_p.pkgname.clone(),
+                pkgver:     scan_p.pkgver.clone(),
+                pkgrelease: scan_p.pkgrelease.clone(),
+                upver:      scan_p.upver.clone(),
+                uprelease:  scan_p.uprelease.clone(),
+                pkgarch:    scan_p.pkgarch.clone(),
+                detect:     Null
+              };
+
+              let vulns_list = VulnsList {
+                time:     time.clone(),
+                hostname: hostname.clone(),
+                ip:       scan_r.ip.clone(),
+                os:       os.clone(),
+                kernel:   kernel.clone(),
+                pkg:      detect_list
+              };
+
+              vulns_vec.vulns.push(vulns_list);
+            };
+
+            if d[1] != Null {
               println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+            }
           }
         }
       }
@@ -971,27 +1746,37 @@ async fn main() -> Result<()> {
         let empty_vec: Vec<Value> = Vec::new();
         let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
 
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+        for scan_p in &scan_r.pkg {
+          let utc = OffsetDateTime::now_utc();
+          let jct = utc.to_offset(offset!(+9));
+          let format = format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+          let time = jct.format(&format).unwrap();
+          let hostname = String::from(&scan_r.hostname).replace('\n', "");
+          let ip = &scan_r.ip;
+          let os = String::from(&scan_r.os).replace('\n', "");
+          let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+          for d in oval_vec {
+            if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
 
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
+              for i in j {
+                  let comment = i["@comment"].as_str().unwrap();
+                  result_vec.push(comment.to_string());
+              }
 
-                for scan_p in &scan_r.pkg {
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
+
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -1000,26 +1785,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -1031,42 +1796,122 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
+
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
+
+              let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+              for i in j{
+                let comment = i["@comment"].as_str().unwrap();
+                result_vec.push(comment.to_string());
               }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
 
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -1075,26 +1920,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -1106,24 +1931,129 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
-              }
-            }
-          }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+      
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+      
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+    
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+    
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+  
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+  
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
 
-          if d[1] != Null {
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else {
+              let detect_list = DetectList {
+                pkgname:    scan_p.pkgname.clone(),
+                pkgver:     scan_p.pkgver.clone(),
+                pkgrelease: scan_p.pkgrelease.clone(),
+                upver:      scan_p.upver.clone(),
+                uprelease:  scan_p.uprelease.clone(),
+                pkgarch:    scan_p.pkgarch.clone(),
+                detect:     Null
+              };
+
+              let vulns_list = VulnsList {
+                time:     time.clone(),
+                hostname: hostname.clone(),
+                ip:       scan_r.ip.clone(),
+                os:       os.clone(),
+                kernel:   kernel.clone(),
+                pkg:      detect_list
+              };
+
+              vulns_vec.vulns.push(vulns_list);
+            };
+
+            if d[1] != Null {
               println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+            }
           }
         }
       }
@@ -1142,27 +2072,37 @@ async fn main() -> Result<()> {
         let empty_vec: Vec<Value> = Vec::new();
         let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
 
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+        for scan_p in &scan_r.pkg {
+          let utc = OffsetDateTime::now_utc();
+          let jct = utc.to_offset(offset!(+9));
+          let format = format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+          let time = jct.format(&format).unwrap();
+          let hostname = String::from(&scan_r.hostname).replace('\n', "");
+          let ip = &scan_r.ip;
+          let os = String::from(&scan_r.os).replace('\n', "");
+          let kernel = String::from(&scan_r.kernel).replace('\n', "");
 
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+          for d in oval_vec {
+            if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
 
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
+              for i in j {
+                  let comment = i["@comment"].as_str().unwrap();
+                  result_vec.push(comment.to_string());
+              }
 
-                for scan_p in &scan_r.pkg {
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
+
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -1171,26 +2111,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -1202,42 +2122,122 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
+
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
+              let epty_vec: Vec<Value> = Vec::new();
+              let mut result_vec: Vec<String> = Vec::new();
+
+              let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+
+              for i in j{
+                let comment = i["@comment"].as_str().unwrap();
+                result_vec.push(comment.to_string());
               }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+              let count = result_vec.len();
+              if count == 3 {
+                let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
 
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
+                if b.len() == 2 {
+                  let pkg = b[0].trim();
+                  let ver = b[1].trim();
 
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
                   if pkg == scan_p.pkgname {
                     let v: Vec<&str> = ver.split(':').collect();
 
@@ -1246,26 +2246,6 @@ async fn main() -> Result<()> {
                     p += &scan_p.pkgrelease;
                     
                     if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                          "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
                       let detect_list = DetectList {
                         pkgname:    scan_p.pkgname.clone(),
                         pkgver:     scan_p.pkgver.clone(),
@@ -1277,30 +2257,135 @@ async fn main() -> Result<()> {
                       };
 
                       let vulns_list = VulnsList {
-                        time,
-                        hostname,
-                        ip:  scan_r.ip.clone(),
-                        os,
-                        kernel,
-                        pkg: detect_list
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
                       };
 
                       vulns_vec.vulns.push(vulns_list);
-                    }
-                  }
-                }
-              }
-            }
-          }
+                    } else {
+                      let detect_list = DetectList {
+                        pkgname:    scan_p.pkgname.clone(),
+                        pkgver:     scan_p.pkgver.clone(),
+                        pkgrelease: scan_p.pkgrelease.clone(),
+                        upver:      scan_p.upver.clone(),
+                        uprelease:  scan_p.uprelease.clone(),
+                        pkgarch:    scan_p.pkgarch.clone(),
+                        detect:     Null
+                      };
+      
+                      let vulns_list = VulnsList {
+                        time:     time.clone(),
+                        hostname: hostname.clone(),
+                        ip:       scan_r.ip.clone(),
+                        os:       os.clone(),
+                        kernel:   kernel.clone(),
+                        pkg:      detect_list
+                      };
+      
+                      vulns_vec.vulns.push(vulns_list);
+                    };
+                  } else {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     Null
+                    };
+    
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       scan_r.ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+    
+                    vulns_vec.vulns.push(vulns_list);
+                  };
+                } else {
+                  let detect_list = DetectList {
+                    pkgname:    scan_p.pkgname.clone(),
+                    pkgver:     scan_p.pkgver.clone(),
+                    pkgrelease: scan_p.pkgrelease.clone(),
+                    upver:      scan_p.upver.clone(),
+                    uprelease:  scan_p.uprelease.clone(),
+                    pkgarch:    scan_p.pkgarch.clone(),
+                    detect:     Null
+                  };
+  
+                  let vulns_list = VulnsList {
+                    time:     time.clone(),
+                    hostname: hostname.clone(),
+                    ip:       scan_r.ip.clone(),
+                    os:       os.clone(),
+                    kernel:   kernel.clone(),
+                    pkg:      detect_list
+                  };
+  
+                  vulns_vec.vulns.push(vulns_list);
+                };
+              } else {
+                let detect_list = DetectList {
+                  pkgname:    scan_p.pkgname.clone(),
+                  pkgver:     scan_p.pkgver.clone(),
+                  pkgrelease: scan_p.pkgrelease.clone(),
+                  upver:      scan_p.upver.clone(),
+                  uprelease:  scan_p.uprelease.clone(),
+                  pkgarch:    scan_p.pkgarch.clone(),
+                  detect:     Null
+                };
 
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+                let vulns_list = VulnsList {
+                  time:     time.clone(),
+                  hostname: hostname.clone(),
+                  ip:       scan_r.ip.clone(),
+                  os:       os.clone(),
+                  kernel:   kernel.clone(),
+                  pkg:      detect_list
+                };
+
+                vulns_vec.vulns.push(vulns_list);
+              };
+            } else {
+              let detect_list = DetectList {
+                pkgname:    scan_p.pkgname.clone(),
+                pkgver:     scan_p.pkgver.clone(),
+                pkgrelease: scan_p.pkgrelease.clone(),
+                upver:      scan_p.upver.clone(),
+                uprelease:  scan_p.uprelease.clone(),
+                pkgarch:    scan_p.pkgarch.clone(),
+                detect:     Null
+              };
+
+              let vulns_list = VulnsList {
+                time:     time.clone(),
+                hostname: hostname.clone(),
+                ip:       scan_r.ip.clone(),
+                os:       os.clone(),
+                kernel:   kernel.clone(),
+                pkg:      detect_list
+              };
+
+              vulns_vec.vulns.push(vulns_list);
+            };
+
+            if d[1] != Null {
+              println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+            }
           }
         }
       }
     }
 
-    let d_file: Vec<&str> = f.split("/").collect();
+    let d_file: Vec<&str> = f.split('/').collect();
     let d_index = d_file.len()-1;
 
     std::fs::create_dir_all("./src/vulns_result").unwrap();
