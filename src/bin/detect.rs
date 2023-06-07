@@ -8,172 +8,49 @@ use time::{OffsetDateTime, macros::offset, format_description};
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct ScanResult {
-    time: String,
-    hostname: String,
-    ip: Vec<String>,
-    os: String,
-    kernel: String,
-    pkg: Vec<PkgList>
+  time:     String,
+  hostname: String,
+  ip:       Vec<String>,
+  os:       String,
+  kernel:   String,
+  pkg:      Vec<PkgList>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct PkgList {
-    pkgname: String,
-    pkgver: String,
-    pkgrelease: String,
-    upver: String,
-    uprelease: String,
-    pkgarch: String
+  pkgname:    String,
+  pkgver:     String,
+  pkgrelease: String,
+  upver:      String,
+  uprelease:  String,
+  pkgarch:    String
+}
+
+//
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Vulns {
+  vulns: Vec<VulnsList>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct VulnsList {
-    detect: Vec<VlunsDetect>
+  time:     String,
+  hostname: String,
+  ip:       Vec<String>,
+  os:       String,
+  kernel:   String,
+  pkg:      DetectList
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct VlunsDetect {
-    time: String,
-    hostname: String,
-    ip: Vec<String>,
-    os: String,
-    kernel: String,
-    oval: Value
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Vluns {
-    time: String,
-    hostname: String,
-    ip: Vec<String>,
-    os: String,
-    kernel: String,
-    detect: Ovalinfo
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Ovalinfo {
-    #[serde(rename = "@id")]
-    id: Option<String>,
-    #[serde(rename = "@class")]
-    class: Option<String>,
-    metadata: Option<Metadata>,
-    criteria: Option<Criteria>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Metadata {
-    title: Option<String>,
-    affected: Option<Affected>,
-    reference: Option<Vec<Reference>>,
-    description: Option<String>,
-    advisory: Option<Advisory>,
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Affected {
-    #[serde(rename = "@family")]
-    family: Option<String>,
-    platform: Option<Vec<String>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Reference {
-    #[serde(rename = "@ref_id")]
-    ref_id: Option<String>,
-    #[serde(rename = "@ref_url")]
-    ref_url: Option<String>,
-    #[serde(rename = "@source")]
-    source: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Advisory{
-    #[serde(rename = "@from")]
-    from: Option<String>,
-    severity: Option<String>,
-    rights: Option<String>,
-    issued: Option<Issued>,
-    updated: Option<Updated>,
-    cve: Option<Vec<Cve>>,
-    bugzilla: Option<Vec<Bugzilla>>,
-    affected_cpe_list: Option<AffectedCpeList>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Issued {
-    #[serde(rename = "@date")]
-    date: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Updated {
-    #[serde(rename = "@date")]
-    date: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Cve {
-    #[serde(rename = "@cvss2")]
-    cvss2: Option<String>,
-    #[serde(rename = "@cvss3")]
-    cvss3: Option<String>,
-    #[serde(rename = "@cwe")]
-    cwe: Option<String>,
-    #[serde(rename = "@href")]
-    href: Option<String>,
-    #[serde(rename = "@impact")]
-    impact: Option<String>,
-    #[serde(rename = "@public")]
-    public: Option<String>,
-    #[serde(rename = "$value")]
-    cve: Option<String>,
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Bugzilla {
-    #[serde(rename = "@href")]
-    href: Option<String>,
-    #[serde(rename = "@id")]
-    id: Option<String>,
-    #[serde(rename = "$value")]
-    bugzilla: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct AffectedCpeList {
-    cpe: Option<Vec<String>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Criteria {
-    #[serde(rename = "@operator")]
-    operator: Option<String>,
-    criterion: Option<Vec<Criterion>>,
-    criteria: Option<Vec<Criteria2>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Criterion {
-    #[serde(rename = "@comment")]
-    comment: Option<String>,
-    #[serde(rename = "@test_ref")]
-    test_ref: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Criteria2 {
-    #[serde(rename = "@operator")]
-    operator: Option<String>,
-    criterion: Option<Vec<Criterion2>>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Criterion2 {
-    #[serde(rename = "@comment")]
-    comment: Option<String>,
-    #[serde(rename = "@test_ref")]
-    test_ref: Option<String>
+struct DetectList {
+  pkgname:    String,
+  pkgver:     String,
+  pkgrelease: String,
+  upver:      String,
+  uprelease:  String,
+  pkgarch:    String,
+  detect:     Value
 }
 
 
@@ -200,8 +77,8 @@ async fn main() -> Result<()> {
   for f in file_vec {
     println!("load file: {:?}", f);
 
-    let mut vulns_list = VulnsList {
-      detect: vec![]
+    let mut vulns_vec = Vulns {
+      vulns: vec![]
     };
 
     let file = match File::open(&f) {
@@ -214,1097 +91,214 @@ async fn main() -> Result<()> {
 
     let release = &scan_r.os.split_whitespace().collect::<Vec<_>>();
 
-      // RockyLinux 9
+    let mut majorver: Vec<Vec<&str>> = Vec::new();
+    // RockyLinux
     if release[0] == "Rocky" && release[1] == "Linux" && release[2] == "release" {
-      let majorver: Vec<&str> = release[3].split('.').collect();
-      if majorver[0] == "9" {
-        let url = String::from("http://127.0.0.1:7878/rhel9/");
-        let client = Client::new();
+      let m: Vec<&str> = release[3].split('.').collect();
+      majorver.push(m);
+    // AlmaLinux
+    } else if release[0] == "AlmaLinux" && release[1] == "release" {
+      let m: Vec<&str> = release[2].split('.').collect();
+      majorver.push(m);
+    // CentOS
+    } else if release[0] == "CentOS" && release[1] == "Linux" && release[2] == "release" {
+      let m: Vec<&str> = release[3].split('.').collect();
+      majorver.push(m);
+    } else {
+      println!("未対応OS...");
+      continue;
+    }
 
-        let res = client.get(url.parse().unwrap()).await.unwrap();
-        let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
-        let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
+    let mut url: Vec<String> = Vec::new();
+    if majorver[0][0] == "9" {
+      let s = String::from("http://127.0.0.1:7878/rhel9/");
+      url.push(s);
+    } else if majorver[0][0] == "8" {
+      let s = String::from("http://127.0.0.1:7878/rhel8/");
+      url.push(s);
+    } else if majorver[0][0] == "7" {
+      let s = String::from("http://127.0.0.1:7878/rhel7/");
+      url.push(s);
+    } else if majorver[0][0] == "6" {
+      let s = String::from("http://127.0.0.1:7878/rhel6/");
+      url.push(s);
+    } else {
+      println!("未対応OSバージョン...");
+      continue;
+    }
 
-        let v: Value = serde_json::from_str(&data).unwrap();
+    if majorver.len() != 1 && url.len() != 1 {
+      println!("URLエラー...");
+    } else {
+      let client = Client::new();
+      let res = client.get(url[0].parse().unwrap()).await.unwrap();
+      let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
+      let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
 
-        let empty_vec: Vec<Value> = Vec::new();
-        let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
+      let v: Value = serde_json::from_str(&data).unwrap();
 
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
+      let empty_vec: Vec<Value> = Vec::new();
+      let oval_vec = v.as_array().unwrap_or(&empty_vec);
+
+      let mut detect_flag = 0;
+
+      for scan_p in &scan_r.pkg {
+        let utc = OffsetDateTime::now_utc();
+        let jct = utc.to_offset(offset!(+9));
+        let format = format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
+
+        let time = jct.format(&format).unwrap();
+        let hostname = String::from(&scan_r.hostname).replace('\n', "");
+        let ip = &scan_r.ip;
+        let os = String::from(&scan_r.os).replace('\n', "");
+        let kernel = String::from(&scan_r.kernel).replace('\n', "");
+
+        for oval in oval_vec {
+          if oval[0]["criteria"]["criteria"][0]["criterion"] != Null {
             let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+            let mut comment_vec: Vec<String> = Vec::new();
 
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or(&epty_vec);
-
-            for i in j {
-                let comment = i["@comment"].as_str().unwrap();
-                result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-            
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or(&epty_vec);
-
-            for i in j{
+            let criterion = oval[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or(&epty_vec);
+            for i in criterion {
               let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
+              comment_vec.push(comment.to_string());
             }
 
-            let count = result_vec.len();
+            let count = comment_vec.len();
             if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let result: Vec<&str> = comment_vec[1].split("is earlier than").collect();
+              if result.len() == 2 {
+                let pkg = result[0].trim();
+                let ver = result[1].trim();
 
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
+                if pkg == scan_p.pkgname {
+                  let v: Vec<&str> = ver.split(':').collect();
 
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
+                  let mut p = String::from(&scan_p.pkgver);
+                  p += "-";
+                  p += &scan_p.pkgrelease;
+                  
+                  if v[1] == p {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     oval.clone()
+                    };
 
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
 
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
+                    vulns_vec.vulns.push(vulns_list);
                   }
                 }
               }
             }
-          }
+          } else if oval[0]["criteria"]["criteria"][1]["criterion"] != Null {
+            let epty_vec: Vec<Value> = Vec::new();
+            let mut comment_vec: Vec<String> = Vec::new();
 
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
+            let criterion = oval[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or(&epty_vec);
+            for i in criterion {
+              let comment = i["@comment"].as_str().unwrap();
+              comment_vec.push(comment.to_string());
+            }
+
+            let count = comment_vec.len();
+            if count == 3 {
+              let result: Vec<&str> = comment_vec[1].split("is earlier than").collect();
+              if result.len() == 2 {
+                let pkg = result[0].trim();
+                let ver = result[1].trim();
+
+                if pkg == scan_p.pkgname {
+                  let v: Vec<&str> = ver.split(':').collect();
+
+                  let mut p = String::from(&scan_p.pkgver);
+                  p += "-";
+                  p += &scan_p.pkgrelease;
+                  
+                  if v[1] == p {
+                    let detect_list = DetectList {
+                      pkgname:    scan_p.pkgname.clone(),
+                      pkgver:     scan_p.pkgver.clone(),
+                      pkgrelease: scan_p.pkgrelease.clone(),
+                      upver:      scan_p.upver.clone(),
+                      uprelease:  scan_p.uprelease.clone(),
+                      pkgarch:    scan_p.pkgarch.clone(),
+                      detect:     oval.clone()
+                    };
+
+                    let vulns_list = VulnsList {
+                      time:     time.clone(),
+                      hostname: hostname.clone(),
+                      ip:       ip.clone(),
+                      os:       os.clone(),
+                      kernel:   kernel.clone(),
+                      pkg:      detect_list
+                    };
+
+                    vulns_vec.vulns.push(vulns_list);
+                  }
+                }
+              }
+            }
+          } else if oval[1] != Null {
+            println!("code[388]: 定義されていない新しい値が追加されています...: {:?}", oval[1]);
+          } else {
+            println!("Not OVAL Criterion Data...");
           }
+        }
+
+        if vulns_vec.vulns.len() == detect_flag {
+          let detect_list = DetectList {
+            pkgname:    scan_p.pkgname.clone(),
+            pkgver:     scan_p.pkgver.clone(),
+            pkgrelease: scan_p.pkgrelease.clone(),
+            upver:      scan_p.upver.clone(),
+            uprelease:  scan_p.uprelease.clone(),
+            pkgarch:    scan_p.pkgarch.clone(),
+            detect:     Null
+          };
+
+          let vulns_list = VulnsList {
+            time:     time.clone(),
+            hostname: hostname.clone(),
+            ip:       ip.clone(),
+            os:       os.clone(),
+            kernel:   kernel.clone(),
+            pkg:      detect_list
+          };
+
+          vulns_vec.vulns.push(vulns_list);
+        } else {
+          detect_flag = vulns_vec.vulns.len();
         }
       }
     }
-
-    // RockyLinux 8
-    if release[0] == "Rocky" && release[1] == "Linux" && release[2] == "release" {
-      let majorver: Vec<&str> = release[3].split('.').collect();
-      if majorver[0] == "8" {
-        let url = String::from("http://127.0.0.1:7878/rhel8/");
-        let client = Client::new();
-
-        let res = client.get(url.parse().unwrap()).await.unwrap();
-        let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
-        let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
-
-        let v: Value = serde_json::from_str(&data).unwrap();
-
-        let empty_vec: Vec<Value> = Vec::new();
-        let oval_vec = v.as_array().unwrap_or(&empty_vec);
-
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or(&epty_vec);
-
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
-          }
-        }
-      }
-    }
-
-    // AlmaLinux 9
-    if release[0] == "AlmaLinux" && release[1] == "release" {
-      let majorver: Vec<&str> = release[2].split('.').collect();
-      if majorver[0] == "9" {
-        let url = String::from("http://127.0.0.1:7878/rhel9/");
-        let client = Client::new();
-
-        let res = client.get(url.parse().unwrap()).await.unwrap();
-        let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
-        let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
-
-        let v: Value = serde_json::from_str(&data).unwrap();
-
-        let empty_vec: Vec<Value> = Vec::new();
-        let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
-
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
-          }
-        }
-      }
-    }
-
-    // AlmaLinux 8
-    if release[0] == "AlmaLinux" && release[1] == "release" {
-      let majorver: Vec<&str> = release[2].split('.').collect();
-      if majorver[0] == "8" {
-        let url = String::from("http://127.0.0.1:7878/rhel8/");
-        let client = Client::new();
-
-        let res = client.get(url.parse().unwrap()).await.unwrap();
-        let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
-        let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
-
-        let v: Value = serde_json::from_str(&data).unwrap();
-
-        let empty_vec: Vec<Value> = Vec::new();
-        let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
-
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
-          }
-        }
-      }
-    }
-
-    // CentOS 8
-    if release[0] == "CentOS" && release[1] == "Linux" && release[2] == "release" {
-      let majorver: Vec<&str> = release[3].split('.').collect();
-      if majorver[0] == "8" {
-        let url = String::from("http://127.0.0.1:7878/rhel8/");
-        let client = Client::new();
-
-        let res = client.get(url.parse().unwrap()).await.unwrap();
-        let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
-        let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
-
-        let v: Value = serde_json::from_str(&data).unwrap();
-
-        let empty_vec: Vec<Value> = Vec::new();
-        let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
-
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          if d[1] != Null {
-              println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
-          }
-        }
-      }
-    }
-
-    // CentOS 7
-    if release[0] == "CentOS" && release[1] == "Linux" && release[2] == "release" {
-      let majorver: Vec<&str> = release[3].split('.').collect();
-      if majorver[0] == "7" {
-        let url = String::from("http://127.0.0.1:7878/rhel7/");
-        let client = Client::new();
-
-        let res = client.get(url.parse().unwrap()).await.unwrap();
-        let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
-        let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
-
-        let v: Value = serde_json::from_str(&data).unwrap();
-
-        let empty_vec: Vec<Value> = Vec::new();
-        let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
-
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          if d[1] != Null {
-              println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
-          }
-        }
-      }
-    }
-
-    // CentOS 6
-    if release[0] == "CentOS" && release[1] == "Linux" && release[2] == "release" {
-      let majorver: Vec<&str> = release[3].split('.').collect();
-      if majorver[0] == "6" {
-        let url = String::from("http://127.0.0.1:7878/rhel6/");
-        let client = Client::new();
-
-        let res = client.get(url.parse().unwrap()).await.unwrap();
-        let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
-        let data = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
-
-        let v: Value = serde_json::from_str(&data).unwrap();
-
-        let empty_vec: Vec<Value> = Vec::new();
-        let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
-
-        for d in oval_vec {
-          if d[0]["criteria"]["criteria"][0]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j {
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                        "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-          
-          if d[0]["criteria"]["criteria"][1]["criterion"] != Null {
-            let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
-
-            let j = d[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
-
-            for i in j{
-              let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
-            }
-
-            let count = result_vec.len();
-            if count == 3 {
-              let b: Vec<&str> = result_vec[1].split("is earlier than").collect();
-
-              if b.len() == 2{
-                let pkg = b[0].trim();
-                let ver = b[1].trim();
-
-                for scan_p in &scan_r.pkg {
-                  if pkg == scan_p.pkgname {
-                    let v: Vec<&str> = ver.split(':').collect();
-
-                    let mut p = String::from(&scan_p.pkgver);
-                    p += "-";
-                    p += &scan_p.pkgrelease;
-                    
-                    if v[1] == p {
-                      //time
-                      let utc = OffsetDateTime::now_utc();
-                      let jct = utc.to_offset(offset!(+9));
-                      let format = format_description::parse(
-                          "[year]-[month]-[day] [hour]:[minute]:[second]"
-                      ).unwrap();
-                      let time = jct.format(&format).unwrap();
-
-                      //hostname
-                      let hostname = String::from(&scan_r.hostname).replace('\n', "");
-
-                      //ip
-                      let ip = &scan_r.ip;
-
-                      //os
-                      let os = String::from(&scan_r.os).replace('\n', "");
-
-                      //kernel
-                      let kernel = String::from(&scan_r.kernel).replace('\n', "");
-
-                      let vluns = VlunsDetect {
-                        time: time,
-                        hostname: hostname,
-                        ip: scan_r.ip.clone(),
-                        os: os,
-                        kernel: kernel,
-                        oval: d.clone()
-                      };
-
-                      vulns_list.detect.push(vluns);
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          if d[1] != Null {
-            println!("code[388]: 定義されていない新しい値が追加されています: {:?}", d[1]);
-          }
-        }
-      }
-    }
-
-    let d_file: Vec<&str> = f.split("/").collect();
+    
+    let d_file: Vec<&str> = f.split('/').collect();
     let d_index = d_file.len()-1;
 
     std::fs::create_dir_all("./src/vulns_result").unwrap();
     let filename = String::from(d_file[d_index]);
     let dir = String::from("./src/vulns_result/") + &filename;
 
-    let serialized = serde_json::to_string(&vulns_list).unwrap();
+    let serialized = serde_json::to_string(&vulns_vec).unwrap();
     let mut w = std::fs::OpenOptions::new()
       .write(true)
       .create(true)
       .open(dir).unwrap();
-    w.write_all(serialized.as_bytes());
+    w.write_all(serialized.as_bytes()).expect("Failed to Write vulns_result...");
 
 
     println!("finished: {:?}", f);

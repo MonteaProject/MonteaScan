@@ -35,15 +35,17 @@ function Tr({d}: any) {
     return (
       <tbody className="responsive-info-table__body">
         <tr className="responsive-info-table__row">
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--impact">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver + "-" + d.pkg.pkgrelease === d.pkg.upver + "-" + d.pkg.uprelease ? "-" : "〇"}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgname}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgrelease}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.upver}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.uprelease}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgarch}</td>
         </tr>
       </tbody>
     )
@@ -54,15 +56,17 @@ function Tr({d}: any) {
         return (
           v.metadata.advisory.cve.map((c: any) => (
             <tr className="responsive-info-table__row">
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{c["$value"]}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--impact">{c["@impact"]}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{c["$value"]}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{c["@impact"]}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.issued["@date"]}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.updated["@date"]}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver + "-" + d.pkg.pkgrelease === d.pkg.upver + "-" + d.pkg.uprelease ? "-" : "〇"}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgname}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgrelease}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.upver}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.uprelease}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgarch}</td>
             </tr>
           ))
         )
@@ -86,6 +90,8 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
           <tr className="responsive-info-table__row">
             <th className="responsive-info-table__head__title responsive-table__head__title--cve">CVE-ID</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--impact">深刻度</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">発行日</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">更新日</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--update">アップデート有無</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--pkgname">パッケージ名称</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--pkgver">現行バージョン番号</th>

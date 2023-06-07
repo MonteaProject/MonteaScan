@@ -51,10 +51,10 @@ body {
   border-collapse: collapse;
 
   @include min-tablet {
-    grid-template-columns: repeat(9, auto);
+    grid-template-columns: repeat(11, auto);
   }
   @include tablet-to-desktop {
-    grid-template-columns: repeat(9, auto);
+    grid-template-columns: repeat(11, auto);
   }
 
   &__head {
