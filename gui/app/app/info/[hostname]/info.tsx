@@ -1,6 +1,6 @@
 "use client";
 import "./info.scss";
-import { Pkg } from "../../types/pkgTypes";
+import { Vulns } from "../../types/cveTypes";
 import { notFound } from "next/navigation";
 import {
   Box,
@@ -27,7 +27,44 @@ const getServerInfo = async (hostname: string) => {
   }
 
   const data = await res.json();
-  return data.pkg as Pkg[];
+  return data as Vulns;
+}
+
+function Tr({d}: any) {
+  if (d.pkg.detect === null) {
+    return (
+      <tbody className="responsive-info-table__body">
+      <tr className="responsive-info-table__row">
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">-</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--impact">-</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
+      </tr>
+      </tbody>
+    )
+  }
+  return (
+    <tbody className="responsive-info-table__body">
+      {d.pkg.detect.map((v: any) => (
+      <tr className="responsive-info-table__row">
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{v.metadata.advisory.cve.map((c: any) => (c["$value"]))}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--impact">{v.metadata.advisory.cve.map((c: any) => (c["@impact"]))}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
+        <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
+      </tr>
+      ))}
+    </tbody>
+  )
 }
 
 export default async function Info ({ infoPass }: { infoPass: string }) {
@@ -45,31 +82,21 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
           <tr className="responsive-info-table__row">
             <th className="responsive-info-table__head__title responsive-table__head__title--cve">CVE-ID</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--impact">深刻度</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--update">アップデート有無</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--pkgname">パッケージ名称</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--pkgver">現行バージョン番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--pkgrelease">現行リリース番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--update">アップデート有無</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--upver">最新バージョン番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--uprelease">最新リリース番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title--pkgarch">アーキテクチャ</th>
           </tr>
         </thead>
-        {info.map((d) => (
-        <tbody className="responsive-info-table__body">
+        {info.vulns.map((d) => (
           <button className="responsive-info-table__button" onClick={() => handleClick()}>
-          <tr className="responsive-info-table__row">
-            <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">CVE-2023-XXXX</td>
-            <td className="responsive-info-table__body__text responsive-table__body__text--impact">Critical</td>
-            <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkgname}</td>
-            <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkgver}</td>
-            <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkgrelease}</td>
-            <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
-            <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.upver}</td>
-            <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.uprelease}</td>
-            <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkgarch}</td>
-          </tr>
+          <Tr
+            d = {d}
+          />
           </button>
-        </tbody>
         ))}
       </table>
       <Drawer onClose={onClose} isOpen={isOpen} size="xl">

@@ -1,5 +1,5 @@
-export type Detects = {
-    detect: Detect[]
+export type Vulns = {
+    vulns: Detect[]
 };
 
 export type Detect = {
@@ -8,10 +8,20 @@ export type Detect = {
     ip      : string[],
     os      : string,
     kernel  : string,
-    oval    : Oval[]
+    pkg     : Pkg
 };
 
-export type Oval = {
+export type Pkg = {
+    pkgname   : string,
+    pkgver    : string,
+    pkgrelease: string,
+    upver     : string,
+    uprelease : string,
+    pkgarch   : string,
+    detect    : pkgDetect[]
+};
+
+export type pkgDetect = {
     '@id'   : string,
     '@class': string,
     metadata: Metadata,

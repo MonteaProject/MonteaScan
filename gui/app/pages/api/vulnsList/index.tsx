@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { readdirSync, readFileSync } from "fs";
-import { Detects } from "../../../app/types/cveTypes";
+import { Vulns } from "../../../app/types/cveTypes";
 import { Impact, VulnsList, Sum } from "../../../app/types/impactTypes";
 
 
@@ -41,33 +41,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         totalVulnsCount.push(count);
       } else {
         for (let v of dirList) {
-          const json = JSON.parse(readFileSync(`../../src/vulns_result/${v}`, "utf8")) as Detects;
-          if (!json.detect[0]) {
+          const json = JSON.parse(readFileSync(`../../src/vulns_result/${v}`, "utf8")) as Vulns;
+          if (!json.vulns[0]) {
             console.log("/vulns_result/のファイル内にデータが記録されていません...");
           } else {
-            let hostname  = json.detect[0].hostname;
+            let hostname  = json.vulns[0].hostname;
             let total     = 0;
             let critical  = 0;
             let important = 0;
             let moderate  = 0;
             let low       = 0;
-            for(let i = 0; i < json.detect.length; i++) {
-              for(let c = 0; c < json.detect[i].oval.length; c++) {
-                for(let p = 0; p < json.detect[i].oval[c].metadata.advisory.cve.length; p++) {
-                  if (json.detect[i].oval[c].metadata.advisory.cve[p]["@impact"] === "critical") {
-                    criticalTotal += 1;
-                    critical += 1;
-                  } else if (json.detect[i].oval[c].metadata.advisory.cve[p]["@impact"] === "important") {
-                    importantTotal += 1;
-                    important += 1;
-                  } else if (json.detect[i].oval[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
-                    moderateTotal += 1;
-                    moderate += 1;
-                  } else if (json.detect[i].oval[c].metadata.advisory.cve[p]["@impact"] === "low") {
-                    lowTotal += 1;
-                    low += 1;
-                  } else {
-                    console.log("新たなCVE重要度が追加されています...");
+            for(let i = 0; i < json.vulns.length; i++) {
+              if (json.vulns[i].pkg.detect === null) {
+                continue;
+              } else {
+                for(let c = 0; c < json.vulns[i].pkg.detect.length; c++) {
+                  for(let p = 0; p < json.vulns[i].pkg.detect[c].metadata.advisory.cve.length; p++) {
+                    if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "critical") {
+                      criticalTotal += 1;
+                      critical += 1;
+                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "important") {
+                      importantTotal += 1;
+                      important += 1;
+                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
+                      moderateTotal += 1;
+                      moderate += 1;
+                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "low") {
+                      lowTotal += 1;
+                      low += 1;
+                    } else {
+                      console.log("新たなCVE重要度が追加されています...");
+                    }
                   }
                 }
               }
@@ -99,10 +103,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         impact: eachVulnsCount,
         sum   : totalVulnsCount
       };
+
       return res.status(200).json(vulns);
     } catch(e) {
       return res.status(500).end();
-    };
+    }
   } else {
     res.status(405).end();
   }
