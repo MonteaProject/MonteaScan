@@ -225,7 +225,7 @@ export default async function SettingList() {
                 </Table>
             </TableContainer>
 
-            {/* 編集/削除 */}
+            {/* PATCH/DELETE */}
             <Modal
                 size={"xl"}
                 blockScrollOnMount={false}
@@ -321,7 +321,7 @@ export default async function SettingList() {
                 </ModalContent>
             </Modal>
 
-            {/* 追加 */}
+            {/* POST */}
             <Modal
                 size={"xl"}
                 blockScrollOnMount={false}

@@ -31,6 +31,11 @@ const getServerInfo = async (hostname: string) => {
 }
 
 function Tr({d}: any) {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const handleClick = () => {
+    onOpen()
+  }
+
   if (d.pkg.detect === null) {
     return (
       <tbody className="responsive-info-table__body">
@@ -55,32 +60,50 @@ function Tr({d}: any) {
       {d.pkg.detect.map((v: any) => {
         return (
           v.metadata.advisory.cve.map((c: any) => (
-            <tr className="responsive-info-table__row">
-              <td className="responsive-info-table__body__text responsive-table__body__text">{c["$value"]}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{c["@impact"]}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.issued["@date"]}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.updated["@date"]}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver + "-" + d.pkg.pkgrelease === d.pkg.upver + "-" + d.pkg.uprelease ? "-" : "〇"}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgname}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgrelease}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.upver}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.uprelease}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgarch}</td>
-            </tr>
+            <button className="responsive-info-table__button" onClick={() => {
+              handleClick();
+            }}>
+              <tr className="responsive-info-table__row">
+                <td className="responsive-info-table__body__text responsive-table__body__text">{c["$value"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{c["@impact"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.issued["@date"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.updated["@date"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver + "-" + d.pkg.pkgrelease === d.pkg.upver + "-" + d.pkg.uprelease ? "-" : "〇"}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgname}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgrelease}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.upver}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.uprelease}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgarch}</td>
+              </tr>
+            </button>
           ))
         )
       })}
+      <Drawer onClose={onClose} isOpen={isOpen} size="xl">
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>{"test"}</DrawerHeader>
+          <DrawerBody>
+            <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Consequat nisl vel pretium lectus quam id. Semper quis lectus
+            nulla at volutpat diam ut venenatis. Dolor morbi non arcu risus
+            quis varius quam quisque. Massa ultricies mi quis hendrerit dolor
+            magna eget est lorem. Erat imperdiet sed euismod nisi porta.
+            Lectus vestibulum mattis ullamcorper velit.
+            </p>
+          </DrawerBody>
+          <DrawerFooter>{"end"}</DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </tbody>
   )
 }
 
 export default async function Info ({ infoPass }: { infoPass: string }) {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const handleClick = () => {
-    onOpen()
-  }
-
   const info = await getServerInfo(infoPass);
   
   return (
@@ -102,32 +125,11 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
           </tr>
         </thead>
         {info.vulns.map((d) => (
-          <button className="responsive-info-table__button" onClick={() => handleClick()}>
           <Tr
             d = {d}
           />
-          </button>
         ))}
       </table>
-      <Drawer onClose={onClose} isOpen={isOpen} size="xl">
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>{"test"}</DrawerHeader>
-          <DrawerBody>
-            <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            Consequat nisl vel pretium lectus quam id. Semper quis lectus
-            nulla at volutpat diam ut venenatis. Dolor morbi non arcu risus
-            quis varius quam quisque. Massa ultricies mi quis hendrerit dolor
-            magna eget est lorem. Erat imperdiet sed euismod nisi porta.
-            Lectus vestibulum mattis ullamcorper velit.
-            </p>
-          </DrawerBody>
-          <DrawerFooter>{"end"}</DrawerFooter>
-        </DrawerContent>
-      </Drawer>
     </Box>
   )
 }
