@@ -34,35 +34,39 @@ function Tr({d}: any) {
   if (d.pkg.detect === null) {
     return (
       <tbody className="responsive-info-table__body">
-      <tr className="responsive-info-table__row">
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">-</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--impact">-</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
-      </tr>
+        <tr className="responsive-info-table__row">
+          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text--impact">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
+        </tr>
       </tbody>
     )
   }
   return (
     <tbody className="responsive-info-table__body">
-      {d.pkg.detect.map((v: any) => (
-      <tr className="responsive-info-table__row">
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{v.metadata.advisory.cve.map((c: any) => (c["$value"]))}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--impact">{v.metadata.advisory.cve.map((c: any) => (c["@impact"]))}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
-        <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
-      </tr>
-      ))}
+      {d.pkg.detect.map((v: any) => {
+        return (
+          v.metadata.advisory.cve.map((c: any) => (
+            <tr className="responsive-info-table__row">
+              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{c["$value"]}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text--impact">{c["@impact"]}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
+              <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
+            </tr>
+          ))
+        )
+      })}
     </tbody>
   )
 }
