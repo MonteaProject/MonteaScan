@@ -33,3 +33,15 @@ https://jvndb.jvn.jp/ja/feed/#jvndbrss
 
 scss テーブル デザイン
 https://kodocode.net/design-css-table/
+
+OVAL
+https://oval.mitre.org/index.html
+
+セキュリティ検査言語OVAL概説
+https://www.ipa.go.jp/security/vuln/scap/oval.html
+
+RockyLinux OVAL
+https://dl.rockylinux.org/pub/oval/
+
+AlmaLinux OVAL
+https://repo.almalinux.org/security/oval/

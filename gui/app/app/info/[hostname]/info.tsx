@@ -123,5 +123,5 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
         </DrawerContent>
       </Drawer>
     </Box>
-  );
+  )
 }
