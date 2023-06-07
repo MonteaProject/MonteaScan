@@ -138,7 +138,9 @@ async fn main() -> Result<()> {
       let v: Value = serde_json::from_str(&data).unwrap();
 
       let empty_vec: Vec<Value> = Vec::new();
-      let oval_vec = v.as_array().unwrap_or_else(|| &empty_vec);
+      let oval_vec = v.as_array().unwrap_or(&empty_vec);
+
+      let mut detect_flag = 0;
 
       for scan_p in &scan_r.pkg {
         let utc = OffsetDateTime::now_utc();
@@ -154,17 +156,17 @@ async fn main() -> Result<()> {
         for oval in oval_vec {
           if oval[0]["criteria"]["criteria"][0]["criterion"] != Null {
             let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+            let mut comment_vec: Vec<String> = Vec::new();
 
-            let criterion = oval[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+            let criterion = oval[0]["criteria"]["criteria"][0]["criterion"].as_array().unwrap_or(&epty_vec);
             for i in criterion {
               let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
+              comment_vec.push(comment.to_string());
             }
 
-            let count = result_vec.len();
+            let count = comment_vec.len();
             if count == 3 {
-              let result: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let result: Vec<&str> = comment_vec[1].split("is earlier than").collect();
               if result.len() == 2 {
                 let pkg = result[0].trim();
                 let ver = result[1].trim();
@@ -190,7 +192,7 @@ async fn main() -> Result<()> {
                     let vulns_list = VulnsList {
                       time:     time.clone(),
                       hostname: hostname.clone(),
-                      ip:       scan_r.ip.clone(),
+                      ip:       ip.clone(),
                       os:       os.clone(),
                       kernel:   kernel.clone(),
                       pkg:      detect_list
@@ -203,17 +205,17 @@ async fn main() -> Result<()> {
             }
           } else if oval[0]["criteria"]["criteria"][1]["criterion"] != Null {
             let epty_vec: Vec<Value> = Vec::new();
-            let mut result_vec: Vec<String> = Vec::new();
+            let mut comment_vec: Vec<String> = Vec::new();
 
-            let criterion = oval[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or_else(|| &epty_vec);
+            let criterion = oval[0]["criteria"]["criteria"][1]["criterion"].as_array().unwrap_or(&epty_vec);
             for i in criterion {
               let comment = i["@comment"].as_str().unwrap();
-              result_vec.push(comment.to_string());
+              comment_vec.push(comment.to_string());
             }
 
-            let count = result_vec.len();
+            let count = comment_vec.len();
             if count == 3 {
-              let result: Vec<&str> = result_vec[1].split("is earlier than").collect();
+              let result: Vec<&str> = comment_vec[1].split("is earlier than").collect();
               if result.len() == 2 {
                 let pkg = result[0].trim();
                 let ver = result[1].trim();
@@ -239,7 +241,7 @@ async fn main() -> Result<()> {
                     let vulns_list = VulnsList {
                       time:     time.clone(),
                       hostname: hostname.clone(),
-                      ip:       scan_r.ip.clone(),
+                      ip:       ip.clone(),
                       os:       os.clone(),
                       kernel:   kernel.clone(),
                       pkg:      detect_list
@@ -257,7 +259,7 @@ async fn main() -> Result<()> {
           }
         }
 
-        if vulns_vec.vulns.is_empty() == true {
+        if vulns_vec.vulns.len() == detect_flag {
           let detect_list = DetectList {
             pkgname:    scan_p.pkgname.clone(),
             pkgver:     scan_p.pkgver.clone(),
@@ -271,13 +273,15 @@ async fn main() -> Result<()> {
           let vulns_list = VulnsList {
             time:     time.clone(),
             hostname: hostname.clone(),
-            ip:       scan_r.ip.clone(),
+            ip:       ip.clone(),
             os:       os.clone(),
             kernel:   kernel.clone(),
             pkg:      detect_list
           };
 
           vulns_vec.vulns.push(vulns_list);
+        } else {
+          detect_flag = vulns_vec.vulns.len();
         }
       }
     }
@@ -294,7 +298,7 @@ async fn main() -> Result<()> {
       .write(true)
       .create(true)
       .open(dir).unwrap();
-    w.write_all(serialized.as_bytes());
+    w.write_all(serialized.as_bytes()).expect("Failed to Write vulns_result...");
 
 
     println!("finished: {:?}", f);
