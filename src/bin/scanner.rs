@@ -236,10 +236,10 @@ fn main() -> Result<()> {
           let release = u[3];
           let arch    = u[4];
 
-          let a = String::from(name) + "." + arch;
+          let name_arch = String::from(name) + "." + arch;
           let mut b = Vec::new();
           for i in &updateinfo.update {
-            if a == i.name {
+            if name_arch == i.name {
               let c: Vec<&str> = i.ver.split('-').collect();
               if c.len() == 2 {
                 b.push(c);
@@ -259,10 +259,10 @@ fn main() -> Result<()> {
           let release = u[3];
           let arch    = u[4];
           
-          let a = String::from(name) + "." + arch;
+          let name_arch = String::from(name) + "." + arch;
           let mut b = Vec::new();
           for i in &updateinfo.update {
-            if a == i.name {
+            if name_arch == i.name {
               let c: Vec<&str> = i.ver.split('-').collect();
               if c.len() == 2 {
                 b.push(c);

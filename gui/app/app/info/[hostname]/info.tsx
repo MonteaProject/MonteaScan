@@ -31,19 +31,26 @@ const getServerInfo = async (hostname: string) => {
 }
 
 function Tr({d}: any) {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const handleClick = () => {
+    onOpen()
+  }
+
   if (d.pkg.detect === null) {
     return (
       <tbody className="responsive-info-table__body">
         <tr className="responsive-info-table__row">
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--impact">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver + "-" + d.pkg.pkgrelease === d.pkg.upver + "-" + d.pkg.uprelease ? "-" : "〇"}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgname}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgrelease}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.upver}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.uprelease}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgarch}</td>
         </tr>
       </tbody>
     )
@@ -53,56 +60,26 @@ function Tr({d}: any) {
       {d.pkg.detect.map((v: any) => {
         return (
           v.metadata.advisory.cve.map((c: any) => (
-            <tr className="responsive-info-table__row">
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{c["$value"]}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--impact">{c["@impact"]}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">〇</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgname">{d.pkg.pkgname}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgver">{d.pkg.pkgver}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgrelease">{d.pkg.pkgrelease}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--upver">{d.pkg.upver}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--uprelease">{d.pkg.uprelease}</td>
-              <td className="responsive-info-table__body__text responsive-table__body__text--pkgarch">{d.pkg.pkgarch}</td>
-            </tr>
+            <button className="responsive-info-table__button" onClick={() => {
+              handleClick();
+            }}>
+              <tr className="responsive-info-table__row">
+                <td className="responsive-info-table__body__text responsive-table__body__text">{c["$value"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{c["@impact"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.issued["@date"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.updated["@date"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver + "-" + d.pkg.pkgrelease === d.pkg.upver + "-" + d.pkg.uprelease ? "-" : "〇"}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgname}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgrelease}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.upver}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.uprelease}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgarch}</td>
+              </tr>
+            </button>
           ))
         )
       })}
-    </tbody>
-  )
-}
-
-export default async function Info ({ infoPass }: { infoPass: string }) {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const handleClick = () => {
-    onOpen()
-  }
-
-  const info = await getServerInfo(infoPass);
-  
-  return (
-    <Box>
-      <table className="responsive-info-table">
-        <thead className="responsive-info-table__head">
-          <tr className="responsive-info-table__row">
-            <th className="responsive-info-table__head__title responsive-table__head__title--cve">CVE-ID</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--impact">深刻度</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--update">アップデート有無</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--pkgname">パッケージ名称</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--pkgver">現行バージョン番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--pkgrelease">現行リリース番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--upver">最新バージョン番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--uprelease">最新リリース番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--pkgarch">アーキテクチャ</th>
-          </tr>
-        </thead>
-        {info.vulns.map((d) => (
-          <button className="responsive-info-table__button" onClick={() => handleClick()}>
-          <Tr
-            d = {d}
-          />
-          </button>
-        ))}
-      </table>
       <Drawer onClose={onClose} isOpen={isOpen} size="xl">
         <DrawerOverlay />
         <DrawerContent>
@@ -122,6 +99,37 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
           <DrawerFooter>{"end"}</DrawerFooter>
         </DrawerContent>
       </Drawer>
+    </tbody>
+  )
+}
+
+export default async function Info ({ infoPass }: { infoPass: string }) {
+  const info = await getServerInfo(infoPass);
+  
+  return (
+    <Box>
+      <table className="responsive-info-table">
+        <thead className="responsive-info-table__head">
+          <tr className="responsive-info-table__row">
+            <th className="responsive-info-table__head__title responsive-table__head__title--cve">CVE-ID</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--impact">深刻度</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">発行日</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">更新日</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--update">アップデート有無</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--pkgname">パッケージ名称</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--pkgver">現行バージョン番号</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--pkgrelease">現行リリース番号</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--upver">最新バージョン番号</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--uprelease">最新リリース番号</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title--pkgarch">アーキテクチャ</th>
+          </tr>
+        </thead>
+        {info.vulns.map((d) => (
+          <Tr
+            d = {d}
+          />
+        ))}
+      </table>
     </Box>
   )
 }
