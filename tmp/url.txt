@@ -45,3 +45,6 @@ https://dl.rockylinux.org/pub/oval/
 
 AlmaLinux OVAL
 https://repo.almalinux.org/security/oval/
+
+共通脆弱性評価システムCVSS v3概説
+https://www.ipa.go.jp/security/vuln/scap/cvssv3.html

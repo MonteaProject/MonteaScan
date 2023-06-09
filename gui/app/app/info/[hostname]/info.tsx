@@ -41,7 +41,149 @@ const getServerInfo = async (hostname: string) => {
   return data as Vulns;
 }
 
-function Body({d, v}: any) {
+function Body({d, v, c}: any) {
+  // "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+  let cvssVec = c["@cvss3"].split("/");
+  let score;
+  let attackVector;
+  let attackVector_item;
+  let attackVector_value;
+  let attackComplexity;
+  let attackComplexity_item;
+  let attackComplexity_value;
+  let privilegesRequired;
+  let privilegesRequired_item;
+  let privilegesRequired_value;
+  let userInteraction;
+  let userInteraction_item;
+  let userInteraction_value;
+  let scope;
+  let scope_item;
+  let scope_value;
+  let confidentiality;
+  let confidentiality_item;
+  let confidentiality_value;
+  let integrity;
+  let integrity_item;
+  let integrity_value;
+  let availability;
+  let availability_item;
+  let availability_value;
+
+  if (cvssVec.length === 10) {
+    score = cvssVec[0];
+
+    attackVector       = cvssVec[2].split(":")[0];
+    attackVector_item  = cvssVec[2].split(":")[1];
+    if (attackVector === "AV") {
+      if (attackVector_item === "N") {
+        attackVector_value = "ネットワーク"
+      } else if (attackVector_item === "A") {
+        attackVector_value = "隣接"
+      } else if (attackVector_item === "L") {
+        attackVector_value = "ローカル"
+      } else if (attackVector_item === "P") {
+        attackVector_value = "物理"
+      } else {
+        console.log("新しい評価項目が追加されています...", attackVector_item);
+      }
+    }
+    
+    attackComplexity       = cvssVec[3].split(":")[0];
+    attackComplexity_item  = cvssVec[3].split(":")[1];
+    if (attackComplexity === "AC") {
+      if (attackComplexity_item === "L") {
+        attackComplexity_value = "低"
+      } else if (attackComplexity_item === "H") {
+        attackComplexity_value = "高"
+      } else {
+        console.log("新しい評価項目が追加されています...", attackComplexity_item);
+      }
+    }
+    
+    privilegesRequired       = cvssVec[4].split(":")[0];
+    privilegesRequired_item  = cvssVec[4].split(":")[1];
+    if (privilegesRequired === "PR") {
+      if (privilegesRequired_item === "N") {
+        privilegesRequired_value = "不要"
+      } else if (privilegesRequired_item === "L") {
+        privilegesRequired_value = "低"
+      } else if (privilegesRequired_item === "H") {
+        privilegesRequired_value = "高"
+      } else {
+        console.log("新しい評価項目が追加されています...", privilegesRequired_item);
+      }
+    }
+    
+    userInteraction       = cvssVec[5].split(":")[0];
+    userInteraction_item  = cvssVec[5].split(":")[1];
+    if (userInteraction === "UI") {
+      if (userInteraction_item === "N") {
+        userInteraction_value = "不要"
+      } else if (userInteraction_item === "R") {
+        userInteraction_value = "要"
+      } else {
+        console.log("新しい評価項目が追加されています...", userInteraction_item);
+      }
+    }
+    
+    scope       = cvssVec[6].split(":")[0];
+    scope_item  = cvssVec[6].split(":")[1];
+    if (scope === "S") {
+      if (scope_item === "U") {
+        scope_value = "変更なし"
+      } else if (scope_item === "C") {
+        scope_value = "変更あり"
+      } else {
+        console.log("新しい評価項目が追加されています...", scope_item);
+      }
+    }
+    
+    confidentiality       = cvssVec[7].split(":")[0];
+    confidentiality_item  = cvssVec[7].split(":")[1];
+    if (confidentiality === "C") {
+      if (confidentiality_item === "N") {
+        confidentiality_value = "なし"
+      } else if (confidentiality_item === "L") {
+        confidentiality_value = "低"
+      } else if (confidentiality_item === "H") {
+        confidentiality_value = "高"
+      } else {
+        console.log("新しい評価項目が追加されています...", confidentiality_item);
+      }
+    }
+    
+    integrity       = cvssVec[8].split(":")[0];
+    integrity_item  = cvssVec[8].split(":")[1];
+    if (integrity === "I") {
+      if (integrity_item === "N") {
+        integrity_value = "なし"
+      } else if (integrity_item === "L") {
+        integrity_value = "低"
+      } else if (integrity_item === "H") {
+        integrity_value = "高"
+      } else {
+        console.log("新しい評価項目が追加されています...", integrity_item);
+      }
+    }
+    
+    availability       = cvssVec[9].split(":")[0];
+    availability_item  = cvssVec[9].split(":")[1];
+    if (availability === "A") {
+      if (availability_item === "N") {
+        availability_value = "なし"
+      } else if (availability_item === "L") {
+        availability_value = "低"
+      } else if (availability_item === "H") {
+        availability_value = "高"
+      } else {
+        console.log("新しい評価項目が追加されています...", availability_item);
+      }
+    }
+  } else {
+    console.log("CVSSの形式が変更されています...");
+  }
+
   return (
     <Box>
       <TableContainer>
@@ -197,48 +339,48 @@ function Body({d, v}: any) {
           </Thead>
           <Tbody>
             <Tr>
-              <Th>CVSS v3 基本スコア</Th>
-              <Td>c</Td>
+              <Th>CVSS v3 基本評価値（スコア）</Th>
+              <Td>{score}</Td>
               <Td>-</Td>
             </Tr>
             <Tr>
-              <Th>攻撃ベクトル</Th>
-              <Td>c</Td>
+              <Th>攻撃元区分（攻撃の難易度を評価）</Th>
+              <Td>{attackVector_value}</Td>
               <Td>-</Td>
             </Tr>
             <Tr>
-              <Th>攻撃の複雑さ</Th>
-              <Td>c</Td>
+              <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th>
+              <Td>{attackComplexity_value}</Td>
               <Td>-</Td>
             </Tr>
             <Tr>
-              <Th>必要な権限</Th>
-              <Td>c</Td>
+              <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th>
+              <Td>{privilegesRequired_value}</Td>
               <Td>-</Td>
             </Tr>
             <Tr>
-              <Th>ユーザーインタラクション</Th>
-              <Td>c</Td>
+              <Th>利用者の関与（攻撃の難易度を評価）</Th>
+              <Td>{userInteraction_value}</Td>
               <Td>-</Td>
             </Tr>
             <Tr>
-              <Th>スコープ</Th>
-              <Td>c</Td>
+              <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th>
+              <Td>{scope_value}</Td>
               <Td>-</Td>
             </Tr>
             <Tr>
-              <Th>機密保持への影響</Th>
-              <Td>c</Td>
+              <Th>機密性への影響（攻撃による影響を評価）</Th>
+              <Td>{confidentiality_value}</Td>
               <Td>-</Td>
             </Tr>
             <Tr>
-              <Th>完全性への影響</Th>
-              <Td>c</Td>
+              <Th>完全性への影響（攻撃による影響を評価）</Th>
+              <Td>{integrity_value}</Td>
               <Td>-</Td>
             </Tr>
             <Tr>
-              <Th>可用性への影響</Th>
-              <Td>c</Td>
+              <Th>可用性への影響（攻撃による影響を評価）</Th>
+              <Td>{availability_value}</Td>
               <Td>-</Td>
             </Tr>
           </Tbody>
@@ -314,7 +456,7 @@ function Body({d, v}: any) {
         <Table variant='simple'>
           <Thead>
             <Tr>
-              <Th>条件</Th>
+              <Th>{v.criteria["@operator"] === "OR" ? "条件（いずれかに該当する場合）" : "条件（いずれも該当する場合）"}</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -327,26 +469,26 @@ function Body({d, v}: any) {
             })}
           </Tbody>
         </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>条件</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.criteria.criteria.map((criteria: any) => {
-              return (
-                criteria.criterion.map((c: any) => {
-                  return (
-                    <Tr>
-                      <Td>{c["@comment"]}</Td>
-                    </Tr>
-                  )
-                })
-              )
-            })}
-          </Tbody>
-        </Table>
+          {v.criteria.criteria.map((c: any) => {
+            return (
+              <Table variant='simple'>
+                <Thead>
+                  <Tr>
+                    <Th>{c["@operator"] === "OR" ? "条件（いずれかに該当する場合）" : "条件（いずれも該当する場合）"}</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {c.criterion.map((c: any) => {
+                    return (
+                      <Tr>
+                        <Td>{c["@comment"]}</Td>
+                      </Tr>
+                    )
+                  })}
+                </Tbody>
+              </Table>
+            )
+          })}
       </TableContainer>
     </Box>
   )
@@ -407,6 +549,7 @@ function MyTbody({d}: any) {
                     <Body
                       d = {d}
                       v = {v}
+                      c = {c}
                     />
                   </DrawerBody>
                   <DrawerFooter>検出時刻: {d.time}</DrawerFooter>
