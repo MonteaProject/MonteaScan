@@ -42,7 +42,7 @@ const getServerInfo = async (hostname: string) => {
 }
 
 function Body({d, v, c}: any) {
-  // "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+  // CVSS v3 "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
   let cvssVec = c["@cvss3"].split("/");
   let score;
   let attackVector;
@@ -69,6 +69,15 @@ function Body({d, v, c}: any) {
   let availability;
   let availability_item;
   let availability_value;
+
+  // CPE
+  let kind;
+  let vendor;
+  let product;
+  let version;
+  let update;
+  let edition;
+  let language;
 
   if (cvssVec.length === 10) {
     score = cvssVec[0];
@@ -184,6 +193,114 @@ function Body({d, v, c}: any) {
     console.log("CVSSの形式が変更されています...");
   }
 
+  let cpeVec: any[] = [];
+  v.metadata.advisory.affected_cpe_list.cpe.map((cpe: string) => {
+    if (cpe.split(":").length === 1) {
+      cpeVec.push(
+        {
+          "kind":"全て",
+          "vendor":"全て",
+          "product":"全て",
+          "version":"全て",
+          "update":"全て",
+          "edition":"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 2) {
+      cpeVec.push(
+        {
+          "kind":cpe.split(":")[1],
+          "vendor":"全て",
+          "product":"全て",
+          "version":"全て",
+          "update":"全て",
+          "edition":"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 3) {
+      cpeVec.push(
+        {
+          "kind":cpe.split(":")[1],
+          "vendor":cpe.split(":")[2],
+          "product":"全て",
+          "version":"全て",
+          "update":"全て",
+          "edition":"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 4) {
+      cpeVec.push(
+        {
+          "kind":cpe.split(":")[1],
+          "vendor":cpe.split(":")[2],
+          "product":cpe.split(":")[3],
+          "version":"全て",
+          "update":"全て",
+          "edition":"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 5) {
+      cpeVec.push(
+        {
+          "kind":cpe.split(":")[1],
+          "vendor":cpe.split(":")[2],
+          "product":cpe.split(":")[3],
+          "version":cpe.split(":")[4],
+          "update":"全て",
+          "edition":"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 6) {
+      cpeVec.push(
+        {
+          "kind":cpe.split(":")[1],
+          "vendor":cpe.split(":")[2],
+          "product":cpe.split(":")[3],
+          "version":cpe.split(":")[4],
+          "update":cpe.split(":")[5],
+          "edition":"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 7) {
+      cpeVec.push(
+        {
+          "kind":cpe.split(":")[1],
+          "vendor":cpe.split(":")[2],
+          "product":cpe.split(":")[3],
+          "version":cpe.split(":")[4],
+          "update":cpe.split(":")[5],
+          "edition":cpe.split(":")[6],
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 8) {
+      cpeVec.push(
+        {
+          "kind":cpe.split(":")[1],
+          "vendor":cpe.split(":")[2],
+          "product":cpe.split(":")[3],
+          "version":cpe.split(":")[4],
+          "update":cpe.split(":")[5],
+          "edition":cpe.split(":")[6],
+          "language":cpe.split(":")[7]
+        }
+      )
+    }
+  })
+
   return (
     <Box>
       <TableContainer>
@@ -251,28 +368,18 @@ function Body({d, v, c}: any) {
           <Thead>
             <Tr>
               <Th>ファミリー</Th>
+              <Th>影響プラットフォーム</Th>
             </Tr>
           </Thead>
           <Tbody>
             <Tr>
               <Td>{v.metadata.affected["@family"]}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>影響プラットフォーム</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.metadata.affected.platform.map((p: string) => {
+              {v.metadata.affected.platform.map((p: string) => {
               return (
-                <Tr>
-                  <Td>{p}</Td>
-                </Tr>
+                <Td>{p}</Td>
               )
             })}
+            </Tr>
           </Tbody>
         </Table>
         <Table variant='simple'>
@@ -312,11 +419,11 @@ function Body({d, v, c}: any) {
         <Table variant='simple'>
           <Thead>
             <Tr>
-              <Th>アドバイザリー:提供元</Th>
-              <Th>アドバイザリー:重大度</Th>
-              <Th>アドバイザリー:コピーライト</Th>
-              <Th>アドバイザリー:発行日</Th>
-              <Th>アドバイザリー:更新日</Th>
+              <Th>提供元（アドバイザリー）</Th>
+              <Th>重大度（アドバイザリー）</Th>
+              <Th>コピーライト（アドバイザリー）</Th>
+              <Th>発行日（アドバイザリー）</Th>
+              <Th>更新日（アドバイザリー）</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -413,13 +520,12 @@ function Body({d, v, c}: any) {
             })}
           </Tbody>
         </Table>
-        <p>RedHat Bugzilla</p>
         <Table variant='simple'>
           <Thead>
             <Tr>
-              <Th>リンク</Th>
-              <Th>ID</Th>
-              <Th>参考</Th>
+              <Th>リンク（RedHat Bugzilla）</Th>
+              <Th>ID（RedHat Bugzilla）</Th>
+              <Th>参考（RedHat Bugzilla）</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -436,21 +542,35 @@ function Body({d, v, c}: any) {
             })}
           </Tbody>
         </Table>
-        <p>影響を受ける共通プラットフォーム一覧</p>
         <Table variant='simple'>
           <Thead>
             <Tr>
-              <Th>CPE名</Th>
+              <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th>
+            </Tr>
+            <Tr>
+              <Th>種別</Th>
+              <Th>ベンダ名</Th>
+              <Th>製品名</Th>
+              <Th>バージョン</Th>
+              <Th>アップデート</Th>
+              <Th>エディション</Th>
+              <Th>言語</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {v.metadata.advisory.affected_cpe_list.cpe.map((cpe: string) => {
-              return (
-                <Tr>
-                  <Td>{cpe}</Td>
-                </Tr>
-              )
-            })}
+          {cpeVec.map((v) => {
+            return (
+              <Tr>
+                <Td>{v.kind === "" ? "全て" : v.kind}</Td>
+                <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
+                <Td>{v.product === "" ? "全て" : v.product}</Td>
+                <Td>{v.version === "" ? "全て" : v.version}</Td>
+                <Td>{v.update === "" ? "全て" : v.update}</Td>
+                <Td>{v.edition === "" ? "全て" : v.edition}</Td>
+                <Td>{v.language === "" ? "全て" : v.language}</Td>
+              </Tr>
+            )
+          })}
           </Tbody>
         </Table>
         <Table variant='simple'>
