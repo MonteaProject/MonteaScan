@@ -70,20 +70,11 @@ function Body({d, v, c}: any) {
   let availability_item;
   let availability_value;
 
-  // CPE
-  let kind;
-  let vendor;
-  let product;
-  let version;
-  let update;
-  let edition;
-  let language;
-
   if (cvssVec.length === 10) {
     score = cvssVec[0];
 
-    attackVector       = cvssVec[2].split(":")[0];
-    attackVector_item  = cvssVec[2].split(":")[1];
+    attackVector      = cvssVec[2].split(":")[0];
+    attackVector_item = cvssVec[2].split(":")[1];
     if (attackVector === "AV") {
       if (attackVector_item === "N") {
         attackVector_value = "ネットワーク"
@@ -98,8 +89,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    attackComplexity       = cvssVec[3].split(":")[0];
-    attackComplexity_item  = cvssVec[3].split(":")[1];
+    attackComplexity      = cvssVec[3].split(":")[0];
+    attackComplexity_item = cvssVec[3].split(":")[1];
     if (attackComplexity === "AC") {
       if (attackComplexity_item === "L") {
         attackComplexity_value = "低"
@@ -110,8 +101,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    privilegesRequired       = cvssVec[4].split(":")[0];
-    privilegesRequired_item  = cvssVec[4].split(":")[1];
+    privilegesRequired      = cvssVec[4].split(":")[0];
+    privilegesRequired_item = cvssVec[4].split(":")[1];
     if (privilegesRequired === "PR") {
       if (privilegesRequired_item === "N") {
         privilegesRequired_value = "不要"
@@ -124,8 +115,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    userInteraction       = cvssVec[5].split(":")[0];
-    userInteraction_item  = cvssVec[5].split(":")[1];
+    userInteraction      = cvssVec[5].split(":")[0];
+    userInteraction_item = cvssVec[5].split(":")[1];
     if (userInteraction === "UI") {
       if (userInteraction_item === "N") {
         userInteraction_value = "不要"
@@ -136,8 +127,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    scope       = cvssVec[6].split(":")[0];
-    scope_item  = cvssVec[6].split(":")[1];
+    scope      = cvssVec[6].split(":")[0];
+    scope_item = cvssVec[6].split(":")[1];
     if (scope === "S") {
       if (scope_item === "U") {
         scope_value = "変更なし"
@@ -148,8 +139,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    confidentiality       = cvssVec[7].split(":")[0];
-    confidentiality_item  = cvssVec[7].split(":")[1];
+    confidentiality      = cvssVec[7].split(":")[0];
+    confidentiality_item = cvssVec[7].split(":")[1];
     if (confidentiality === "C") {
       if (confidentiality_item === "N") {
         confidentiality_value = "なし"
@@ -162,8 +153,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    integrity       = cvssVec[8].split(":")[0];
-    integrity_item  = cvssVec[8].split(":")[1];
+    integrity      = cvssVec[8].split(":")[0];
+    integrity_item = cvssVec[8].split(":")[1];
     if (integrity === "I") {
       if (integrity_item === "N") {
         integrity_value = "なし"
@@ -176,8 +167,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    availability       = cvssVec[9].split(":")[0];
-    availability_item  = cvssVec[9].split(":")[1];
+    availability      = cvssVec[9].split(":")[0];
+    availability_item = cvssVec[9].split(":")[1];
     if (availability === "A") {
       if (availability_item === "N") {
         availability_value = "なし"
@@ -193,108 +184,187 @@ function Body({d, v, c}: any) {
     console.log("CVSSの形式が変更されています...");
   }
 
+  // CPE
   let cpeVec: any[] = [];
   v.metadata.advisory.affected_cpe_list.cpe.map((cpe: string) => {
     if (cpe.split(":").length === 1) {
       cpeVec.push(
         {
-          "kind":"全て",
-          "vendor":"全て",
-          "product":"全て",
-          "version":"全て",
-          "update":"全て",
-          "edition":"全て",
+          "cpe"     :cpe,
+          "kind"    :"全て",
+          "vendor"  :"全て",
+          "product" :"全て",
+          "version" :"全て",
+          "update"  :"全て",
+          "edition" :"全て",
           "language":"全て"
         }
       )
     }
     if (cpe.split(":").length === 2) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
       cpeVec.push(
         {
-          "kind":cpe.split(":")[1],
-          "vendor":"全て",
-          "product":"全て",
-          "version":"全て",
-          "update":"全て",
-          "edition":"全て",
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :"全て",
+          "product" :"全て",
+          "version" :"全て",
+          "update"  :"全て",
+          "edition" :"全て",
           "language":"全て"
         }
       )
     }
     if (cpe.split(":").length === 3) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
       cpeVec.push(
         {
-          "kind":cpe.split(":")[1],
-          "vendor":cpe.split(":")[2],
-          "product":"全て",
-          "version":"全て",
-          "update":"全て",
-          "edition":"全て",
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :"全て",
+          "version" :"全て",
+          "update"  :"全て",
+          "edition" :"全て",
           "language":"全て"
         }
       )
     }
     if (cpe.split(":").length === 4) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
       cpeVec.push(
         {
-          "kind":cpe.split(":")[1],
-          "vendor":cpe.split(":")[2],
-          "product":cpe.split(":")[3],
-          "version":"全て",
-          "update":"全て",
-          "edition":"全て",
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :"全て",
+          "update"  :"全て",
+          "edition" :"全て",
           "language":"全て"
         }
       )
     }
     if (cpe.split(":").length === 5) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
       cpeVec.push(
         {
-          "kind":cpe.split(":")[1],
-          "vendor":cpe.split(":")[2],
-          "product":cpe.split(":")[3],
-          "version":cpe.split(":")[4],
-          "update":"全て",
-          "edition":"全て",
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :cpe.split(":")[4],
+          "update"  :"全て",
+          "edition" :"全て",
           "language":"全て"
         }
       )
     }
     if (cpe.split(":").length === 6) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
       cpeVec.push(
         {
-          "kind":cpe.split(":")[1],
-          "vendor":cpe.split(":")[2],
-          "product":cpe.split(":")[3],
-          "version":cpe.split(":")[4],
-          "update":cpe.split(":")[5],
-          "edition":"全て",
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :cpe.split(":")[4],
+          "update"  :cpe.split(":")[5],
+          "edition" :"全て",
           "language":"全て"
         }
       )
     }
     if (cpe.split(":").length === 7) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
       cpeVec.push(
         {
-          "kind":cpe.split(":")[1],
-          "vendor":cpe.split(":")[2],
-          "product":cpe.split(":")[3],
-          "version":cpe.split(":")[4],
-          "update":cpe.split(":")[5],
-          "edition":cpe.split(":")[6],
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :cpe.split(":")[4],
+          "update"  :cpe.split(":")[5],
+          "edition" :cpe.split(":")[6],
           "language":"全て"
         }
       )
     }
     if (cpe.split(":").length === 8) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
       cpeVec.push(
         {
-          "kind":cpe.split(":")[1],
-          "vendor":cpe.split(":")[2],
-          "product":cpe.split(":")[3],
-          "version":cpe.split(":")[4],
-          "update":cpe.split(":")[5],
-          "edition":cpe.split(":")[6],
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :cpe.split(":")[4],
+          "update"  :cpe.split(":")[5],
+          "edition" :cpe.split(":")[6],
           "language":cpe.split(":")[7]
         }
       )
@@ -342,7 +412,7 @@ function Body({d, v, c}: any) {
           <Thead>
             <Tr>
               <Th>OVAL-ID</Th>
-              <Th>OVAL-CLASS</Th>
+              <Th>OVALクラス</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -419,11 +489,11 @@ function Body({d, v, c}: any) {
         <Table variant='simple'>
           <Thead>
             <Tr>
-              <Th>提供元（アドバイザリー）</Th>
-              <Th>重大度（アドバイザリー）</Th>
-              <Th>コピーライト（アドバイザリー）</Th>
-              <Th>発行日（アドバイザリー）</Th>
-              <Th>更新日（アドバイザリー）</Th>
+              <Th textTransform="none">提供元（Advisory）</Th>
+              <Th>重大度</Th>
+              <Th>コピーライト</Th>
+              <Th>発行日</Th>
+              <Th>更新日</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -523,19 +593,19 @@ function Body({d, v, c}: any) {
         <Table variant='simple'>
           <Thead>
             <Tr>
-              <Th>リンク（RedHat Bugzilla）</Th>
-              <Th>ID（RedHat Bugzilla）</Th>
-              <Th>参考（RedHat Bugzilla）</Th>
+              <Th textTransform="none">RedHat Bugzilla バグ番号</Th>
+              <Th textTransform="none">リンク</Th>
+              <Th textTransform="none">参考</Th>
             </Tr>
           </Thead>
           <Tbody>
             {v.metadata.advisory.bugzilla.map((b: string) => {
               return (
                 <Tr>
+                  <Td>{b["@id"]}</Td>
                   <Link color="green.400" href={b["@href"]} isExternal>
                     <Td>{b["@href"]} <ExternalLinkIcon mx="2px" /></Td>
                   </Link>
-                  <Td>{b["@id"]}</Td>
                   <Td>{b["$value"]}</Td>
                 </Tr>
               )
@@ -546,8 +616,6 @@ function Body({d, v, c}: any) {
           <Thead>
             <Tr>
               <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th>
-            </Tr>
-            <Tr>
               <Th>種別</Th>
               <Th>ベンダ名</Th>
               <Th>製品名</Th>
@@ -561,6 +629,7 @@ function Body({d, v, c}: any) {
           {cpeVec.map((v) => {
             return (
               <Tr>
+                <Td>{v.cpe}</Td>
                 <Td>{v.kind === "" ? "全て" : v.kind}</Td>
                 <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
                 <Td>{v.product === "" ? "全て" : v.product}</Td>
