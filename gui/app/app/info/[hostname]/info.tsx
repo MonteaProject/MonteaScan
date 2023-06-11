@@ -6,6 +6,7 @@ import NextLink from "next/link";
 import {
   Box,
   Link,
+  Heading,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -374,195 +375,7 @@ function Body({d, v, c}: any) {
   return (
     <Box>
       <TableContainer>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>ホスト名</Th>
-              <Th>OS</Th>
-              <Th>カーネル</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{d.hostname}</Td>
-              <Td>{d.os}</Td>
-              <Td>{d.kernel}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>ネットワークインターフェイス名</Th>
-              <Th>IPアドレス</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {d.ip.map((i: string) => {
-              return (
-                <Tr>
-                  <Td>{i.split(':')[0]}</Td>
-                  <Td>{i.split(':')[1]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>OVAL-ID</Th>
-              <Th>OVALクラス</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v["@id"]}</Td>
-              <Td>{v["@class"]}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>タイトル</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.title}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>ファミリー</Th>
-              <Th>影響プラットフォーム</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.affected["@family"]}</Td>
-              {v.metadata.affected.platform.map((p: string) => {
-              return (
-                <Td>{p}</Td>
-              )
-            })}
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>リファレンスID</Th>
-              <Th>リファレンスURL</Th>
-              <Th>ソース</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.metadata.reference.map((r: string) => {
-              return (
-                <Tr>
-                  <Td>{r["@ref_id"]}</Td>
-                  <Link color="green.400" href={r["@ref_url"]} isExternal>
-                    <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td>
-                  </Link>
-                  <Td>{r["@source"]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>参考</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.description}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th textTransform="none">提供元（Advisory）</Th>
-              <Th>重大度</Th>
-              <Th>コピーライト</Th>
-              <Th>発行日</Th>
-              <Th>更新日</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.advisory["@from"]}</Td>
-              <Td>{v.metadata.advisory.severity}</Td>
-              <Td>{v.metadata.advisory.rights}</Td>
-              <Td>{v.metadata.advisory.issued["@date"]}</Td>
-              <Td>{v.metadata.advisory.updated["@date"]}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th textTransform="none">Red Hat</Th>
-              <Th>NVD</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Th>CVSS v3 基本評価値（スコア）</Th>
-              <Td>{score}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃元区分（攻撃の難易度を評価）</Th>
-              <Td>{attackVector_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th>
-              <Td>{attackComplexity_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th>
-              <Td>{privilegesRequired_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>利用者の関与（攻撃の難易度を評価）</Th>
-              <Td>{userInteraction_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th>
-              <Td>{scope_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>機密性への影響（攻撃による影響を評価）</Th>
-              <Td>{confidentiality_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>完全性への影響（攻撃による影響を評価）</Th>
-              <Td>{integrity_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>可用性への影響（攻撃による影響を評価）</Th>
-              <Td>{availability_value}</Td>
-              <Td>-</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
+        <Table variant='simple' mt="10">
           <Thead>
             <Tr>
               <Th>CWE-ID</Th>
@@ -590,7 +403,177 @@ function Body({d, v, c}: any) {
             })}
           </Tbody>
         </Table>
-        <Table variant='simple'>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>ホスト名</Th>
+              <Th>OS</Th>
+              <Th>カーネル</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{d.hostname}</Td>
+              <Td>{d.os}</Td>
+              <Td>{d.kernel}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>ネットワークインターフェイス名</Th>
+              <Th>IPアドレス</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {d.ip.map((i: string) => {
+              return (
+                <Tr>
+                  <Td>{i.split(':')[0]}</Td>
+                  <Td>{i.split(':')[1]}</Td>
+                </Tr>
+              )
+            })}
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>OVAL-ID</Th>
+              <Th>OVALクラス</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v["@id"]}</Td>
+              <Td>{v["@class"]}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>タイトル</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v.metadata.title}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>ファミリー</Th>
+              <Th>影響プラットフォーム</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v.metadata.affected["@family"]}</Td>
+              {v.metadata.affected.platform.map((p: string) => {
+              return (
+                <Td>{p}</Td>
+              )
+            })}
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>リファレンスID</Th>
+              <Th>リファレンスURL</Th>
+              <Th>ソース</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {v.metadata.reference.map((r: string) => {
+              return (
+                <Tr>
+                  <Td>{r["@ref_id"]}</Td>
+                  <Link color="green.400" href={r["@ref_url"]} isExternal>
+                    <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td>
+                  </Link>
+                  <Td>{r["@source"]}</Td>
+                </Tr>
+              )
+            })}
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>参考</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v.metadata.description}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th textTransform="none">提供元（Advisory）</Th>
+              <Th>重大度</Th>
+              <Th>コピーライト</Th>
+              <Th>発行日</Th>
+              <Th>更新日</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v.metadata.advisory["@from"]}</Td>
+              <Td>{v.metadata.advisory.severity}</Td>
+              <Td>{v.metadata.advisory.rights}</Td>
+              <Td>{v.metadata.advisory.issued["@date"]}</Td>
+              <Td>{v.metadata.advisory.updated["@date"]}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th></Th>
+              <Th textTransform="none">Red Hat</Th>
+              <Th>NVD</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Th>CVSS v3 基本評価値（スコア）</Th><Td>{score}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>攻撃元区分（攻撃の難易度を評価）</Th><Td>{attackVector_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th><Td>{attackComplexity_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th><Td>{privilegesRequired_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>利用者の関与（攻撃の難易度を評価）</Th><Td>{userInteraction_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th><Td>{scope_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>機密性への影響（攻撃による影響を評価）</Th><Td>{confidentiality_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>完全性への影響（攻撃による影響を評価）</Th><Td>{integrity_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>可用性への影響（攻撃による影響を評価）</Th><Td>{availability_value}</Td><Td>-</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
           <Thead>
             <Tr>
               <Th textTransform="none">RedHat Bugzilla バグ番号</Th>
@@ -612,7 +595,7 @@ function Body({d, v, c}: any) {
             })}
           </Tbody>
         </Table>
-        <Table variant='simple'>
+        <Table variant='simple' mt="10">
           <Thead>
             <Tr>
               <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th>
@@ -642,10 +625,10 @@ function Body({d, v, c}: any) {
           })}
           </Tbody>
         </Table>
-        <Table variant='simple'>
+        <Table variant='simple' mt="10">
           <Thead>
             <Tr>
-              <Th>{v.criteria["@operator"] === "OR" ? "条件（いずれかに該当する場合）" : "条件（いずれも該当する場合）"}</Th>
+              <Th>{v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -660,10 +643,10 @@ function Body({d, v, c}: any) {
         </Table>
           {v.criteria.criteria.map((c: any) => {
             return (
-              <Table variant='simple'>
+              <Table variant='simple' mt="10">
                 <Thead>
                   <Tr>
-                    <Th>{c["@operator"] === "OR" ? "条件（いずれかに該当する場合）" : "条件（いずれも該当する場合）"}</Th>
+                    <Th>{c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
