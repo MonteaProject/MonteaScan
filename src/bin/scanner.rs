@@ -151,7 +151,7 @@ fn main() -> Result<()> {
     for i in &v {
       let t = i.trim();
       let u = t.split_whitespace().collect::<Vec<&str>>();
-      let ipaddr = String::from(u[1]) + ":" + u[3];
+      let ipaddr = String::from(u[1]) + "_!_" + u[3];
       localinfo.ip.push(ipaddr);
     }
     ch.wait_close().expect("Close SSH Connection Failed...");

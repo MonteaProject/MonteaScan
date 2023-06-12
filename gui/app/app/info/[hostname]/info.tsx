@@ -23,7 +23,10 @@ import {
   Td,
   TableCaption,
   TableContainer,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  InfoIcon,
+  InfoOutlineIcon,
+  Badge
 } from "../../common/components";
 
 
@@ -44,121 +47,181 @@ const getServerInfo = async (hostname: string) => {
 
 function CweTable({v}: any) {
   return (
-    <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th>CVE-ID</Th>
-          <Th>重要度</Th>
-          <Th>CWE-ID</Th>
-          <Th>脆弱性の種類</Th>
-          <Th>リンク</Th>
-          <Th>公開日</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {v.metadata.advisory.cve.map((c: string) => {
-          return (
-            <Tr>
-              <Td>{c["$value"]}</Td>
-              <Td>{c["@impact"]}</Td>
-              <Td>{c["@cwe"]}</Td>
-              <Td>-</Td>
-              <Link color="green.400" href={c["@href"]} isExternal>
-                <Td>{c["@href"]} <ExternalLinkIcon mx="2px" /></Td>
-              </Link>
-              <Td>{c["@public"]}</Td>
-            </Tr>
-          )
-        })}
-      </Tbody>
-    </Table>
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />CWE情報</Heading>
+      <Table variant='simple'>
+        <Thead>
+          <Tr>
+            <Th>CVE-ID</Th>
+            <Th>重要度</Th>
+            <Th>CWE-ID</Th>
+            <Th>脆弱性の種類</Th>
+            <Th>リンク</Th>
+            <Th>公開日</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {v.metadata.advisory.cve.map((c: string) => {
+            return (
+              <Tr>
+                <Td>{c["$value"]}</Td>
+                <Td>{c["@impact"]}</Td>
+                <Td>{c["@cwe"]}</Td>
+                <Td>-</Td>
+                <Link color="green.400" href={c["@href"]} isExternal>
+                  <Td>{c["@href"]} <ExternalLinkIcon mx="2px" /></Td>
+                </Link>
+                <Td>{c["@public"]}</Td>
+              </Tr>
+            )
+          })}
+        </Tbody>
+      </Table>
+    </Box>
   )
 }
 
 function HostTable({d}: any) {
   return (
-    <Table variant='simple' mt="10">
-      <Tr>
-        <Th>ホスト名</Th>
-        <Td>{d.hostname}</Td>
-      </Tr>
-      <Tr>
-        <Th>OS</Th>
-        <Td>{d.os}</Td>
-      </Tr>
-      <Tr>
-        <Th>カーネル</Th>
-        <Td>{d.kernel}</Td>
-      </Tr>
-    </Table>
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />ホスト情報</Heading>
+      <Table variant='simple'>
+        <Tr>
+          <Th>ホスト名</Th>
+          <Td>{d.hostname}</Td>
+        </Tr>
+        <Tr>
+          <Th>OS</Th>
+          <Td>{d.os}</Td>
+        </Tr>
+        <Tr>
+          <Th>カーネル</Th>
+          <Td>{d.kernel}</Td>
+        </Tr>
+      </Table>
+    </Box>
   )
 }
+
+// function HostTable({d}: any) {
+//   return (
+//     <Table variant='simple' mt="10">
+//       <Tr>
+//         <Th>ホスト名</Th>
+//         <Td>{d.hostname}</Td>
+//       </Tr>
+//       <Tr>
+//         <Th>OS</Th>
+//         <Td>{d.os}</Td>
+//         <Th>カーネル</Th>
+//         <Td>{d.kernel}</Td>
+//       </Tr>
+//     </Table>
+//   )
+// }
 
 function IpTable({d}: any) {
   return (
-    <Table variant='simple' mt="10">
-      {d.ip.map((i: string) => {
-        return (
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />IPアドレス</Heading>
+      <Table variant='simple'>
+        <Thead>
           <Tr>
-            <Th>ネットワークインターフェイス名</Th>
-            <Td>{i.split(':')[0]}</Td>
             <Th>IPアドレス</Th>
-            <Td>{i.split(':')[1]}</Td>
+            <Th>ネットワークインターフェイス名</Th>
           </Tr>
-        )
-      })}
-    </Table>
+        </Thead>
+        <Tbody>
+        {d.ip.map((i: string) => {
+          return (
+            <Tr>
+              <Td>{i.split('_!_')[1]}</Td>
+              <Td>{i.split('_!_')[0]}</Td>
+            </Tr>
+          )
+        })}
+        </Tbody>
+      </Table>
+    </Box>
   )
 }
+
+// function IpTable({d}: any) {
+//   return (
+//     <Table variant='simple' mt="10">
+//       {d.ip.map((i: string) => {
+//         return (
+//           <Tr>
+//             <Th>ネットワークインターフェイス名</Th>
+//             <Td>{i.split('_!_')[0]}</Td>
+//             <Th>IPアドレス</Th>
+//             <Td>{i.split('_!_')[1]}</Td>
+//           </Tr>
+//         )
+//       })}
+//     </Table>
+//   )
+// }
 
 function OvalInfo({v}: any) {
   return (
-    <Table variant='simple' mt="10">
-      <Tr>
-        <Th>OVAL-ID</Th>
-        <Td>{v["@id"]}</Td>
-      </Tr>
-      <Tr>
-        <Th>OVALクラス</Th>
-        <Td>{v["@class"]}</Td>
-      </Tr>
-    </Table>
-  )
-}
-
-function TitleTable({v}: any) {
-  return (
-    <Table variant='simple' mt="10">
-      <Tr>
-        <Th>タイトル</Th>
-        <Td>{v.metadata.title}</Td>
-      </Tr>
-    </Table>
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />OVAL</Heading>
+      <Table variant='simple'>
+        <Tr>
+          <Th>ID</Th>
+          <Td>{v["@id"]}</Td>
+        </Tr>
+        <Tr>
+          <Th>クラス</Th>
+          <Td>{v["@class"]}</Td>
+        </Tr>
+      </Table>
+    </Box>
   )
 }
 
 function FamilyTable({v}: any) {
   return (
-    <Table variant='simple' mt="10">
-      <Tr>
-        <Th>ファミリー</Th>
-        <Td>{v.metadata.affected["@family"]}</Td>
-      </Tr>
-      <Tr>
-        <Th>影響プラットフォーム</Th>
-        {v.metadata.affected.platform.map((p: string) => {
-          return (
-            <Td>{p}</Td>
-          )
-        })}
-      </Tr>
-    </Table>
+    <Box>
+      <Heading size="sm" mt="10"><InfoIcon mb="1" mr="1" />対象プラットフォーム</Heading>
+      <Table variant='simple'>
+        <Tr>
+          <Th>ファミリー</Th>
+          <Td>{v.metadata.affected["@family"]}</Td>
+        </Tr>
+        <Tr>
+          <Th>影響プラットフォーム</Th>
+          {v.metadata.affected.platform.map((p: string) => {
+            return (
+              <Td>{p}</Td>
+            )
+          })}
+        </Tr>
+      </Table>
+    </Box>
+  )
+}
+
+function TitleTable({v}: any) {
+  return (
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />タイトル</Heading>
+      <Table variant='simple'>
+        <Tr>
+          <Th>タイトル</Th>
+          <Td>{v.metadata.title}</Td>
+        </Tr>
+      </Table>
+    </Box>
   )
 }
 
 function ReferenceTable({v}: any) {
   return (
-    <Table variant='simple' mt="10">
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />リファレンス</Heading>
+      <Table variant='simple'>
       <Thead>
         <Tr>
           <Th>ソース</Th>
@@ -180,48 +243,35 @@ function ReferenceTable({v}: any) {
         })}
       </Tbody>
     </Table>
-  )
-}
-
-function DescriptionTable({v}: any) {
-  return (
-    <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th>参考</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          <Td>{v.metadata.description}</Td>
-        </Tr>
-      </Tbody>
-    </Table>
+    </Box>
   )
 }
 
 function AdvisoryTable({v}: any) {
   return (
-    <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th textTransform="none">提供元（Advisory）</Th>
-          <Th>重大度</Th>
-          <Th>コピーライト</Th>
-          <Th>発行日</Th>
-          <Th>更新日</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          <Td>{v.metadata.advisory["@from"]}</Td>
-          <Td>{v.metadata.advisory.severity}</Td>
-          <Td>{v.metadata.advisory.rights}</Td>
-          <Td>{v.metadata.advisory.issued["@date"]}</Td>
-          <Td>{v.metadata.advisory.updated["@date"]}</Td>
-        </Tr>
-      </Tbody>
-    </Table>
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />アドバイザリー</Heading>
+      <Table variant='simple'>
+        <Thead>
+          <Tr>
+            <Th textTransform="none">提供元（Advisory）</Th>
+            <Th>重大度</Th>
+            <Th>コピーライト</Th>
+            <Th>発行日</Th>
+            <Th>更新日</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          <Tr>
+            <Td>{v.metadata.advisory["@from"]}</Td>
+            <Td>{v.metadata.advisory.severity}</Td>
+            <Td>{v.metadata.advisory.rights}</Td>
+            <Td>{v.metadata.advisory.issued["@date"]}</Td>
+            <Td>{v.metadata.advisory.updated["@date"]}</Td>
+          </Tr>
+        </Tbody>
+      </Table>
+    </Box>
   )
 }
 
@@ -369,71 +419,77 @@ function CvssTable({c}: any) {
   }
 
   return (
-    <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th></Th>
-          <Th textTransform="none">Red Hat</Th>
-          <Th>NVD</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          <Th>CVSS v3 基本評価値（スコア）</Th><Td>{score}</Td><Td>-</Td>
-        </Tr>
-        <Tr>
-          <Th>攻撃元区分（攻撃の難易度を評価）</Th><Td>{attackVector_value}</Td><Td>-</Td>
-        </Tr>
-        <Tr>
-          <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th><Td>{attackComplexity_value}</Td><Td>-</Td>
-        </Tr>
-        <Tr>
-          <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th><Td>{privilegesRequired_value}</Td><Td>-</Td>
-        </Tr>
-        <Tr>
-          <Th>利用者の関与（攻撃の難易度を評価）</Th><Td>{userInteraction_value}</Td><Td>-</Td>
-        </Tr>
-        <Tr>
-          <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th><Td>{scope_value}</Td><Td>-</Td>
-        </Tr>
-        <Tr>
-          <Th>機密性への影響（攻撃による影響を評価）</Th><Td>{confidentiality_value}</Td><Td>-</Td>
-        </Tr>
-        <Tr>
-          <Th>完全性への影響（攻撃による影響を評価）</Th><Td>{integrity_value}</Td><Td>-</Td>
-        </Tr>
-        <Tr>
-          <Th>可用性への影響（攻撃による影響を評価）</Th><Td>{availability_value}</Td><Td>-</Td>
-        </Tr>
-      </Tbody>
-    </Table>
+    <Box>
+      <Heading size="sm" mb="-2" mt="10" textTransform="none"><InfoIcon mb="1" mr="1" />CVSS v3情報</Heading>
+      <Table variant='simple'>
+        <Thead>
+          <Tr>
+            <Th></Th>
+            <Th textTransform="none">Red Hat</Th>
+            <Th>NVD</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          <Tr>
+            <Th textTransform="none">CVSS v3 基本評価値（スコア）</Th><Td>{score}</Td><Td>-</Td>
+          </Tr>
+          <Tr>
+            <Th>攻撃元区分（攻撃の難易度を評価）</Th><Td>{attackVector_value}</Td><Td>-</Td>
+          </Tr>
+          <Tr>
+            <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th><Td>{attackComplexity_value}</Td><Td>-</Td>
+          </Tr>
+          <Tr>
+            <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th><Td>{privilegesRequired_value}</Td><Td>-</Td>
+          </Tr>
+          <Tr>
+            <Th>利用者の関与（攻撃の難易度を評価）</Th><Td>{userInteraction_value}</Td><Td>-</Td>
+          </Tr>
+          <Tr>
+            <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th><Td>{scope_value}</Td><Td>-</Td>
+          </Tr>
+          <Tr>
+            <Th>機密性への影響（攻撃による影響を評価）</Th><Td>{confidentiality_value}</Td><Td>-</Td>
+          </Tr>
+          <Tr>
+            <Th>完全性への影響（攻撃による影響を評価）</Th><Td>{integrity_value}</Td><Td>-</Td>
+          </Tr>
+          <Tr>
+            <Th>可用性への影響（攻撃による影響を評価）</Th><Td>{availability_value}</Td><Td>-</Td>
+          </Tr>
+        </Tbody>
+      </Table>
+    </Box>
   )
 }
 
 function BugzillaTable({v}: any) {
   return (
-    <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th textTransform="none">RedHat Bugzilla バグ番号</Th>
-          <Th textTransform="none">リンク</Th>
-          <Th textTransform="none">参考</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {v.metadata.advisory.bugzilla.map((b: string) => {
-          return (
-            <Tr>
-              <Td>{b["@id"]}</Td>
-              <Link color="green.400" href={b["@href"]} isExternal>
-                <Td>{b["@href"]} <ExternalLinkIcon mx="2px" /></Td>
-              </Link>
-              <Td>{b["$value"]}</Td>
-            </Tr>
-          )
-        })}
-      </Tbody>
-    </Table>
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />RedHat Bugzilla</Heading>
+      <Table variant='simple'>
+        <Thead>
+          <Tr>
+            <Th textTransform="none">バグ番号</Th>
+            <Th textTransform="none">リンク</Th>
+            <Th textTransform="none">参考</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {v.metadata.advisory.bugzilla.map((b: string) => {
+            return (
+              <Tr>
+                <Td>{b["@id"]}</Td>
+                <Link color="green.400" href={b["@href"]} isExternal>
+                  <Td>{b["@href"]} <ExternalLinkIcon mx="2px" /></Td>
+                </Link>
+                <Td>{b["$value"]}</Td>
+              </Tr>
+            )
+          })}
+        </Tbody>
+      </Table>
+    </Box>
   )
 }
 
@@ -625,43 +681,47 @@ function CpeTable({v}: any) {
   })
 
   return (
-    <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th>
-          <Th>種別</Th>
-          <Th>ベンダ名</Th>
-          <Th>製品名</Th>
-          <Th>バージョン</Th>
-          <Th>アップデート</Th>
-          <Th>エディション</Th>
-          <Th>言語</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-      {cpeVec.map((v) => {
-        return (
+    <Box>
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />CPE情報</Heading>
+      <Table variant='simple'>
+        <Thead>
           <Tr>
-            <Td>{v.cpe}</Td>
-            <Td>{v.kind === "" ? "全て" : v.kind}</Td>
-            <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
-            <Td>{v.product === "" ? "全て" : v.product}</Td>
-            <Td>{v.version === "" ? "全て" : v.version}</Td>
-            <Td>{v.update === "" ? "全て" : v.update}</Td>
-            <Td>{v.edition === "" ? "全て" : v.edition}</Td>
-            <Td>{v.language === "" ? "全て" : v.language}</Td>
+            {/* <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th> */}
+            <Th>種別</Th>
+            <Th>ベンダ名</Th>
+            <Th>製品名</Th>
+            <Th>バージョン</Th>
+            <Th>アップデート</Th>
+            <Th>エディション</Th>
+            <Th>言語</Th>
           </Tr>
-        )
-      })}
-      </Tbody>
-    </Table>
+        </Thead>
+        <Tbody>
+        {cpeVec.map((v) => {
+          return (
+            <Tr>
+              {/* <Td>{v.cpe}</Td> */}
+              <Td>{v.kind === "" ? "全て" : v.kind}</Td>
+              <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
+              <Td>{v.product === "" ? "全て" : v.product}</Td>
+              <Td>{v.version === "" ? "全て" : v.version}</Td>
+              <Td>{v.update === "" ? "全て" : v.update}</Td>
+              <Td>{v.edition === "" ? "全て" : v.edition}</Td>
+              <Td>{v.language === "" ? "全て" : v.language}</Td>
+            </Tr>
+          )
+        })}
+        </Tbody>
+      </Table>
+    </Box>
   )
 }
 
 function SubjectTable({v}: any) {
   return (
     <Box>
-      <Table variant='simple' mt="10">
+      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />対象条件</Heading>
+      <Table variant='simple'>
         <Thead>
           <Tr>
             <Th>{v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
@@ -679,7 +739,7 @@ function SubjectTable({v}: any) {
       </Table>
       {v.criteria.criteria.map((c: any) => {
         return (
-          <Table variant='simple' mt="10">
+          <Table variant='simple' mt="5">
             <Thead>
               <Tr>
                 <Th>{c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
@@ -704,7 +764,9 @@ function SubjectTable({v}: any) {
 function Body({d, v, c}: any) {
   return (
     <Box>
-      <TableContainer>
+      <Heading size="sm" mb="2"><InfoIcon mb="1" mr="1" />説明</Heading>
+      <p>{v.metadata.description}</p>
+      <TableContainer overflowX="unset" overflowY="unset">
         <CweTable
           v = {v}
         />
@@ -717,16 +779,13 @@ function Body({d, v, c}: any) {
         <OvalInfo
           v = {v}
         />
-        <TitleTable
-          v = {v}
-        />
         <FamilyTable
           v = {v}
         />
-        <ReferenceTable
+        <TitleTable
           v = {v}
         />
-        <DescriptionTable
+        <ReferenceTable
           v = {v}
         />
         <AdvisoryTable
@@ -799,7 +858,11 @@ function MyTbody({d}: any) {
                 <DrawerOverlay />
                 <DrawerContent>
                   <DrawerCloseButton />
-                  <DrawerHeader>{c["$value"]}</DrawerHeader>
+                  <DrawerHeader>
+                    <Badge variant='outline' colorScheme='green' fontSize='lg'>
+                      {c["$value"]}
+                    </Badge>
+                  </DrawerHeader>
                   <DrawerBody>
                     <Body
                       d = {d}
