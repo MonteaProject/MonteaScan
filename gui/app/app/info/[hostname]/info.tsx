@@ -47,26 +47,26 @@ function CweTable({v}: any) {
     <Table variant='simple' mt="10">
       <Thead>
         <Tr>
+          <Th>CVE-ID</Th>
+          <Th>重要度</Th>
           <Th>CWE-ID</Th>
           <Th>脆弱性の種類</Th>
           <Th>リンク</Th>
-          <Th>重要度</Th>
           <Th>公開日</Th>
-          <Th>CVE-ID</Th>
         </Tr>
       </Thead>
       <Tbody>
         {v.metadata.advisory.cve.map((c: string) => {
           return (
             <Tr>
+              <Td>{c["$value"]}</Td>
+              <Td>{c["@impact"]}</Td>
               <Td>{c["@cwe"]}</Td>
               <Td>-</Td>
               <Link color="green.400" href={c["@href"]} isExternal>
                 <Td>{c["@href"]} <ExternalLinkIcon mx="2px" /></Td>
               </Link>
-              <Td>{c["@impact"]}</Td>
               <Td>{c["@public"]}</Td>
-              <Td>{c["$value"]}</Td>
             </Tr>
           )
         })}
@@ -78,30 +78,35 @@ function CweTable({v}: any) {
 function HostTable({d}: any) {
   return (
     <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th>ホスト名</Th>
-          <Th>OS</Th>
-          <Th>カーネル</Th>
-          <Th>ネットワークインターフェイス名</Th>
-          <Th>IPアドレス</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          <Td>{d.hostname}</Td>
-          <Td>{d.os}</Td>
-          <Td>{d.kernel}</Td>
-          {d.ip.map((i: string) => {
-          return (
-            <Tr>
-              <Td>{i.split(':')[0]}</Td>
-              <Td>{i.split(':')[1]}</Td>
-            </Tr>
-          )
-        })}
-        </Tr>
-      </Tbody>
+      <Tr>
+        <Th>ホスト名</Th>
+        <Td>{d.hostname}</Td>
+      </Tr>
+      <Tr>
+        <Th>OS</Th>
+        <Td>{d.os}</Td>
+      </Tr>
+      <Tr>
+        <Th>カーネル</Th>
+        <Td>{d.kernel}</Td>
+      </Tr>
+    </Table>
+  )
+}
+
+function IpTable({d}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      {d.ip.map((i: string) => {
+        return (
+          <Tr>
+            <Th>ネットワークインターフェイス名</Th>
+            <Td>{i.split(':')[0]}</Td>
+            <Th>IPアドレス</Th>
+            <Td>{i.split(':')[1]}</Td>
+          </Tr>
+        )
+      })}
     </Table>
   )
 }
@@ -109,18 +114,14 @@ function HostTable({d}: any) {
 function OvalInfo({v}: any) {
   return (
     <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th>OVAL-ID</Th>
-          <Th>OVALクラス</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          <Td>{v["@id"]}</Td>
-          <Td>{v["@class"]}</Td>
-        </Tr>
-      </Tbody>
+      <Tr>
+        <Th>OVAL-ID</Th>
+        <Td>{v["@id"]}</Td>
+      </Tr>
+      <Tr>
+        <Th>OVALクラス</Th>
+        <Td>{v["@class"]}</Td>
+      </Tr>
     </Table>
   )
 }
@@ -128,16 +129,10 @@ function OvalInfo({v}: any) {
 function TitleTable({v}: any) {
   return (
     <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th>タイトル</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          <Td>{v.metadata.title}</Td>
-        </Tr>
-      </Tbody>
+      <Tr>
+        <Th>タイトル</Th>
+        <Td>{v.metadata.title}</Td>
+      </Tr>
     </Table>
   )
 }
@@ -145,22 +140,18 @@ function TitleTable({v}: any) {
 function FamilyTable({v}: any) {
   return (
     <Table variant='simple' mt="10">
-      <Thead>
-        <Tr>
-          <Th>ファミリー</Th>
-          <Th>影響プラットフォーム</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          <Td>{v.metadata.affected["@family"]}</Td>
-          {v.metadata.affected.platform.map((p: string) => {
+      <Tr>
+        <Th>ファミリー</Th>
+        <Td>{v.metadata.affected["@family"]}</Td>
+      </Tr>
+      <Tr>
+        <Th>影響プラットフォーム</Th>
+        {v.metadata.affected.platform.map((p: string) => {
           return (
             <Td>{p}</Td>
           )
         })}
-        </Tr>
-      </Tbody>
+      </Tr>
     </Table>
   )
 }
@@ -170,20 +161,20 @@ function ReferenceTable({v}: any) {
     <Table variant='simple' mt="10">
       <Thead>
         <Tr>
+          <Th>ソース</Th>
           <Th>リファレンスID</Th>
           <Th>リファレンスURL</Th>
-          <Th>ソース</Th>
         </Tr>
       </Thead>
       <Tbody>
         {v.metadata.reference.map((r: string) => {
           return (
             <Tr>
+              <Td>{r["@source"]}</Td>
               <Td>{r["@ref_id"]}</Td>
               <Link color="green.400" href={r["@ref_url"]} isExternal>
                 <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td>
               </Link>
-              <Td>{r["@source"]}</Td>
             </Tr>
           )
         })}
@@ -235,7 +226,7 @@ function AdvisoryTable({v}: any) {
 }
 
 function CvssTable({c}: any) {
-  // CVSS v3 "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+  // "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
   let cvssVec = c["@cvss3"].split("/");
   let score;
   let attackVector;
@@ -720,6 +711,9 @@ function Body({d, v, c}: any) {
         <HostTable
           d = {d}
         />
+        <IpTable
+          d = {d}
+        />
         <OvalInfo
           v = {v}
         />
@@ -826,23 +820,23 @@ function MyTbody({d}: any) {
 
 export default async function Info ({ infoPass }: { infoPass: string }) {
   const info = await getServerInfo(infoPass);
-  
+
   return (
     <Box>
       <table className="responsive-info-table">
         <thead className="responsive-info-table__head">
           <tr className="responsive-info-table__row">
-            <th className="responsive-info-table__head__title responsive-table__head__title--cve">CVE-ID</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--impact">深刻度</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">CVE-ID</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">深刻度</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">発行日</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">更新日</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--update">アップデート有無</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--pkgname">パッケージ名称</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--pkgver">現行バージョン番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--pkgrelease">現行リリース番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--upver">最新バージョン番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--uprelease">最新リリース番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title--pkgarch">アーキテクチャ</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">アップデート有無</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">パッケージ名称</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">現行バージョン番号</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">現行リリース番号</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">最新バージョン番号</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">最新リリース番号</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">アーキテクチャ</th>
           </tr>
         </thead>
         {info.vulns.map((d) => (
