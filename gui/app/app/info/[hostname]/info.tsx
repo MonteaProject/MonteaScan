@@ -26,7 +26,8 @@ import {
   ExternalLinkIcon,
   InfoIcon,
   InfoOutlineIcon,
-  Badge
+  Badge,
+  Tooltip
 } from "../../common/components";
 
 
@@ -48,16 +49,16 @@ const getServerInfo = async (hostname: string) => {
 function CweTable({v}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />CWE情報</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>CWE情報</Heading>
       <Table variant='simple'>
         <Thead>
           <Tr>
-            <Th>CVE-ID</Th>
-            <Th>重要度</Th>
-            <Th>CWE-ID</Th>
-            <Th>脆弱性の種類</Th>
-            <Th>リンク</Th>
-            <Th>公開日</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CVE-ID</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>重要度</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CWE-ID</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>脆弱性の種類</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>リンク</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>公開日</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -84,18 +85,18 @@ function CweTable({v}: any) {
 function HostTable({d}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />ホスト情報</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>ホスト情報</Heading>
       <Table variant='simple'>
         <Tr>
-          <Th>ホスト名</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ホスト名</Th>
           <Td>{d.hostname}</Td>
         </Tr>
         <Tr>
-          <Th>OS</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>OS</Th>
           <Td>{d.os}</Td>
         </Tr>
         <Tr>
-          <Th>カーネル</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>カーネル</Th>
           <Td>{d.kernel}</Td>
         </Tr>
       </Table>
@@ -123,12 +124,12 @@ function HostTable({d}: any) {
 function IpTable({d}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />IPアドレス</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>IPアドレス</Heading>
       <Table variant='simple'>
         <Thead>
           <Tr>
-            <Th>IPアドレス</Th>
-            <Th>ネットワークインターフェイス名</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>IPアドレス</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ネットワークインターフェイス名</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -166,14 +167,14 @@ function IpTable({d}: any) {
 function OvalInfo({v}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />OVAL</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>OVAL</Heading>
       <Table variant='simple'>
         <Tr>
-          <Th>ID</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ID</Th>
           <Td>{v["@id"]}</Td>
         </Tr>
         <Tr>
-          <Th>クラス</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>クラス</Th>
           <Td>{v["@class"]}</Td>
         </Tr>
       </Table>
@@ -184,14 +185,14 @@ function OvalInfo({v}: any) {
 function FamilyTable({v}: any) {
   return (
     <Box>
-      <Heading size="sm" mt="10"><InfoIcon mb="1" mr="1" />対象プラットフォーム</Heading>
+      <Heading size="sm" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>対象プラットフォーム</Heading>
       <Table variant='simple'>
         <Tr>
-          <Th>ファミリー</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ファミリー</Th>
           <Td>{v.metadata.affected["@family"]}</Td>
         </Tr>
         <Tr>
-          <Th>影響プラットフォーム</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>影響プラットフォーム</Th>
           {v.metadata.affected.platform.map((p: string) => {
             return (
               <Td>{p}</Td>
@@ -206,10 +207,10 @@ function FamilyTable({v}: any) {
 function TitleTable({v}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />タイトル</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>タイトル</Heading>
       <Table variant='simple'>
         <Tr>
-          <Th>タイトル</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>タイトル</Th>
           <Td>{v.metadata.title}</Td>
         </Tr>
       </Table>
@@ -220,13 +221,13 @@ function TitleTable({v}: any) {
 function ReferenceTable({v}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />リファレンス</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>リファレンス</Heading>
       <Table variant='simple'>
       <Thead>
         <Tr>
-          <Th>ソース</Th>
-          <Th>リファレンスID</Th>
-          <Th>リファレンスURL</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ソース</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>リファレンスID</Th>
+          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>リファレンスURL</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -250,15 +251,15 @@ function ReferenceTable({v}: any) {
 function AdvisoryTable({v}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />アドバイザリー</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>アドバイザリー</Heading>
       <Table variant='simple'>
         <Thead>
           <Tr>
-            <Th textTransform="none">提供元（Advisory）</Th>
-            <Th>重大度</Th>
-            <Th>コピーライト</Th>
-            <Th>発行日</Th>
-            <Th>更新日</Th>
+            <Th textTransform="none"><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>提供元</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>重大度</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>コピーライト</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>発行日</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>更新日</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -420,42 +421,93 @@ function CvssTable({c}: any) {
 
   return (
     <Box>
-      <Heading size="sm" mb="-2" mt="10" textTransform="none"><InfoIcon mb="1" mr="1" />CVSS v3情報</Heading>
+      <Heading size="sm" mb="-2" mt="10" textTransform="none"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>CVSS v3情報</Heading>
       <Table variant='simple'>
         <Thead>
           <Tr>
             <Th></Th>
-            <Th textTransform="none">Red Hat</Th>
-            <Th>NVD</Th>
+            <Th textTransform="none">
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              Red Hat
+            </Th>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              NVD
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
           <Tr>
-            <Th textTransform="none">CVSS v3 基本評価値（スコア）</Th><Td>{score}</Td><Td>-</Td>
+            <Th textTransform="none">
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              CVSS v3 基本評価値（スコア）
+            </Th>
+            <Td>{score}</Td>
+            <Td>-</Td>
           </Tr>
           <Tr>
-            <Th>攻撃元区分（攻撃の難易度を評価）</Th><Td>{attackVector_value}</Td><Td>-</Td>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              攻撃元区分（攻撃の難易度を評価）
+            </Th>
+            <Td>{attackVector_value}</Td>
+            <Td>-</Td>
           </Tr>
           <Tr>
-            <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th><Td>{attackComplexity_value}</Td><Td>-</Td>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              攻撃条件の複雑さ（攻撃の難易度を評価）
+            </Th>
+            <Td>{attackComplexity_value}</Td>
+            <Td>-</Td>
           </Tr>
           <Tr>
-            <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th><Td>{privilegesRequired_value}</Td><Td>-</Td>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              攻撃に必要な特権レベル（攻撃の難易度を評価）
+            </Th>
+            <Td>{privilegesRequired_value}</Td>
+            <Td>-</Td>
           </Tr>
           <Tr>
-            <Th>利用者の関与（攻撃の難易度を評価）</Th><Td>{userInteraction_value}</Td><Td>-</Td>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              利用者の関与（攻撃の難易度を評価）
+            </Th>
+            <Td>{userInteraction_value}</Td>
+            <Td>-</Td>
           </Tr>
           <Tr>
-            <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th><Td>{scope_value}</Td><Td>-</Td>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              影響の想定範囲（脆弱性による影響の広がりを評価）
+            </Th>
+            <Td>{scope_value}</Td>
+            <Td>-</Td>
           </Tr>
           <Tr>
-            <Th>機密性への影響（攻撃による影響を評価）</Th><Td>{confidentiality_value}</Td><Td>-</Td>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              機密性への影響（攻撃による影響を評価）
+            </Th>
+            <Td>{confidentiality_value}</Td>
+            <Td>-</Td>
           </Tr>
           <Tr>
-            <Th>完全性への影響（攻撃による影響を評価）</Th><Td>{integrity_value}</Td><Td>-</Td>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              完全性への影響（攻撃による影響を評価）
+            </Th>
+            <Td>{integrity_value}</Td>
+            <Td>-</Td>
           </Tr>
           <Tr>
-            <Th>可用性への影響（攻撃による影響を評価）</Th><Td>{availability_value}</Td><Td>-</Td>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              可用性への影響（攻撃による影響を評価）
+            </Th>
+            <Td>{availability_value}</Td>
+            <Td>-</Td>
           </Tr>
         </Tbody>
       </Table>
@@ -466,13 +518,13 @@ function CvssTable({c}: any) {
 function BugzillaTable({v}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />RedHat Bugzilla</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>RedHat Bugzilla</Heading>
       <Table variant='simple'>
         <Thead>
           <Tr>
-            <Th textTransform="none">バグ番号</Th>
-            <Th textTransform="none">リンク</Th>
-            <Th textTransform="none">参考</Th>
+            <Th textTransform="none"><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>バグ番号</Th>
+            <Th textTransform="none"><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>リンク</Th>
+            <Th textTransform="none"><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>参考</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -682,18 +734,18 @@ function CpeTable({v}: any) {
 
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />CPE情報</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>CPE情報</Heading>
       <Table variant='simple'>
         <Thead>
           <Tr>
             {/* <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th> */}
-            <Th>種別</Th>
-            <Th>ベンダ名</Th>
-            <Th>製品名</Th>
-            <Th>バージョン</Th>
-            <Th>アップデート</Th>
-            <Th>エディション</Th>
-            <Th>言語</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>種別</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ベンダ名</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>製品名</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>バージョン</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>アップデート</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>エディション</Th>
+            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>言語</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -720,11 +772,14 @@ function CpeTable({v}: any) {
 function SubjectTable({v}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><InfoIcon mb="1" mr="1" />対象条件</Heading>
+      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>対象条件</Heading>
       <Table variant='simple'>
         <Thead>
           <Tr>
-            <Th>{v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
+            <Th>
+              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+              {v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -742,7 +797,10 @@ function SubjectTable({v}: any) {
           <Table variant='simple' mt="5">
             <Thead>
               <Tr>
-                <Th>{c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
+                <Th>
+                  <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+                  {c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}
+                </Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -764,7 +822,7 @@ function SubjectTable({v}: any) {
 function Body({d, v, c}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2"><InfoIcon mb="1" mr="1" />説明</Heading>
+      <Heading size="sm" mb="2"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>説明</Heading>
       <p>{v.metadata.description}</p>
       <TableContainer overflowX="unset" overflowY="unset">
         <CweTable
