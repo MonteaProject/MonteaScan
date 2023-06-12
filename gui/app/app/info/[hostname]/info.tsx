@@ -6,6 +6,7 @@ import NextLink from "next/link";
 import {
   Box,
   Link,
+  Heading,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -42,7 +43,7 @@ const getServerInfo = async (hostname: string) => {
 }
 
 function Body({d, v, c}: any) {
-  // "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+  // CVSS v3 "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
   let cvssVec = c["@cvss3"].split("/");
   let score;
   let attackVector;
@@ -73,8 +74,8 @@ function Body({d, v, c}: any) {
   if (cvssVec.length === 10) {
     score = cvssVec[0];
 
-    attackVector       = cvssVec[2].split(":")[0];
-    attackVector_item  = cvssVec[2].split(":")[1];
+    attackVector      = cvssVec[2].split(":")[0];
+    attackVector_item = cvssVec[2].split(":")[1];
     if (attackVector === "AV") {
       if (attackVector_item === "N") {
         attackVector_value = "ネットワーク"
@@ -89,8 +90,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    attackComplexity       = cvssVec[3].split(":")[0];
-    attackComplexity_item  = cvssVec[3].split(":")[1];
+    attackComplexity      = cvssVec[3].split(":")[0];
+    attackComplexity_item = cvssVec[3].split(":")[1];
     if (attackComplexity === "AC") {
       if (attackComplexity_item === "L") {
         attackComplexity_value = "低"
@@ -101,8 +102,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    privilegesRequired       = cvssVec[4].split(":")[0];
-    privilegesRequired_item  = cvssVec[4].split(":")[1];
+    privilegesRequired      = cvssVec[4].split(":")[0];
+    privilegesRequired_item = cvssVec[4].split(":")[1];
     if (privilegesRequired === "PR") {
       if (privilegesRequired_item === "N") {
         privilegesRequired_value = "不要"
@@ -115,8 +116,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    userInteraction       = cvssVec[5].split(":")[0];
-    userInteraction_item  = cvssVec[5].split(":")[1];
+    userInteraction      = cvssVec[5].split(":")[0];
+    userInteraction_item = cvssVec[5].split(":")[1];
     if (userInteraction === "UI") {
       if (userInteraction_item === "N") {
         userInteraction_value = "不要"
@@ -127,8 +128,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    scope       = cvssVec[6].split(":")[0];
-    scope_item  = cvssVec[6].split(":")[1];
+    scope      = cvssVec[6].split(":")[0];
+    scope_item = cvssVec[6].split(":")[1];
     if (scope === "S") {
       if (scope_item === "U") {
         scope_value = "変更なし"
@@ -139,8 +140,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    confidentiality       = cvssVec[7].split(":")[0];
-    confidentiality_item  = cvssVec[7].split(":")[1];
+    confidentiality      = cvssVec[7].split(":")[0];
+    confidentiality_item = cvssVec[7].split(":")[1];
     if (confidentiality === "C") {
       if (confidentiality_item === "N") {
         confidentiality_value = "なし"
@@ -153,8 +154,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    integrity       = cvssVec[8].split(":")[0];
-    integrity_item  = cvssVec[8].split(":")[1];
+    integrity      = cvssVec[8].split(":")[0];
+    integrity_item = cvssVec[8].split(":")[1];
     if (integrity === "I") {
       if (integrity_item === "N") {
         integrity_value = "なし"
@@ -167,8 +168,8 @@ function Body({d, v, c}: any) {
       }
     }
     
-    availability       = cvssVec[9].split(":")[0];
-    availability_item  = cvssVec[9].split(":")[1];
+    availability      = cvssVec[9].split(":")[0];
+    availability_item = cvssVec[9].split(":")[1];
     if (availability === "A") {
       if (availability_item === "N") {
         availability_value = "なし"
@@ -184,208 +185,197 @@ function Body({d, v, c}: any) {
     console.log("CVSSの形式が変更されています...");
   }
 
+  // CPE
+  let cpeVec: any[] = [];
+  v.metadata.advisory.affected_cpe_list.cpe.map((cpe: string) => {
+    if (cpe.split(":").length === 1) {
+      cpeVec.push(
+        {
+          "cpe"     :cpe,
+          "kind"    :"全て",
+          "vendor"  :"全て",
+          "product" :"全て",
+          "version" :"全て",
+          "update"  :"全て",
+          "edition" :"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 2) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
+      cpeVec.push(
+        {
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :"全て",
+          "product" :"全て",
+          "version" :"全て",
+          "update"  :"全て",
+          "edition" :"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 3) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
+      cpeVec.push(
+        {
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :"全て",
+          "version" :"全て",
+          "update"  :"全て",
+          "edition" :"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 4) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
+      cpeVec.push(
+        {
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :"全て",
+          "update"  :"全て",
+          "edition" :"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 5) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
+      cpeVec.push(
+        {
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :cpe.split(":")[4],
+          "update"  :"全て",
+          "edition" :"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 6) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
+      cpeVec.push(
+        {
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :cpe.split(":")[4],
+          "update"  :cpe.split(":")[5],
+          "edition" :"全て",
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 7) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
+      cpeVec.push(
+        {
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :cpe.split(":")[4],
+          "update"  :cpe.split(":")[5],
+          "edition" :cpe.split(":")[6],
+          "language":"全て"
+        }
+      )
+    }
+    if (cpe.split(":").length === 8) {
+      let k;
+      if (cpe.split(":")[1] === "/h") {
+        k = "ハードウェア"
+      } else if (cpe.split(":")[1] === "/o") {
+        k = "OS"
+      } else if (cpe.split(":")[1] === "/a") {
+        k = "アプリケーション"
+      } else {
+        console.log("新しい製品種別が追加されています...");
+      }
+      cpeVec.push(
+        {
+          "cpe"     :cpe,
+          "kind"    :k,
+          "vendor"  :cpe.split(":")[2],
+          "product" :cpe.split(":")[3],
+          "version" :cpe.split(":")[4],
+          "update"  :cpe.split(":")[5],
+          "edition" :cpe.split(":")[6],
+          "language":cpe.split(":")[7]
+        }
+      )
+    }
+  })
+
   return (
     <Box>
       <TableContainer>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>ホスト名</Th>
-              <Th>OS</Th>
-              <Th>カーネル</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{d.hostname}</Td>
-              <Td>{d.os}</Td>
-              <Td>{d.kernel}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>ネットワークインターフェイス名</Th>
-              <Th>IPアドレス</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {d.ip.map((i: string) => {
-              return (
-                <Tr>
-                  <Td>{i.split(':')[0]}</Td>
-                  <Td>{i.split(':')[1]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>OVAL-ID</Th>
-              <Th>OVAL-CLASS</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v["@id"]}</Td>
-              <Td>{v["@class"]}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>タイトル</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.title}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>ファミリー</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.affected["@family"]}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>影響プラットフォーム</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.metadata.affected.platform.map((p: string) => {
-              return (
-                <Tr>
-                  <Td>{p}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>リファレンスID</Th>
-              <Th>リファレンスURL</Th>
-              <Th>ソース</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.metadata.reference.map((r: string) => {
-              return (
-                <Tr>
-                  <Td>{r["@ref_id"]}</Td>
-                  <Link color="green.400" href={r["@ref_url"]} isExternal>
-                    <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td>
-                  </Link>
-                  <Td>{r["@source"]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>参考</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.description}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th>アドバイザリー:提供元</Th>
-              <Th>アドバイザリー:重大度</Th>
-              <Th>アドバイザリー:コピーライト</Th>
-              <Th>アドバイザリー:発行日</Th>
-              <Th>アドバイザリー:更新日</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.advisory["@from"]}</Td>
-              <Td>{v.metadata.advisory.severity}</Td>
-              <Td>{v.metadata.advisory.rights}</Td>
-              <Td>{v.metadata.advisory.issued["@date"]}</Td>
-              <Td>{v.metadata.advisory.updated["@date"]}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th textTransform="none">Red Hat</Th>
-              <Th>NVD</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Th>CVSS v3 基本評価値（スコア）</Th>
-              <Td>{score}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃元区分（攻撃の難易度を評価）</Th>
-              <Td>{attackVector_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th>
-              <Td>{attackComplexity_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th>
-              <Td>{privilegesRequired_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>利用者の関与（攻撃の難易度を評価）</Th>
-              <Td>{userInteraction_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th>
-              <Td>{scope_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>機密性への影響（攻撃による影響を評価）</Th>
-              <Td>{confidentiality_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>完全性への影響（攻撃による影響を評価）</Th>
-              <Td>{integrity_value}</Td>
-              <Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>可用性への影響（攻撃による影響を評価）</Th>
-              <Td>{availability_value}</Td>
-              <Td>-</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple'>
+        <Table variant='simple' mt="10">
           <Thead>
             <Tr>
               <Th>CWE-ID</Th>
@@ -413,50 +403,232 @@ function Body({d, v, c}: any) {
             })}
           </Tbody>
         </Table>
-        <p>RedHat Bugzilla</p>
-        <Table variant='simple'>
+        <Table variant='simple' mt="10">
           <Thead>
             <Tr>
-              <Th>リンク</Th>
-              <Th>ID</Th>
+              <Th>ホスト名</Th>
+              <Th>OS</Th>
+              <Th>カーネル</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{d.hostname}</Td>
+              <Td>{d.os}</Td>
+              <Td>{d.kernel}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>ネットワークインターフェイス名</Th>
+              <Th>IPアドレス</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {d.ip.map((i: string) => {
+              return (
+                <Tr>
+                  <Td>{i.split(':')[0]}</Td>
+                  <Td>{i.split(':')[1]}</Td>
+                </Tr>
+              )
+            })}
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>OVAL-ID</Th>
+              <Th>OVALクラス</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v["@id"]}</Td>
+              <Td>{v["@class"]}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>タイトル</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v.metadata.title}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>ファミリー</Th>
+              <Th>影響プラットフォーム</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v.metadata.affected["@family"]}</Td>
+              {v.metadata.affected.platform.map((p: string) => {
+              return (
+                <Td>{p}</Td>
+              )
+            })}
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th>リファレンスID</Th>
+              <Th>リファレンスURL</Th>
+              <Th>ソース</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {v.metadata.reference.map((r: string) => {
+              return (
+                <Tr>
+                  <Td>{r["@ref_id"]}</Td>
+                  <Link color="green.400" href={r["@ref_url"]} isExternal>
+                    <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td>
+                  </Link>
+                  <Td>{r["@source"]}</Td>
+                </Tr>
+              )
+            })}
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
               <Th>参考</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v.metadata.description}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th textTransform="none">提供元（Advisory）</Th>
+              <Th>重大度</Th>
+              <Th>コピーライト</Th>
+              <Th>発行日</Th>
+              <Th>更新日</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>{v.metadata.advisory["@from"]}</Td>
+              <Td>{v.metadata.advisory.severity}</Td>
+              <Td>{v.metadata.advisory.rights}</Td>
+              <Td>{v.metadata.advisory.issued["@date"]}</Td>
+              <Td>{v.metadata.advisory.updated["@date"]}</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th></Th>
+              <Th textTransform="none">Red Hat</Th>
+              <Th>NVD</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Th>CVSS v3 基本評価値（スコア）</Th><Td>{score}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>攻撃元区分（攻撃の難易度を評価）</Th><Td>{attackVector_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th><Td>{attackComplexity_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th><Td>{privilegesRequired_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>利用者の関与（攻撃の難易度を評価）</Th><Td>{userInteraction_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th><Td>{scope_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>機密性への影響（攻撃による影響を評価）</Th><Td>{confidentiality_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>完全性への影響（攻撃による影響を評価）</Th><Td>{integrity_value}</Td><Td>-</Td>
+            </Tr>
+            <Tr>
+              <Th>可用性への影響（攻撃による影響を評価）</Th><Td>{availability_value}</Td><Td>-</Td>
+            </Tr>
+          </Tbody>
+        </Table>
+        <Table variant='simple' mt="10">
+          <Thead>
+            <Tr>
+              <Th textTransform="none">RedHat Bugzilla バグ番号</Th>
+              <Th textTransform="none">リンク</Th>
+              <Th textTransform="none">参考</Th>
             </Tr>
           </Thead>
           <Tbody>
             {v.metadata.advisory.bugzilla.map((b: string) => {
               return (
                 <Tr>
+                  <Td>{b["@id"]}</Td>
                   <Link color="green.400" href={b["@href"]} isExternal>
                     <Td>{b["@href"]} <ExternalLinkIcon mx="2px" /></Td>
                   </Link>
-                  <Td>{b["@id"]}</Td>
                   <Td>{b["$value"]}</Td>
                 </Tr>
               )
             })}
           </Tbody>
         </Table>
-        <p>影響を受ける共通プラットフォーム一覧</p>
-        <Table variant='simple'>
+        <Table variant='simple' mt="10">
           <Thead>
             <Tr>
-              <Th>CPE名</Th>
+              <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th>
+              <Th>種別</Th>
+              <Th>ベンダ名</Th>
+              <Th>製品名</Th>
+              <Th>バージョン</Th>
+              <Th>アップデート</Th>
+              <Th>エディション</Th>
+              <Th>言語</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {v.metadata.advisory.affected_cpe_list.cpe.map((cpe: string) => {
-              return (
-                <Tr>
-                  <Td>{cpe}</Td>
-                </Tr>
-              )
-            })}
+          {cpeVec.map((v) => {
+            return (
+              <Tr>
+                <Td>{v.cpe}</Td>
+                <Td>{v.kind === "" ? "全て" : v.kind}</Td>
+                <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
+                <Td>{v.product === "" ? "全て" : v.product}</Td>
+                <Td>{v.version === "" ? "全て" : v.version}</Td>
+                <Td>{v.update === "" ? "全て" : v.update}</Td>
+                <Td>{v.edition === "" ? "全て" : v.edition}</Td>
+                <Td>{v.language === "" ? "全て" : v.language}</Td>
+              </Tr>
+            )
+          })}
           </Tbody>
         </Table>
-        <Table variant='simple'>
+        <Table variant='simple' mt="10">
           <Thead>
             <Tr>
-              <Th>{v.criteria["@operator"] === "OR" ? "条件（いずれかに該当する場合）" : "条件（いずれも該当する場合）"}</Th>
+              <Th>{v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -471,10 +643,10 @@ function Body({d, v, c}: any) {
         </Table>
           {v.criteria.criteria.map((c: any) => {
             return (
-              <Table variant='simple'>
+              <Table variant='simple' mt="10">
                 <Thead>
                   <Tr>
-                    <Th>{c["@operator"] === "OR" ? "条件（いずれかに該当する場合）" : "条件（いずれも該当する場合）"}</Th>
+                    <Th>{c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
