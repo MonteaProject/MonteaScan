@@ -42,7 +42,199 @@ const getServerInfo = async (hostname: string) => {
   return data as Vulns;
 }
 
-function Body({d, v, c}: any) {
+function CweTable({v}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th>CWE-ID</Th>
+          <Th>脆弱性の種類</Th>
+          <Th>リンク</Th>
+          <Th>重要度</Th>
+          <Th>公開日</Th>
+          <Th>CVE-ID</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {v.metadata.advisory.cve.map((c: string) => {
+          return (
+            <Tr>
+              <Td>{c["@cwe"]}</Td>
+              <Td>-</Td>
+              <Link color="green.400" href={c["@href"]} isExternal>
+                <Td>{c["@href"]} <ExternalLinkIcon mx="2px" /></Td>
+              </Link>
+              <Td>{c["@impact"]}</Td>
+              <Td>{c["@public"]}</Td>
+              <Td>{c["$value"]}</Td>
+            </Tr>
+          )
+        })}
+      </Tbody>
+    </Table>
+  )
+}
+
+function HostTable({d}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th>ホスト名</Th>
+          <Th>OS</Th>
+          <Th>カーネル</Th>
+          <Th>ネットワークインターフェイス名</Th>
+          <Th>IPアドレス</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr>
+          <Td>{d.hostname}</Td>
+          <Td>{d.os}</Td>
+          <Td>{d.kernel}</Td>
+          {d.ip.map((i: string) => {
+          return (
+            <Tr>
+              <Td>{i.split(':')[0]}</Td>
+              <Td>{i.split(':')[1]}</Td>
+            </Tr>
+          )
+        })}
+        </Tr>
+      </Tbody>
+    </Table>
+  )
+}
+
+function OvalInfo({v}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th>OVAL-ID</Th>
+          <Th>OVALクラス</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr>
+          <Td>{v["@id"]}</Td>
+          <Td>{v["@class"]}</Td>
+        </Tr>
+      </Tbody>
+    </Table>
+  )
+}
+
+function TitleTable({v}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th>タイトル</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr>
+          <Td>{v.metadata.title}</Td>
+        </Tr>
+      </Tbody>
+    </Table>
+  )
+}
+
+function FamilyTable({v}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th>ファミリー</Th>
+          <Th>影響プラットフォーム</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr>
+          <Td>{v.metadata.affected["@family"]}</Td>
+          {v.metadata.affected.platform.map((p: string) => {
+          return (
+            <Td>{p}</Td>
+          )
+        })}
+        </Tr>
+      </Tbody>
+    </Table>
+  )
+}
+
+function ReferenceTable({v}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th>リファレンスID</Th>
+          <Th>リファレンスURL</Th>
+          <Th>ソース</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {v.metadata.reference.map((r: string) => {
+          return (
+            <Tr>
+              <Td>{r["@ref_id"]}</Td>
+              <Link color="green.400" href={r["@ref_url"]} isExternal>
+                <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td>
+              </Link>
+              <Td>{r["@source"]}</Td>
+            </Tr>
+          )
+        })}
+      </Tbody>
+    </Table>
+  )
+}
+
+function DescriptionTable({v}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th>参考</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr>
+          <Td>{v.metadata.description}</Td>
+        </Tr>
+      </Tbody>
+    </Table>
+  )
+}
+
+function AdvisoryTable({v}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th textTransform="none">提供元（Advisory）</Th>
+          <Th>重大度</Th>
+          <Th>コピーライト</Th>
+          <Th>発行日</Th>
+          <Th>更新日</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr>
+          <Td>{v.metadata.advisory["@from"]}</Td>
+          <Td>{v.metadata.advisory.severity}</Td>
+          <Td>{v.metadata.advisory.rights}</Td>
+          <Td>{v.metadata.advisory.issued["@date"]}</Td>
+          <Td>{v.metadata.advisory.updated["@date"]}</Td>
+        </Tr>
+      </Tbody>
+    </Table>
+  )
+}
+
+function CvssTable({c}: any) {
   // CVSS v3 "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
   let cvssVec = c["@cvss3"].split("/");
   let score;
@@ -185,7 +377,76 @@ function Body({d, v, c}: any) {
     console.log("CVSSの形式が変更されています...");
   }
 
-  // CPE
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th></Th>
+          <Th textTransform="none">Red Hat</Th>
+          <Th>NVD</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        <Tr>
+          <Th>CVSS v3 基本評価値（スコア）</Th><Td>{score}</Td><Td>-</Td>
+        </Tr>
+        <Tr>
+          <Th>攻撃元区分（攻撃の難易度を評価）</Th><Td>{attackVector_value}</Td><Td>-</Td>
+        </Tr>
+        <Tr>
+          <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th><Td>{attackComplexity_value}</Td><Td>-</Td>
+        </Tr>
+        <Tr>
+          <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th><Td>{privilegesRequired_value}</Td><Td>-</Td>
+        </Tr>
+        <Tr>
+          <Th>利用者の関与（攻撃の難易度を評価）</Th><Td>{userInteraction_value}</Td><Td>-</Td>
+        </Tr>
+        <Tr>
+          <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th><Td>{scope_value}</Td><Td>-</Td>
+        </Tr>
+        <Tr>
+          <Th>機密性への影響（攻撃による影響を評価）</Th><Td>{confidentiality_value}</Td><Td>-</Td>
+        </Tr>
+        <Tr>
+          <Th>完全性への影響（攻撃による影響を評価）</Th><Td>{integrity_value}</Td><Td>-</Td>
+        </Tr>
+        <Tr>
+          <Th>可用性への影響（攻撃による影響を評価）</Th><Td>{availability_value}</Td><Td>-</Td>
+        </Tr>
+      </Tbody>
+    </Table>
+  )
+}
+
+function BugzillaTable({v}: any) {
+  return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th textTransform="none">RedHat Bugzilla バグ番号</Th>
+          <Th textTransform="none">リンク</Th>
+          <Th textTransform="none">参考</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {v.metadata.advisory.bugzilla.map((b: string) => {
+          return (
+            <Tr>
+              <Td>{b["@id"]}</Td>
+              <Link color="green.400" href={b["@href"]} isExternal>
+                <Td>{b["@href"]} <ExternalLinkIcon mx="2px" /></Td>
+              </Link>
+              <Td>{b["$value"]}</Td>
+            </Tr>
+          )
+        })}
+      </Tbody>
+    </Table>
+  )
+}
+
+function CpeTable({v}: any) {
   let cpeVec: any[] = [];
   v.metadata.advisory.affected_cpe_list.cpe.map((cpe: string) => {
     if (cpe.split(":").length === 1) {
@@ -373,294 +634,122 @@ function Body({d, v, c}: any) {
   })
 
   return (
+    <Table variant='simple' mt="10">
+      <Thead>
+        <Tr>
+          <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th>
+          <Th>種別</Th>
+          <Th>ベンダ名</Th>
+          <Th>製品名</Th>
+          <Th>バージョン</Th>
+          <Th>アップデート</Th>
+          <Th>エディション</Th>
+          <Th>言語</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+      {cpeVec.map((v) => {
+        return (
+          <Tr>
+            <Td>{v.cpe}</Td>
+            <Td>{v.kind === "" ? "全て" : v.kind}</Td>
+            <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
+            <Td>{v.product === "" ? "全て" : v.product}</Td>
+            <Td>{v.version === "" ? "全て" : v.version}</Td>
+            <Td>{v.update === "" ? "全て" : v.update}</Td>
+            <Td>{v.edition === "" ? "全て" : v.edition}</Td>
+            <Td>{v.language === "" ? "全て" : v.language}</Td>
+          </Tr>
+        )
+      })}
+      </Tbody>
+    </Table>
+  )
+}
+
+function SubjectTable({v}: any) {
+  return (
     <Box>
-      <TableContainer>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>CWE-ID</Th>
-              <Th>脆弱性の種類</Th>
-              <Th>リンク</Th>
-              <Th>重要度</Th>
-              <Th>公開日</Th>
-              <Th>CVE-ID</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.metadata.advisory.cve.map((c: string) => {
-              return (
-                <Tr>
-                  <Td>{c["@cwe"]}</Td>
-                  <Td>-</Td>
-                  <Link color="green.400" href={c["@href"]} isExternal>
-                    <Td>{c["@href"]} <ExternalLinkIcon mx="2px" /></Td>
-                  </Link>
-                  <Td>{c["@impact"]}</Td>
-                  <Td>{c["@public"]}</Td>
-                  <Td>{c["$value"]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>ホスト名</Th>
-              <Th>OS</Th>
-              <Th>カーネル</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{d.hostname}</Td>
-              <Td>{d.os}</Td>
-              <Td>{d.kernel}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>ネットワークインターフェイス名</Th>
-              <Th>IPアドレス</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {d.ip.map((i: string) => {
-              return (
-                <Tr>
-                  <Td>{i.split(':')[0]}</Td>
-                  <Td>{i.split(':')[1]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>OVAL-ID</Th>
-              <Th>OVALクラス</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v["@id"]}</Td>
-              <Td>{v["@class"]}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>タイトル</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.title}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>ファミリー</Th>
-              <Th>影響プラットフォーム</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.affected["@family"]}</Td>
-              {v.metadata.affected.platform.map((p: string) => {
-              return (
-                <Td>{p}</Td>
-              )
-            })}
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>リファレンスID</Th>
-              <Th>リファレンスURL</Th>
-              <Th>ソース</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.metadata.reference.map((r: string) => {
-              return (
-                <Tr>
-                  <Td>{r["@ref_id"]}</Td>
-                  <Link color="green.400" href={r["@ref_url"]} isExternal>
-                    <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td>
-                  </Link>
-                  <Td>{r["@source"]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>参考</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.description}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th textTransform="none">提供元（Advisory）</Th>
-              <Th>重大度</Th>
-              <Th>コピーライト</Th>
-              <Th>発行日</Th>
-              <Th>更新日</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>{v.metadata.advisory["@from"]}</Td>
-              <Td>{v.metadata.advisory.severity}</Td>
-              <Td>{v.metadata.advisory.rights}</Td>
-              <Td>{v.metadata.advisory.issued["@date"]}</Td>
-              <Td>{v.metadata.advisory.updated["@date"]}</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th></Th>
-              <Th textTransform="none">Red Hat</Th>
-              <Th>NVD</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Th>CVSS v3 基本評価値（スコア）</Th><Td>{score}</Td><Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃元区分（攻撃の難易度を評価）</Th><Td>{attackVector_value}</Td><Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃条件の複雑さ（攻撃の難易度を評価）</Th><Td>{attackComplexity_value}</Td><Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>攻撃に必要な特権レベル（攻撃の難易度を評価）</Th><Td>{privilegesRequired_value}</Td><Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>利用者の関与（攻撃の難易度を評価）</Th><Td>{userInteraction_value}</Td><Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>影響の想定範囲（脆弱性による影響の広がりを評価）</Th><Td>{scope_value}</Td><Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>機密性への影響（攻撃による影響を評価）</Th><Td>{confidentiality_value}</Td><Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>完全性への影響（攻撃による影響を評価）</Th><Td>{integrity_value}</Td><Td>-</Td>
-            </Tr>
-            <Tr>
-              <Th>可用性への影響（攻撃による影響を評価）</Th><Td>{availability_value}</Td><Td>-</Td>
-            </Tr>
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th textTransform="none">RedHat Bugzilla バグ番号</Th>
-              <Th textTransform="none">リンク</Th>
-              <Th textTransform="none">参考</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.metadata.advisory.bugzilla.map((b: string) => {
-              return (
-                <Tr>
-                  <Td>{b["@id"]}</Td>
-                  <Link color="green.400" href={b["@href"]} isExternal>
-                    <Td>{b["@href"]} <ExternalLinkIcon mx="2px" /></Td>
-                  </Link>
-                  <Td>{b["$value"]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th>
-              <Th>種別</Th>
-              <Th>ベンダ名</Th>
-              <Th>製品名</Th>
-              <Th>バージョン</Th>
-              <Th>アップデート</Th>
-              <Th>エディション</Th>
-              <Th>言語</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-          {cpeVec.map((v) => {
+      <Table variant='simple' mt="10">
+        <Thead>
+          <Tr>
+            <Th>{v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {v.criteria.criterion.map((criterion: string) => {
             return (
               <Tr>
-                <Td>{v.cpe}</Td>
-                <Td>{v.kind === "" ? "全て" : v.kind}</Td>
-                <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
-                <Td>{v.product === "" ? "全て" : v.product}</Td>
-                <Td>{v.version === "" ? "全て" : v.version}</Td>
-                <Td>{v.update === "" ? "全て" : v.update}</Td>
-                <Td>{v.edition === "" ? "全て" : v.edition}</Td>
-                <Td>{v.language === "" ? "全て" : v.language}</Td>
+                <Td>{criterion["@comment"]}</Td>
               </Tr>
             )
           })}
-          </Tbody>
-        </Table>
-        <Table variant='simple' mt="10">
-          <Thead>
-            <Tr>
-              <Th>{v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {v.criteria.criterion.map((criterion: string) => {
-              return (
-                <Tr>
-                  <Td>{criterion["@comment"]}</Td>
-                </Tr>
-              )
-            })}
-          </Tbody>
-        </Table>
-          {v.criteria.criteria.map((c: any) => {
-            return (
-              <Table variant='simple' mt="10">
-                <Thead>
+        </Tbody>
+      </Table>
+      {v.criteria.criteria.map((c: any) => {
+        return (
+          <Table variant='simple' mt="10">
+            <Thead>
+              <Tr>
+                <Th>{c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {c.criterion.map((c: any) => {
+                return (
                   <Tr>
-                    <Th>{c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}</Th>
+                    <Td>{c["@comment"]}</Td>
                   </Tr>
-                </Thead>
-                <Tbody>
-                  {c.criterion.map((c: any) => {
-                    return (
-                      <Tr>
-                        <Td>{c["@comment"]}</Td>
-                      </Tr>
-                    )
-                  })}
-                </Tbody>
-              </Table>
-            )
-          })}
+                )
+              })}
+            </Tbody>
+          </Table>
+        )
+      })}
+    </Box>
+  )
+}
+
+function Body({d, v, c}: any) {
+  return (
+    <Box>
+      <TableContainer>
+        <CweTable
+          v = {v}
+        />
+        <HostTable
+          d = {d}
+        />
+        <OvalInfo
+          v = {v}
+        />
+        <TitleTable
+          v = {v}
+        />
+        <FamilyTable
+          v = {v}
+        />
+        <ReferenceTable
+          v = {v}
+        />
+        <DescriptionTable
+          v = {v}
+        />
+        <AdvisoryTable
+          v = {v}
+        />
+        <CvssTable
+          c = {c}
+        />
+        <BugzillaTable
+          v = {v}
+        />
+        <CpeTable
+          v = {v}
+        />
+        <SubjectTable
+          v = {v}
+        />
       </TableContainer>
     </Box>
   )
