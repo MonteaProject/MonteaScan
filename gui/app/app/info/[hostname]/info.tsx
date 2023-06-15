@@ -45,7 +45,9 @@ import {
   MenuOptionGroup,
   MenuItemOption,
   IconButton,
-  VStack
+  VStack,
+  HStack,
+  Stack
 } from "../../common/components";
 
 
@@ -908,7 +910,7 @@ function MyTbody({d}: any) {
 
 export default async function Info ({ infoPass }: { infoPass: string }) {
   const [data, setData]         = useState([]);
-  const [sortType, setSortType]   = useState("pkgAsc");
+  const [sortType, setSortType] = useState("pkgAsc");
 
   const sortedData = useMemo(() => {
     let result = data;
@@ -980,12 +982,13 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
             <th className="responsive-info-table__head__title responsive-table__head__title">更新日</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">アップデート有無</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">パッケージ名称
-            <VStack gap={0}>
               <IconButton
                 aria-label="Pkg Asc"
                 icon={<TriangleUpIcon />}
                 variant="outline"
                 size="sm"
+                pb="1"
+                isRound={true}
                 onClick={PkgAsc}
               />
               <IconButton
@@ -993,21 +996,24 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
                 icon={<TriangleDownIcon />}
                 variant="outline"
                 size="sm"
+                pb="1"
+                ml="-2"
+                isRound={true}
                 onClick={PkgDesc}
               />
-            </VStack>
             </th>
             <th className="responsive-info-table__head__title responsive-table__head__title">現行バージョン番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">現行リリース番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">最新バージョン番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">最新リリース番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">アーキテクチャ
-            <VStack gap={0}>
               <IconButton
                 aria-label="Arch Asc"
                 icon={<TriangleUpIcon />}
                 variant="outline"
                 size="sm"
+                pb="1"
+                isRound={true}
                 onClick={ArchAsc}
               />
               <IconButton
@@ -1015,9 +1021,11 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
                 icon={<TriangleDownIcon />}
                 variant="outline"
                 size="sm"
+                pb="1"
+                ml="-2"
+                isRound={true}
                 onClick={ArchDesc}
               />
-            </VStack>
             </th>
           </tr>
         </thead>
