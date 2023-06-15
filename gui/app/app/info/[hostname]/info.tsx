@@ -41,13 +41,16 @@ import {
   MenuDivider,
   SettingsIcon,
   LinkIcon,
-  ChevronDownIcon,
   MenuOptionGroup,
   MenuItemOption,
   IconButton,
   VStack,
   HStack,
-  Stack
+  Stack,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  ChevronUpIcon,
+  ChevronDownIcon
 } from "../../common/components";
 
 
@@ -984,21 +987,21 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
             <th className="responsive-info-table__head__title responsive-table__head__title">パッケージ名称
               <IconButton
                 aria-label="Pkg Asc"
-                icon={<TriangleUpIcon />}
+                icon={<ArrowUpIcon />}
                 variant="outline"
-                size="sm"
-                pb="1"
-                isRound={true}
+                size="xs"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
                 onClick={PkgAsc}
               />
               <IconButton
                 aria-label="Pkg Desc"
-                icon={<TriangleDownIcon />}
+                icon={<ArrowDownIcon />}
                 variant="outline"
-                size="sm"
-                pb="1"
-                ml="-2"
-                isRound={true}
+                size="xs"
+                ml="-1"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
                 onClick={PkgDesc}
               />
             </th>
@@ -1009,21 +1012,21 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
             <th className="responsive-info-table__head__title responsive-table__head__title">アーキテクチャ
               <IconButton
                 aria-label="Arch Asc"
-                icon={<TriangleUpIcon />}
+                icon={<ArrowUpIcon />}
                 variant="outline"
-                size="sm"
-                pb="1"
-                isRound={true}
+                size="xs"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
                 onClick={ArchAsc}
               />
               <IconButton
                 aria-label="Arch Desc"
-                icon={<TriangleDownIcon />}
+                icon={<ArrowDownIcon />}
                 variant="outline"
-                size="sm"
-                pb="1"
-                ml="-2"
-                isRound={true}
+                size="xs"
+                ml="-1"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
                 onClick={ArchDesc}
               />
             </th>
