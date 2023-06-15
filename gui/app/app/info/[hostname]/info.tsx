@@ -1,5 +1,6 @@
 "use client";
 import "./info.scss";
+import { useEffect, useState, useMemo } from "react";
 import { Vulns } from "../../types/cveTypes";
 import { notFound } from "next/navigation";
 import NextLink from "next/link";
@@ -30,21 +31,6 @@ import {
   Tooltip
 } from "../../common/components";
 
-
-const getServerInfo = async (hostname: string) => {
-  const res = await fetch(`/api/serverInfo/${hostname}`, {cache: "no-store"});
-
-  if (res.status === 404) {
-    notFound();
-  }
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch server infomation...");
-  }
-
-  const data = await res.json();
-  return data as Vulns;
-}
 
 function CweTable({v}: any) {
   return (
@@ -104,23 +90,6 @@ function HostTable({d}: any) {
   )
 }
 
-// function HostTable({d}: any) {
-//   return (
-//     <Table variant='simple' mt="10">
-//       <Tr>
-//         <Th>ホスト名</Th>
-//         <Td>{d.hostname}</Td>
-//       </Tr>
-//       <Tr>
-//         <Th>OS</Th>
-//         <Td>{d.os}</Td>
-//         <Th>カーネル</Th>
-//         <Td>{d.kernel}</Td>
-//       </Tr>
-//     </Table>
-//   )
-// }
-
 function IpTable({d}: any) {
   return (
     <Box>
@@ -146,23 +115,6 @@ function IpTable({d}: any) {
     </Box>
   )
 }
-
-// function IpTable({d}: any) {
-//   return (
-//     <Table variant='simple' mt="10">
-//       {d.ip.map((i: string) => {
-//         return (
-//           <Tr>
-//             <Th>ネットワークインターフェイス名</Th>
-//             <Td>{i.split('_!_')[0]}</Td>
-//             <Th>IPアドレス</Th>
-//             <Td>{i.split('_!_')[1]}</Td>
-//           </Tr>
-//         )
-//       })}
-//     </Table>
-//   )
-// }
 
 function OvalInfo({v}: any) {
   return (
@@ -738,7 +690,6 @@ function CpeTable({v}: any) {
       <Table variant='simple'>
         <Thead>
           <Tr>
-            {/* <Th>CPE名（影響を受ける共通プラットフォーム一覧）</Th> */}
             <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>種別</Th>
             <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ベンダ名</Th>
             <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>製品名</Th>
@@ -752,7 +703,6 @@ function CpeTable({v}: any) {
         {cpeVec.map((v) => {
           return (
             <Tr>
-              {/* <Td>{v.cpe}</Td> */}
               <Td>{v.kind === "" ? "全て" : v.kind}</Td>
               <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
               <Td>{v.product === "" ? "全て" : v.product}</Td>
@@ -940,10 +890,56 @@ function MyTbody({d}: any) {
 }
 
 export default async function Info ({ infoPass }: { infoPass: string }) {
-  const info = await getServerInfo(infoPass);
+  const [data, setData] = useState([]);
+  const [sortType, setSortType] = useState("default");
+
+  const sortedData = useMemo(() => {
+    let result = data;
+
+    if (sortType === "descending") {
+      result = [...data].sort((a, b) => {
+        return b.pkg.pkgname.localeCompare(a.pkg.pkgname, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "ascending") {
+      result = [...data].sort((a, b) => {
+        return a.pkg.pkgname.localeCompare(b.pkg.pkgname, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    }
+
+    return result;
+  }, [data, sortType]);
+  
+  useEffect(() => {// コンポーネントマウント時、1回だけfetchを実行
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const res = await fetch(`/api/serverInfo/${infoPass}`, {cache: "no-store"});
+
+    if (res.status === 404) {
+      notFound();
+    }
+  
+    if (!res.ok) {
+      throw new Error("Failed to fetch server infomation...");
+    }
+
+    const data = await res.json();
+    setData(data.vulns);
+  };
 
   return (
     <Box>
+      <div>
+        <select defaultValue="default" onChange={(e) => setSortType(e.target.value)}>
+          <option disabled value="default">
+            Sort by
+          </option>
+          <option value="ascending">Ascending</option>
+          <option value="descending">Descending</option>
+        </select>
+      </div>
+
       <table className="responsive-info-table">
         <thead className="responsive-info-table__head">
           <tr className="responsive-info-table__row">
@@ -960,7 +956,7 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
             <th className="responsive-info-table__head__title responsive-table__head__title">アーキテクチャ</th>
           </tr>
         </thead>
-        {info.vulns.map((d) => (
+        {sortedData.map((d) => (
           <MyTbody
             d = {d}
           />
