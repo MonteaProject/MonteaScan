@@ -28,7 +28,24 @@ import {
   InfoIcon,
   InfoOutlineIcon,
   Badge,
-  Tooltip
+  Tooltip,
+  TriangleUpIcon,
+  TriangleDownIcon,
+  Button,
+  Select,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuGroup,
+  MenuDivider,
+  SettingsIcon,
+  LinkIcon,
+  ChevronDownIcon,
+  MenuOptionGroup,
+  MenuItemOption,
+  IconButton,
+  VStack
 } from "../../common/components";
 
 
@@ -890,19 +907,27 @@ function MyTbody({d}: any) {
 }
 
 export default async function Info ({ infoPass }: { infoPass: string }) {
-  const [data, setData] = useState([]);
-  const [sortType, setSortType] = useState("default");
+  const [data, setData]         = useState([]);
+  const [sortType, setSortType]   = useState("pkgAsc");
 
   const sortedData = useMemo(() => {
     let result = data;
 
-    if (sortType === "descending") {
+    if (sortType === "pkgDesc") {
       result = [...data].sort((a, b) => {
         return b.pkg.pkgname.localeCompare(a.pkg.pkgname, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
       });
-    } else if (sortType === "ascending") {
+    } else if (sortType === "pkgAsc") {
       result = [...data].sort((a, b) => {
         return a.pkg.pkgname.localeCompare(b.pkg.pkgname, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "archDesc") {
+      result = [...data].sort((a, b) => {
+        return b.pkg.pkgarch.localeCompare(a.pkg.pkgarch, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "archAsc") {
+      result = [...data].sort((a, b) => {
+        return a.pkg.pkgarch.localeCompare(b.pkg.pkgarch, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
       });
     }
 
@@ -928,18 +953,24 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
     setData(data.vulns);
   };
 
+  const PkgAsc = () => {
+    setSortType("pkgAsc");
+  };
+
+  const PkgDesc = () => {
+    setSortType("pkgDesc");
+  };
+
+  const ArchAsc = () => {
+    setSortType("archAsc");
+  };
+
+  const ArchDesc = () => {
+    setSortType("archDesc");
+  };
+
   return (
     <Box>
-      <div>
-        <select defaultValue="default" onChange={(e) => setSortType(e.target.value)}>
-          <option disabled value="default">
-            Sort by
-          </option>
-          <option value="ascending">Ascending</option>
-          <option value="descending">Descending</option>
-        </select>
-      </div>
-
       <table className="responsive-info-table">
         <thead className="responsive-info-table__head">
           <tr className="responsive-info-table__row">
@@ -948,12 +979,46 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
             <th className="responsive-info-table__head__title responsive-table__head__title">発行日</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">更新日</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">アップデート有無</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title">パッケージ名称</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">パッケージ名称
+            <VStack gap={0}>
+              <IconButton
+                aria-label="Pkg Asc"
+                icon={<TriangleUpIcon />}
+                variant="outline"
+                size="sm"
+                onClick={PkgAsc}
+              />
+              <IconButton
+                aria-label="Pkg Desc"
+                icon={<TriangleDownIcon />}
+                variant="outline"
+                size="sm"
+                onClick={PkgDesc}
+              />
+            </VStack>
+            </th>
             <th className="responsive-info-table__head__title responsive-table__head__title">現行バージョン番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">現行リリース番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">最新バージョン番号</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">最新リリース番号</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title">アーキテクチャ</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">アーキテクチャ
+            <VStack gap={0}>
+              <IconButton
+                aria-label="Arch Asc"
+                icon={<TriangleUpIcon />}
+                variant="outline"
+                size="sm"
+                onClick={ArchAsc}
+              />
+              <IconButton
+                aria-label="Arch Desc"
+                icon={<TriangleDownIcon />}
+                variant="outline"
+                size="sm"
+                onClick={ArchDesc}
+              />
+            </VStack>
+            </th>
           </tr>
         </thead>
         {sortedData.map((d) => (
