@@ -939,7 +939,7 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
     return result;
   }, [data, sortType]);
   
-  useEffect(() => {// コンポーネントマウント時、1回だけfetchを実行
+  useEffect(() => {
     fetchData();
   }, []);
 
