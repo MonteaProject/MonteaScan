@@ -3,15 +3,11 @@ export type Vulns = {
 };
 
 export type Detect = {
-    time    : string,
-    hostname: string,
-    ip      : string[],
-    os      : string,
-    kernel  : string,
-    pkg     : Pkg
-};
-
-export type Pkg = {
+    time      : string,
+    hostname  : string,
+    ip        : string[],
+    os        : string,
+    kernel    : string,
     pkgname   : string,
     pkgver    : string,
     pkgrelease: string,

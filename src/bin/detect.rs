@@ -34,16 +34,11 @@ struct Vulns {
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct VulnsList {
-  time:     String,
-  hostname: String,
-  ip:       Vec<String>,
-  os:       String,
-  kernel:   String,
-  pkg:      DetectList
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct DetectList {
+  time:       String,
+  hostname:   String,
+  ip:         Vec<String>,
+  os:         String,
+  kernel:     String,
   pkgname:    String,
   pkgver:     String,
   pkgrelease: String,
@@ -179,7 +174,12 @@ async fn main() -> Result<()> {
                   p += &scan_p.pkgrelease;
                   
                   if v[1] == p {
-                    let detect_list = DetectList {
+                    let vulns_list = VulnsList {
+                      time:       time.clone(),
+                      hostname:   hostname.clone(),
+                      ip:         ip.clone(),
+                      os:         os.clone(),
+                      kernel:     kernel.clone(),
                       pkgname:    scan_p.pkgname.clone(),
                       pkgver:     scan_p.pkgver.clone(),
                       pkgrelease: scan_p.pkgrelease.clone(),
@@ -187,15 +187,6 @@ async fn main() -> Result<()> {
                       uprelease:  scan_p.uprelease.clone(),
                       pkgarch:    scan_p.pkgarch.clone(),
                       detect:     oval.clone()
-                    };
-
-                    let vulns_list = VulnsList {
-                      time:     time.clone(),
-                      hostname: hostname.clone(),
-                      ip:       ip.clone(),
-                      os:       os.clone(),
-                      kernel:   kernel.clone(),
-                      pkg:      detect_list
                     };
 
                     vulns_vec.vulns.push(vulns_list);
@@ -228,7 +219,12 @@ async fn main() -> Result<()> {
                   p += &scan_p.pkgrelease;
                   
                   if v[1] == p {
-                    let detect_list = DetectList {
+                    let vulns_list = VulnsList {
+                      time:       time.clone(),
+                      hostname:   hostname.clone(),
+                      ip:         ip.clone(),
+                      os:         os.clone(),
+                      kernel:     kernel.clone(),
                       pkgname:    scan_p.pkgname.clone(),
                       pkgver:     scan_p.pkgver.clone(),
                       pkgrelease: scan_p.pkgrelease.clone(),
@@ -236,15 +232,6 @@ async fn main() -> Result<()> {
                       uprelease:  scan_p.uprelease.clone(),
                       pkgarch:    scan_p.pkgarch.clone(),
                       detect:     oval.clone()
-                    };
-
-                    let vulns_list = VulnsList {
-                      time:     time.clone(),
-                      hostname: hostname.clone(),
-                      ip:       ip.clone(),
-                      os:       os.clone(),
-                      kernel:   kernel.clone(),
-                      pkg:      detect_list
                     };
 
                     vulns_vec.vulns.push(vulns_list);
@@ -260,7 +247,12 @@ async fn main() -> Result<()> {
         }
 
         if vulns_vec.vulns.len() == detect_flag {
-          let detect_list = DetectList {
+          let vulns_list = VulnsList {
+            time:       time.clone(),
+            hostname:   hostname.clone(),
+            ip:         ip.clone(),
+            os:         os.clone(),
+            kernel:     kernel.clone(),
             pkgname:    scan_p.pkgname.clone(),
             pkgver:     scan_p.pkgver.clone(),
             pkgrelease: scan_p.pkgrelease.clone(),
@@ -268,15 +260,6 @@ async fn main() -> Result<()> {
             uprelease:  scan_p.uprelease.clone(),
             pkgarch:    scan_p.pkgarch.clone(),
             detect:     Null
-          };
-
-          let vulns_list = VulnsList {
-            time:     time.clone(),
-            hostname: hostname.clone(),
-            ip:       ip.clone(),
-            os:       os.clone(),
-            kernel:   kernel.clone(),
-            pkg:      detect_list
           };
 
           vulns_vec.vulns.push(vulns_list);

@@ -1,9 +1,7 @@
 "use client";
 import "./info.scss";
 import { useEffect, useState, useMemo } from "react";
-import { Vulns } from "../../types/cveTypes";
 import { notFound } from "next/navigation";
-import NextLink from "next/link";
 import {
   Box,
   Link,
@@ -22,35 +20,15 @@ import {
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
   ExternalLinkIcon,
   InfoIcon,
   InfoOutlineIcon,
   Badge,
   Tooltip,
-  TriangleUpIcon,
-  TriangleDownIcon,
-  Button,
-  Select,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuGroup,
-  MenuDivider,
-  SettingsIcon,
-  LinkIcon,
-  MenuOptionGroup,
-  MenuItemOption,
   IconButton,
-  VStack,
-  HStack,
-  Stack,
   ArrowUpIcon,
-  ArrowDownIcon,
-  ChevronUpIcon,
-  ChevronDownIcon
+  ArrowDownIcon
 } from "../../common/components";
 
 
@@ -844,7 +822,7 @@ function MyTbody({d}: any) {
     onOpen()
   }
 
-  if (d.pkg.detect === null) {
+  if (d.detect === null) {
     return (
       <tbody className="responsive-info-table__body">
         <tr className="responsive-info-table__row">
@@ -852,20 +830,20 @@ function MyTbody({d}: any) {
           <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
           <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
           <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver + "-" + d.pkg.pkgrelease === d.pkg.upver + "-" + d.pkg.uprelease ? "-" : "〇"}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgname}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgrelease}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.upver}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.uprelease}</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgarch}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver + "-" + d.pkgrelease === d.upver + "-" + d.uprelease ? "-" : "〇"}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgname}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgrelease}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.upver}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.uprelease}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgarch}</td>
         </tr>
       </tbody>
     )
   }
   return (
     <tbody className="responsive-info-table__body">
-      {d.pkg.detect.map((v: any) => {
+      {d.detect.map((v: any) => {
         return (
           v.metadata.advisory.cve.map((c: any) => (
             <button className="responsive-info-table__button" onClick={() => {
@@ -876,13 +854,13 @@ function MyTbody({d}: any) {
                 <td className="responsive-info-table__body__text responsive-table__body__text">{c["@impact"]}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.issued["@date"]}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.updated["@date"]}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver + "-" + d.pkg.pkgrelease === d.pkg.upver + "-" + d.pkg.uprelease ? "-" : "〇"}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgname}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgver}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgrelease}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.upver}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.uprelease}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkg.pkgarch}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver + "-" + d.pkgrelease === d.upver + "-" + d.uprelease ? "-" : "〇"}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgname}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgrelease}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.upver}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.uprelease}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgarch}</td>
               </tr>
               <Drawer onClose={onClose} isOpen={isOpen} size="xl" blockScrollOnMount={true}>
                 <DrawerOverlay />
@@ -920,21 +898,52 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
 
     if (sortType === "pkgDesc") {
       result = [...data].sort((a, b) => {
-        return b.pkg.pkgname.localeCompare(a.pkg.pkgname, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+        return b.pkgname.localeCompare(a.pkgname, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
       });
     } else if (sortType === "pkgAsc") {
       result = [...data].sort((a, b) => {
-        return a.pkg.pkgname.localeCompare(b.pkg.pkgname, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+        return a.pkgname.localeCompare(b.pkgname, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
       });
     } else if (sortType === "archDesc") {
       result = [...data].sort((a, b) => {
-        return b.pkg.pkgarch.localeCompare(a.pkg.pkgarch, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+        return b.pkgarch.localeCompare(a.pkgarch, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
       });
     } else if (sortType === "archAsc") {
       result = [...data].sort((a, b) => {
-        return a.pkg.pkgarch.localeCompare(b.pkg.pkgarch, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+        return a.pkgarch.localeCompare(b.pkgarch, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
       });
     }
+
+    //
+    if (sortType === "upFlagDesc") {
+      result = [...data].sort((a, b) => {
+        if (a.detect === null) {
+          return 1
+        }
+        if (b.detect === null) {
+          return -1
+        }
+        if (a.detect.metadata === b.detect.metadata) {
+          console.log(a.detect)
+          return 0
+        }
+        return a.detect.metadata < b.detect.metadata ? 1 : -1
+      })
+    } else if (sortType === "upFlagAsc") {
+      result = [...data].sort((a, b) => {
+        if (a.detect === null) {
+          return 1
+        }
+        if (b.detect === null) {
+          return -1
+        }
+        if (a.detect.metadata === b.detect.metadata) {
+          return 0
+        }
+        return a.detect.metadata < b.detect.metadata ? -1 : 1
+      })
+    }
+    //
 
     return result;
   }, [data, sortType]);
@@ -960,19 +969,27 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
 
   const PkgAsc = () => {
     setSortType("pkgAsc");
-  };
+  }
 
   const PkgDesc = () => {
     setSortType("pkgDesc");
-  };
+  }
 
   const ArchAsc = () => {
     setSortType("archAsc");
-  };
+  }
 
   const ArchDesc = () => {
     setSortType("archDesc");
-  };
+  }
+
+  const UpFlagAsc = () => {
+    setSortType("upFlagAsc");
+  }
+
+  const UpFlagDesc = () => {
+    setSortType("upFlagDesc");
+  }
 
   return (
     <Box>
@@ -983,7 +1000,27 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
             <th className="responsive-info-table__head__title responsive-table__head__title">深刻度</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">発行日</th>
             <th className="responsive-info-table__head__title responsive-table__head__title">更新日</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title">アップデート有無</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">アップデート有無
+              <IconButton
+                aria-label="Pkg Asc"
+                icon={<ArrowUpIcon />}
+                variant="outline"
+                size="xs"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={UpFlagAsc}
+              />
+              <IconButton
+                aria-label="Pkg Desc"
+                icon={<ArrowDownIcon />}
+                variant="outline"
+                size="xs"
+                ml="-1"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={UpFlagDesc}
+              />
+            </th>
             <th className="responsive-info-table__head__title responsive-table__head__title">パッケージ名称
               <IconButton
                 aria-label="Pkg Asc"

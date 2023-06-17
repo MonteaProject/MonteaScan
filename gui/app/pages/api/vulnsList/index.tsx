@@ -52,21 +52,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let moderate  = 0;
             let low       = 0;
             for(let i = 0; i < json.vulns.length; i++) {
-              if (json.vulns[i].pkg.detect === null) {
+              if (json.vulns[i].detect === null) {
                 continue;
               } else {
-                for(let c = 0; c < json.vulns[i].pkg.detect.length; c++) {
-                  for(let p = 0; p < json.vulns[i].pkg.detect[c].metadata.advisory.cve.length; p++) {
-                    if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "critical") {
+                for(let c = 0; c < json.vulns[i].detect.length; c++) {
+                  for(let p = 0; p < json.vulns[i].detect[c].metadata.advisory.cve.length; p++) {
+                    if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "critical") {
                       criticalTotal += 1;
                       critical += 1;
-                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "important") {
+                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "important") {
                       importantTotal += 1;
                       important += 1;
-                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
+                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
                       moderateTotal += 1;
                       moderate += 1;
-                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "low") {
+                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "low") {
                       lowTotal += 1;
                       low += 1;
                     } else {
