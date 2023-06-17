@@ -139,41 +139,13 @@ struct Criterion2 {
     test_ref: Option<String>
 }
 
-// fn load_rustls_config() -> rustls::ServerConfig {
-//     let config = ServerConfig::builder()
-//         .with_safe_defaults()
-//         .with_no_client_auth();
-
-//     let cert_file = &mut BufReader::new(File::open("cert/cert.pem").unwrap());
-//     let key_file = &mut BufReader::new(File::open("cert/key.pem").unwrap());
-
-//     let cert_chain = certs(cert_file)
-//         .unwrap()
-//         .into_iter()
-//         .map(Certificate)
-//         .collect();
-
-//     let mut key: Vec<PrivateKey> = pkcs8_private_keys(key_file)
-//         .unwrap()
-//         .into_iter()
-//         .map(PrivateKey)
-//         .collect();
-
-//     if key.is_empty() {
-//         eprintln!("Could not locate PKCS 8 private keys.");
-//         std::process::exit(1);
-//     }
-//     config.with_single_cert(cert_chain, key.remove(0)).unwrap()
-// }
-
-
 #[get("/get_id/{id}")]
 async fn get_id(client: web::Data<MongoClient>, id: web::Path<String>) -> HttpResponse {
-    let db = client.database("OvalRHEL");
-    let col = String::from("RHEL6");
-    let type_collection = db.collection::<Definition>(&col);
+    let db: mongodb::Database = client.database("OvalRHEL");
+    let col: String = String::from("RHEL6");
+    let type_collection: mongodb::Collection<Definition> = db.collection::<Definition>(&col);
 
-    let id = id.into_inner();
+    let id: String = id.into_inner();
 
     match type_collection
         .find_one(doc! { "@id": &id }, None)
@@ -189,11 +161,11 @@ async fn get_id(client: web::Data<MongoClient>, id: web::Path<String>) -> HttpRe
 
 #[get("/rhel6/")]
 async fn rhel6(client: web::Data<MongoClient>) -> HttpResponse {
-    let db = client.database("OvalRHEL");
-    let col = String::from("RHEL6");
+    let db: mongodb::Database = client.database("OvalRHEL");
+    let col: String = String::from("RHEL6");
     
     let aggr_pipeline: Vec<Document> = Vec::new();
-    let mut cursor = db
+    let mut cursor: mongodb::Cursor<Document> = db
         .collection::<Document>(&col)
         .aggregate(aggr_pipeline, None)
         .await
@@ -217,11 +189,11 @@ async fn rhel6(client: web::Data<MongoClient>) -> HttpResponse {
 
 #[get("/rhel7/")]
 async fn rhel7(client: web::Data<MongoClient>) -> HttpResponse {
-    let db = client.database("OvalRHEL");
-    let col = String::from("RHEL7");
+    let db: mongodb::Database = client.database("OvalRHEL");
+    let col: String = String::from("RHEL7");
     
     let aggr_pipeline: Vec<Document> = Vec::new();
-    let mut cursor = db
+    let mut cursor: mongodb::Cursor<Document> = db
         .collection::<Document>(&col)
         .aggregate(aggr_pipeline, None)
         .await
@@ -245,11 +217,11 @@ async fn rhel7(client: web::Data<MongoClient>) -> HttpResponse {
 
 #[get("/rhel8/")]
 async fn rhel8(client: web::Data<MongoClient>) -> HttpResponse {
-    let db = client.database("OvalRHEL");
-    let col = String::from("RHEL8");
+    let db: mongodb::Database = client.database("OvalRHEL");
+    let col: String = String::from("RHEL8");
     
     let aggr_pipeline: Vec<Document> = Vec::new();
-    let mut cursor = db
+    let mut cursor: mongodb::Cursor<Document> = db
         .collection::<Document>(&col)
         .aggregate(aggr_pipeline, None)
         .await
@@ -273,11 +245,11 @@ async fn rhel8(client: web::Data<MongoClient>) -> HttpResponse {
 
 #[get("/rhel9/")]
 async fn rhel9(client: web::Data<MongoClient>) -> HttpResponse {
-    let db = client.database("OvalRHEL");
-    let col = String::from("RHEL9");
+    let db: mongodb::Database = client.database("OvalRHEL");
+    let col: String = String::from("RHEL9");
 
     let aggr_pipeline: Vec<Document> = Vec::new();
-    let mut cursor = db
+    let mut cursor: mongodb::Cursor<Document> = db
         .collection::<Document>(&col)
         .aggregate(aggr_pipeline, None)
         .await
@@ -302,15 +274,13 @@ async fn rhel9(client: web::Data<MongoClient>) -> HttpResponse {
 
 #[actix_web::main]
 pub async fn main() -> std::io::Result<()> {
-    let mut client_options = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
+    let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
     client_options.app_name = Some("My App".to_string());
 
-    let mongo_client = MongoClient::with_options(client_options).unwrap();
+    let mongo_client: MongoClient = MongoClient::with_options(client_options).unwrap();
 
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     log::info!("Starting HTTP Server...");
-
-    // let config = load_rustls_config();
 
     HttpServer::new(move || {
         App::new()
@@ -322,7 +292,6 @@ pub async fn main() -> std::io::Result<()> {
             .service(rhel8)
             .service(rhel9)
     })
-    // .bind_rustls("127.0.0.1:7878", config).unwrap()
     .bind(("127.0.0.1", 7878)).unwrap()
     .run()
     .await

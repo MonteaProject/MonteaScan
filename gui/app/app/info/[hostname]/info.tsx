@@ -854,7 +854,7 @@ function MyTbody({d}: any) {
                 <td className="responsive-info-table__body__text responsive-table__body__text">{c["@impact"]}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.issued["@date"]}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.updated["@date"]}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver + "-" + d.pkgrelease === d.upver + "-" + d.uprelease ? "-" : "〇"}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.update_flag}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgname}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgrelease}</td>
@@ -912,37 +912,45 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
       result = [...data].sort((a, b) => {
         return a.pkgarch.localeCompare(b.pkgarch, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
       });
+    } else if (sortType === "upFlagDesc") {
+      result = [...data].sort((a, b) => {
+        return b.update_flag.localeCompare(a.update_flag, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "upFlagAsc") {
+      result = [...data].sort((a, b) => {
+        return a.update_flag.localeCompare(b.update_flag, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
     }
 
     //
-    if (sortType === "upFlagDesc") {
-      result = [...data].sort((a, b) => {
-        if (a.detect === null) {
-          return 1
-        }
-        if (b.detect === null) {
-          return -1
-        }
-        if (a.detect.metadata === b.detect.metadata) {
-          console.log(a.detect)
-          return 0
-        }
-        return a.detect.metadata < b.detect.metadata ? 1 : -1
-      })
-    } else if (sortType === "upFlagAsc") {
-      result = [...data].sort((a, b) => {
-        if (a.detect === null) {
-          return 1
-        }
-        if (b.detect === null) {
-          return -1
-        }
-        if (a.detect.metadata === b.detect.metadata) {
-          return 0
-        }
-        return a.detect.metadata < b.detect.metadata ? -1 : 1
-      })
-    }
+    // if (sortType === "upFlagDesc") {
+    //   result = [...data].sort((a, b) => {
+    //     if (a.detect === null) {
+    //       return 1
+    //     }
+    //     if (b.detect === null) {
+    //       return -1
+    //     }
+    //     if (a.detect.metadata === b.detect.metadata) {
+    //       console.log(a.detect)
+    //       return 0
+    //     }
+    //     return a.detect.metadata < b.detect.metadata ? 1 : -1
+    //   })
+    // } else if (sortType === "upFlagAsc") {
+    //   result = [...data].sort((a, b) => {
+    //     if (a.detect === null) {
+    //       return 1
+    //     }
+    //     if (b.detect === null) {
+    //       return -1
+    //     }
+    //     if (a.detect.metadata === b.detect.metadata) {
+    //       return 0
+    //     }
+    //     return a.detect.metadata < b.detect.metadata ? -1 : 1
+    //   })
+    // }
     //
 
     return result;
