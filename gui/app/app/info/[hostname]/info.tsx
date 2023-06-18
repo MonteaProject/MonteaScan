@@ -826,11 +826,11 @@ function MyTbody({d}: any) {
     return (
       <tbody className="responsive-info-table__body">
         <tr className="responsive-info-table__row">
-          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">-</td>
-          <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver + "-" + d.pkgrelease === d.upver + "-" + d.uprelease ? "-" : "〇"}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.cveid}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.impact}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.issued}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.updated}</td>
+          <td className="responsive-info-table__body__text responsive-table__body__text">{d.update_flag}</td>
           <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgname}</td>
           <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver}</td>
           <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgrelease}</td>
@@ -850,10 +850,10 @@ function MyTbody({d}: any) {
               handleClick();
             }}>
               <tr className="responsive-info-table__row">
-                <td className="responsive-info-table__body__text responsive-table__body__text">{c["$value"]}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{c["@impact"]}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.issued["@date"]}</td>
-                <td className="responsive-info-table__body__text responsive-table__body__text">{v.metadata.advisory.updated["@date"]}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.cveid}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.impact}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.issued}</td>
+                <td className="responsive-info-table__body__text responsive-table__body__text">{d.updated}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{d.update_flag}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgname}</td>
                 <td className="responsive-info-table__body__text responsive-table__body__text">{d.pkgver}</td>
@@ -920,38 +920,39 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
       result = [...data].sort((a, b) => {
         return a.update_flag.localeCompare(b.update_flag, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
       });
+    } else if (sortType === "cveIdDesc") {
+      result = [...data].sort((a, b) => {
+        return b.cveid.localeCompare(a.cveid, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "cveIdAsc") {
+      result = [...data].sort((a, b) => {
+        return a.cveid.localeCompare(b.cveid, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "impactDesc") {
+      result = [...data].sort((a, b) => {
+        return b.impact.localeCompare(a.impact, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "impactAsc") {
+      result = [...data].sort((a, b) => {
+        return a.impact.localeCompare(b.impact, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "issuedDesc") {
+      result = [...data].sort((a, b) => {
+        return b.issued.localeCompare(a.issued, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "issuedAsc") {
+      result = [...data].sort((a, b) => {
+        return a.issued.localeCompare(b.issued, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "updateDesc") {
+      result = [...data].sort((a, b) => {
+        return b.updated.localeCompare(a.updated, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
+    } else if (sortType === "updateAsc") {
+      result = [...data].sort((a, b) => {
+        return a.updated.localeCompare(b.updated, "en", {sensitivity: "variant", ignorePunctuation: false, caseFirst: "false", numeric: true});
+      });
     }
-
-    //
-    // if (sortType === "upFlagDesc") {
-    //   result = [...data].sort((a, b) => {
-    //     if (a.detect === null) {
-    //       return 1
-    //     }
-    //     if (b.detect === null) {
-    //       return -1
-    //     }
-    //     if (a.detect.metadata === b.detect.metadata) {
-    //       console.log(a.detect)
-    //       return 0
-    //     }
-    //     return a.detect.metadata < b.detect.metadata ? 1 : -1
-    //   })
-    // } else if (sortType === "upFlagAsc") {
-    //   result = [...data].sort((a, b) => {
-    //     if (a.detect === null) {
-    //       return 1
-    //     }
-    //     if (b.detect === null) {
-    //       return -1
-    //     }
-    //     if (a.detect.metadata === b.detect.metadata) {
-    //       return 0
-    //     }
-    //     return a.detect.metadata < b.detect.metadata ? -1 : 1
-    //   })
-    // }
-    //
 
     return result;
   }, [data, sortType]);
@@ -999,15 +1000,127 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
     setSortType("upFlagDesc");
   }
 
+  const CveIdAsc = () => {
+    setSortType("cveIdAsc");
+  }
+
+  const CveIdDesc = () => {
+    setSortType("cveIdDesc");
+  }
+
+  const ImpactAsc = () => {
+    setSortType("impactAsc");
+  }
+
+  const ImpactDesc = () => {
+    setSortType("impactDesc");
+  }
+
+  const IssuedAsc = () => {
+    setSortType("issuedAsc");
+  }
+
+  const IssuedDesc = () => {
+    setSortType("issuedDesc");
+  }
+
+  const UpdateAsc = () => {
+    setSortType("updateAsc");
+  }
+
+  const UpdateDesc = () => {
+    setSortType("updateDesc");
+  }
+
   return (
     <Box>
       <table className="responsive-info-table">
         <thead className="responsive-info-table__head">
           <tr className="responsive-info-table__row">
-            <th className="responsive-info-table__head__title responsive-table__head__title">CVE-ID</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title">深刻度</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title">発行日</th>
-            <th className="responsive-info-table__head__title responsive-table__head__title">更新日</th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">CVE-ID
+              <IconButton
+                aria-label="Pkg Asc"
+                icon={<ArrowUpIcon />}
+                variant="outline"
+                size="xs"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={CveIdAsc}
+              />
+              <IconButton
+                aria-label="Pkg Desc"
+                icon={<ArrowDownIcon />}
+                variant="outline"
+                size="xs"
+                ml="-1"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={CveIdDesc}
+              />
+            </th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">深刻度
+              <IconButton
+                aria-label="Pkg Asc"
+                icon={<ArrowUpIcon />}
+                variant="outline"
+                size="xs"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={ImpactAsc}
+              />
+              <IconButton
+                aria-label="Pkg Desc"
+                icon={<ArrowDownIcon />}
+                variant="outline"
+                size="xs"
+                ml="-1"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={ImpactDesc}
+              />
+            </th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">発行日
+              <IconButton
+                aria-label="Pkg Asc"
+                icon={<ArrowUpIcon />}
+                variant="outline"
+                size="xs"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={IssuedAsc}
+              />
+              <IconButton
+                aria-label="Pkg Desc"
+                icon={<ArrowDownIcon />}
+                variant="outline"
+                size="xs"
+                ml="-1"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={IssuedDesc}
+              />
+            </th>
+            <th className="responsive-info-table__head__title responsive-table__head__title">更新日
+              <IconButton
+                aria-label="Pkg Asc"
+                icon={<ArrowUpIcon />}
+                variant="outline"
+                size="xs"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={UpdateAsc}
+              />
+              <IconButton
+                aria-label="Pkg Desc"
+                icon={<ArrowDownIcon />}
+                variant="outline"
+                size="xs"
+                ml="-1"
+                fontSize="21px"
+                _hover={{color:"green.300"}}
+                onClick={UpdateDesc}
+              />
+            </th>
             <th className="responsive-info-table__head__title responsive-table__head__title">アップデート有無
               <IconButton
                 aria-label="Pkg Asc"

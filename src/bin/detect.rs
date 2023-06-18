@@ -40,6 +40,10 @@ struct VulnsList {
   ip:          Vec<String>,
   os:          String,
   kernel:      String,
+  issued:      String,
+  updated:     String,
+  impact:      String,
+  cveid:       String,
   pkgname:     String,
   pkgver:      String,
   pkgrelease:  String,
@@ -176,12 +180,39 @@ async fn main() -> Result<()> {
                   p += &scan_p.pkgrelease;
                   
                   if v[1] == p {
+                    let mut issued: String = "-".to_string();
+                    if oval[0]["metadata"]["advisory"]["issued"]["@date"] != Null {
+                      issued = oval[0]["metadata"]["advisory"]["issued"]["@date"].to_string().replace('"', "");
+                    }
+
+                    let mut updated: String = "-".to_string();
+                    if oval[0]["metadata"]["advisory"]["updated"]["@date"] != Null {
+                      updated = oval[0]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
+                    }
+
+                    let mut impact: String = "-".to_string();
+                    let mut cveid: String = "-".to_string();
+                    if oval[0]["metadata"]["advisory"]["cve"] != Null {
+                      for i in 0..oval[0]["metadata"]["advisory"]["cve"].as_array().unwrap().len() {
+                        if oval[0]["metadata"]["advisory"]["cve"][i]["@impact"] != Null {
+                          impact = oval[0]["metadata"]["advisory"]["cve"][i]["@impact"].to_string().replace('"', "");
+                        }
+                        if oval[0]["metadata"]["advisory"]["cve"][i]["$value"] != Null {
+                          cveid = oval[0]["metadata"]["advisory"]["cve"][i]["$value"].to_string().replace('"', "");
+                        }
+                      }
+                    }
+
                     let vulns_list: VulnsList = VulnsList {
                       time:       time.clone(),
                       hostname:   hostname.clone(),
                       ip:         ip.clone(),
                       os:         os.clone(),
                       kernel:     kernel.clone(),
+                      issued:     issued.clone(),
+                      updated:    updated.clone(),
+                      impact:     impact.clone(),
+                      cveid:      cveid.clone(),
                       pkgname:    scan_p.pkgname.clone(),
                       pkgver:     scan_p.pkgver.clone(),
                       pkgrelease: scan_p.pkgrelease.clone(),
@@ -222,12 +253,39 @@ async fn main() -> Result<()> {
                   p += &scan_p.pkgrelease;
                   
                   if v[1] == p {
+                    let mut issued: String = "-".to_string();
+                    if oval[0]["metadata"]["advisory"]["issued"]["@date"] != Null {
+                      issued = oval[0]["metadata"]["advisory"]["issued"]["@date"].to_string().replace('"', "");
+                    }
+
+                    let mut updated: String = "-".to_string();
+                    if oval[0]["metadata"]["advisory"]["updated"]["@date"] != Null {
+                      updated = oval[0]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
+                    }
+
+                    let mut impact: String = "-".to_string();
+                    let mut cveid: String = "-".to_string();
+                    if oval[0]["metadata"]["advisory"]["cve"] != Null {
+                      for i in 0..oval[0]["metadata"]["advisory"]["cve"].as_array().unwrap().len() {
+                        if oval[0]["metadata"]["advisory"]["cve"][i]["@impact"] != Null {
+                          impact = oval[0]["metadata"]["advisory"]["cve"][i]["@impact"].to_string().replace('"', "");
+                        }
+                        if oval[0]["metadata"]["advisory"]["cve"][i]["$value"] != Null {
+                          cveid = oval[0]["metadata"]["advisory"]["cve"][i]["$value"].to_string().replace('"', "");
+                        }
+                      }
+                    }
+
                     let vulns_list: VulnsList = VulnsList {
                       time:       time.clone(),
                       hostname:   hostname.clone(),
                       ip:         ip.clone(),
                       os:         os.clone(),
                       kernel:     kernel.clone(),
+                      issued:     issued.clone(),
+                      updated:    updated.clone(),
+                      impact:     impact.clone(),
+                      cveid:      cveid.clone(),
                       pkgname:    scan_p.pkgname.clone(),
                       pkgver:     scan_p.pkgver.clone(),
                       pkgrelease: scan_p.pkgrelease.clone(),
@@ -251,12 +309,22 @@ async fn main() -> Result<()> {
         }
 
         if vulns_vec.vulns.len() == detect_flag {
+
+          let issued: String = "-".to_string();
+          let updated: String = "-".to_string();
+          let impact: String = "-".to_string();
+          let cveid: String = "-".to_string();
+          
           let vulns_list: VulnsList = VulnsList {
             time:       time.clone(),
             hostname:   hostname.clone(),
             ip:         ip.clone(),
             os:         os.clone(),
             kernel:     kernel.clone(),
+            issued:     issued.clone(),
+            updated:    updated.clone(),
+            impact:     impact.clone(),
+            cveid:      cveid.clone(),
             pkgname:    scan_p.pkgname.clone(),
             pkgver:     scan_p.pkgver.clone(),
             pkgrelease: scan_p.pkgrelease.clone(),
