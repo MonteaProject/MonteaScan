@@ -42,18 +42,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let moderate  = 0;
             let low       = 0;
             for(let i = 0; i < json.vulns.length; i++) {
-              if (json.vulns[i].pkg.detect === null) {
+              if (json.vulns[i].detect === null) {
                 continue;
               } else {
-                for(let c = 0; c < json.vulns[i].pkg.detect.length; c++) {
-                  for(let p = 0; p < json.vulns[i].pkg.detect[c].metadata.advisory.cve.length; p++) {
-                    if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "critical") {
+                for(let c = 0; c < json.vulns[i].detect.length; c++) {
+                  for(let p = 0; p < json.vulns[i].detect[c].metadata.advisory.cve.length; p++) {
+                    if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "critical") {
                       critical += 1;
-                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "important") {
+                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "important") {
                       important += 1;
-                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
+                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
                       moderate += 1;
-                    } else if (json.vulns[i].pkg.detect[c].metadata.advisory.cve[p]["@impact"] === "low") {
+                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "low") {
                       low += 1;
                     } else {
                       console.log("新たなCVE重要度が追加されています...");

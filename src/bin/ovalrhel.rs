@@ -147,50 +147,50 @@ struct Criterion2 {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
-    let mut client_options = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
+    let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
     client_options.app_name = Some("My App".to_string());
 
-    let mongo_client = MongoClient::with_options(client_options).unwrap();
+    let mongo_client: MongoClient = MongoClient::with_options(client_options).unwrap();
 
     for db_name in mongo_client.list_database_names(None, None).await.unwrap() {
         println!("list DB: {}", db_name);
     }
 
-    let db = mongo_client.database("OvalRHEL");
+    let db: mongodb::Database = mongo_client.database("OvalRHEL");
 
     for collection_name in db.list_collection_names(None).await.unwrap() {
         println!("list Collection: {}", collection_name);
     }
 
-    let https = HttpsConnector::new();
-    let client = Client::builder().build::<_, hyper::Body>(https);
+    let https: HttpsConnector<hyper::client::HttpConnector> = HttpsConnector::new();
+    let client: Client<HttpsConnector<hyper::client::HttpConnector>> = Client::builder().build::<_, hyper::Body>(https);
 
-    let mut rhel_ver = vec![];
+    let mut rhel_ver: Vec<i32> = vec![];
     for i in 6..10 {
         rhel_ver.push(i);
     }
 
     for v in rhel_ver {
         let v: &str = &v.to_string();
-        let url = String::from("https://access.redhat.com/security/data/oval/v2/RHEL") + v + "/rhel-" + v + ".oval.xml.bz2";
-        let res = client.get(url.parse().unwrap()).await.unwrap();
-        let resp = hyper::body::to_bytes(res.into_body()).await.unwrap();
+        let url: String = String::from("https://access.redhat.com/security/data/oval/v2/RHEL") + v + "/rhel-" + v + ".oval.xml.bz2";
+        let res: hyper::Response<hyper::Body> = client.get(url.parse().unwrap()).await.unwrap();
+        let resp: actix_web::web::Bytes = hyper::body::to_bytes(res.into_body()).await.unwrap();
 
-        let mut gz = BzDecoder::new(&resp[..]);
-        let mut resp_body = String::new();
+        let mut gz: BzDecoder<&[u8]> = BzDecoder::new(&resp[..]);
+        let mut resp_body: String = String::new();
         gz.read_to_string(&mut resp_body).unwrap();
 
         let oval_rhel: OvalRhel = from_str(&resp_body).unwrap();
 
-        let col = String::from("RHEL") + v;
-        let typed_collection = db.collection::<Definition>(&col);
+        let col: String = String::from("RHEL") + v;
+        let typed_collection: mongodb::Collection<Definition> = db.collection::<Definition>(&col);
         
-        let filter = doc! {};
-        let delete_result = typed_collection.delete_many(filter, None).await.unwrap();
+        let filter: bson::Document = doc! {};
+        let delete_result: mongodb::results::DeleteResult = typed_collection.delete_many(filter, None).await.unwrap();
         println!("Deleted {} documents, col:{}", delete_result.deleted_count, col);
         
         for i in 0..oval_rhel.definitions.definition.len() {
-            let insert_result = typed_collection.insert_one(oval_rhel.definitions.definition[i].clone(), None).await.unwrap();
+            let insert_result: mongodb::results::InsertOneResult = typed_collection.insert_one(oval_rhel.definitions.definition[i].clone(), None).await.unwrap();
             println!("document ID:{}, col:{}", insert_result.inserted_id, col);
         }
     }
