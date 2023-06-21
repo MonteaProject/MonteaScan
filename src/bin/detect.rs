@@ -1,10 +1,11 @@
+use time::{OffsetDateTime, macros::offset, format_description};
 use std::{vec, path::PathBuf, fs::File};
 use hyper::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::{Result, Value, Value::Null};
 use std::io::{BufReader, Write};
-use time::{OffsetDateTime, macros::offset, format_description};
 use std::path::Path;
+use quick_xml::de::from_str;
 
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -55,6 +56,25 @@ struct VulnsList {
   detect:      Value
 }
 
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+#[allow(non_snake_case)]
+struct Cwe {
+  Weaknesses: Weaknesses
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+#[allow(non_snake_case)]
+struct Weaknesses {
+  Weakness: Vec<Weakness>
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Weakness {
+  #[serde(rename = "@ID")]
+  id: Option<String>,
+  #[serde(rename = "@Name")]
+  name: Option<String>
+}
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
@@ -201,6 +221,7 @@ async fn main() -> Result<()> {
 
                     let mut impact: String = "-".to_string();
                     let mut cveid: String = "-".to_string();
+                    let mut cwe_oval: String = "-".to_string();
                     if oval[0]["metadata"]["advisory"]["cve"] != Null {
                       for i in 0..oval[0]["metadata"]["advisory"]["cve"].as_array().unwrap().len() {
                         if oval[0]["metadata"]["advisory"]["cve"][i]["@impact"] != Null {
@@ -209,6 +230,47 @@ async fn main() -> Result<()> {
                         if oval[0]["metadata"]["advisory"]["cve"][i]["$value"] != Null {
                           cveid = oval[0]["metadata"]["advisory"]["cve"][i]["$value"].to_string().replace('"', "");
                         }
+
+                        //
+                        if oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"] != Null {
+                          cwe_oval = oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"].to_string().replace('"', "");
+                        }
+
+                        let utc: OffsetDateTime = OffsetDateTime::now_utc();
+                        let jct: OffsetDateTime = utc.to_offset(offset!(+9));
+                        let format: Vec<format_description::FormatItem<'_>> = format_description::parse("[year][month][day]").unwrap();
+                        let time: String = jct.format(&format).unwrap();
+
+                        let cwe_dir = String::from("./src/cwe_result/");
+                        let cwe_dirpath = Path::new(&cwe_dir);
+
+                        if cwe_dirpath.is_dir() {
+                          println!("Remove dir... {:?}", cwe_dir);
+                          std::fs::remove_dir_all(&cwe_dir).unwrap();
+                        }
+
+                        std::fs::create_dir_all(&cwe_dir).unwrap();
+
+                        let cwe_read: String = String::from("./src/cwe/cwe.json");
+
+                        let cwe: Cwe = {
+                          let cwe: String = std::fs::read_to_string(&cwe_read).unwrap();
+                          from_str::<Cwe>(&cwe).unwrap()
+                        };
+
+                        println!("{:?}", cwe);
+
+                        // let cwe_write: String = String::from("cwe_") + &time + ".json";
+                        // let full_path: String = String::from(&cwe_dir) + &cwe_write;
+
+                        // let serialized: String = serde_json::to_string(&cwe).unwrap();
+                        // let mut w: std::fs::File = std::fs::OpenOptions::new()
+                        //   .write(true)
+                        //   .create(true)
+                        //   .open(full_path).unwrap();
+                        // w.write_all(serialized.as_bytes()).expect("Failed to Write cwe_result...");
+                        //
+
                       }
                     }
 
