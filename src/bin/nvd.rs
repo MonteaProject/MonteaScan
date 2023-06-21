@@ -1,10 +1,10 @@
 use time::{OffsetDateTime, macros::offset};
+use mongodb::{options::ClientOptions, Client as MongoClient, bson::doc};
 use hyper::Client;
 use hyper_tls::HttpsConnector;
 use serde::{Deserialize, Serialize};
-use mongodb::{options::ClientOptions, Client as MongoClient, bson::doc};
-use std::clone::Clone;
 use serde_json::{Result};
+use std::clone::Clone;
 use std::io::Read;
 use flate2::read::GzDecoder;
 use hyper_proxy::{Proxy, ProxyConnector, Intercept};
@@ -14,12 +14,12 @@ use headers::Authorization;
 #[allow(dead_code)]
 #[allow(non_snake_case)]
 struct Nvd {
-    CVE_data_type: Option<String>,
-    CVE_data_format: Option<String>,
-    CVE_data_version: Option<String>,
-    CVE_data_numberOfCVEs: Option<String>,
-    CVE_data_timestamp: Option<String>,
-    CVE_Items: Vec<CVE_Items>,
+  CVE_data_type: Option<String>,
+  CVE_data_format: Option<String>,
+  CVE_data_version: Option<String>,
+  CVE_data_numberOfCVEs: Option<String>,
+  CVE_data_timestamp: Option<String>,
+  CVE_Items: Vec<CVE_Items>,
 }
 
 // Nvd
@@ -28,11 +28,11 @@ struct Nvd {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct CVE_Items {
-    cve: Option<Cve>,
-    configurations: Option<Configurations>,
-    impact: Option<Impact>,
-    publishedDate: Option<String>,
-    lastModifiedDate: Option<String>,
+  cve: Option<Cve>,
+  configurations: Option<Configurations>,
+  impact: Option<Impact>,
+  publishedDate: Option<String>,
+  lastModifiedDate: Option<String>,
 }
 
 // CVE_Items
@@ -40,14 +40,14 @@ struct CVE_Items {
 #[allow(dead_code)]
 #[allow(non_snake_case)]
 struct Cve {
-    data_type: Option<String>,
-    data_format: Option<String>,
-    data_version: Option<String>,
-    CVE_data_meta: Option<CVE_data_meta>,
-    problemtype: Option<problemtype>,
-    references: Option<references>,
-    #[serde(rename = "@description")]
-    description2: Option<Vec<description2>>,
+  data_type: Option<String>,
+  data_format: Option<String>,
+  data_version: Option<String>,
+  CVE_data_meta: Option<CVE_data_meta>,
+  problemtype: Option<problemtype>,
+  references: Option<references>,
+  #[serde(rename = "@description")]
+  description2: Option<Vec<description2>>,
 }
 
 // Cve
@@ -56,8 +56,8 @@ struct Cve {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct CVE_data_meta {
-    ID: Option<String>,
-    ASSIGNER: Option<String>,
+  ID: Option<String>,
+  ASSIGNER: Option<String>,
 }
 
 // Cve
@@ -66,7 +66,7 @@ struct CVE_data_meta {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct problemtype {
-    problemtype_data: Option<Vec<problemtype_data>>,
+  problemtype_data: Option<Vec<problemtype_data>>,
 }
 
 // Cve
@@ -75,7 +75,7 @@ struct problemtype {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct problemtype_data {
-    description: Option<Vec<description>>,
+  description: Option<Vec<description>>,
 }
 
 // Cve
@@ -84,8 +84,8 @@ struct problemtype_data {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct description {
-    lang: Option<String>,
-    value: Option<String>,
+  lang: Option<String>,
+  value: Option<String>,
 }
 
 // Cve
@@ -94,7 +94,7 @@ struct description {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct references {
-    reference_data: Option<Vec<reference_data>>,
+  reference_data: Option<Vec<reference_data>>,
 }
 
 // Cve
@@ -103,10 +103,10 @@ struct references {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct reference_data {
-    url: Option<String>,
-    name: Option<String>,
-    refsource: Option<String>,
-    tags: Option<Vec<String>>,
+  url: Option<String>,
+  name: Option<String>,
+  refsource: Option<String>,
+  tags: Option<Vec<String>>,
 }
 
 // Cve
@@ -115,7 +115,7 @@ struct reference_data {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct description2 {
-    description_data: Option<Vec<description_data>>,
+  description_data: Option<Vec<description_data>>,
 }
 
 // Cve
@@ -124,8 +124,8 @@ struct description2 {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct description_data {
-    lang: Option<String>,
-    value: Option<String>,
+  lang: Option<String>,
+  value: Option<String>,
 }
 
 // CVE_Items
@@ -134,8 +134,8 @@ struct description_data {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct Configurations {
-    CVE_data_version: Option<String>,
-    nodes: Option<Vec<nodes>>,
+  CVE_data_version: Option<String>,
+  nodes: Option<Vec<nodes>>,
 }
 
 // Configurations
@@ -144,10 +144,10 @@ struct Configurations {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct nodes {
-    operator: Option<String>,
-    children: Option<Vec<children>>,
-    negate: Option<bool>,
-    cpe_match: Option<Vec<cpe_match>>,
+  operator: Option<String>,
+  children: Option<Vec<children>>,
+  negate: Option<bool>,
+  cpe_match: Option<Vec<cpe_match>>,
 }
 
 // Configurations
@@ -156,12 +156,12 @@ struct nodes {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct cpe_match {
-    vulnerable: Option<bool>,
-    cpe23Uri: Option<String>,
-    versionStartExcluding: Option<String>,
-    versionStartIncluding: Option<String>,
-    versionEndExcluding: Option<String>,
-    versionEndIncluding: Option<String>,
+  vulnerable: Option<bool>,
+  cpe23Uri: Option<String>,
+  versionStartExcluding: Option<String>,
+  versionStartIncluding: Option<String>,
+  versionEndExcluding: Option<String>,
+  versionEndIncluding: Option<String>,
 }
 
 // Configurations
@@ -170,9 +170,9 @@ struct cpe_match {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct children {
-    operator: Option<String>,
-    #[serde(rename = "@cpe_match")]
-    cpe_match2: Option<Vec<cpe_match2>>,
+  operator: Option<String>,
+  #[serde(rename = "@cpe_match")]
+  cpe_match2: Option<Vec<cpe_match2>>,
 }
 
 // Configurations
@@ -181,12 +181,12 @@ struct children {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct cpe_match2 {
-    vulnerable: Option<bool>,
-    cpe23Uri: Option<String>,
-    versionStartExcluding: Option<String>,
-    versionStartIncluding: Option<String>,
-    versionEndExcluding: Option<String>,
-    versionEndIncluding: Option<String>,
+  vulnerable: Option<bool>,
+  cpe23Uri: Option<String>,
+  versionStartExcluding: Option<String>,
+  versionStartIncluding: Option<String>,
+  versionEndExcluding: Option<String>,
+  versionEndIncluding: Option<String>,
 }
 
 // CVE_Items
@@ -195,8 +195,8 @@ struct cpe_match2 {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct Impact {
-    baseMetricV3: Option<baseMetricV3>,
-    baseMetricV2: Option<baseMetricV2>,
+  baseMetricV3: Option<baseMetricV3>,
+  baseMetricV2: Option<baseMetricV2>,
 }
 
 // Impact
@@ -205,9 +205,9 @@ struct Impact {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct baseMetricV3 {
-    cvssV3: Option<cvssV3>,
-    exploitabilityScore: Option<f64>,
-    impactScore: Option<f64>,
+  cvssV3: Option<cvssV3>,
+  exploitabilityScore: Option<f64>,
+  impactScore: Option<f64>,
 }
 
 // baseMetricV3
@@ -216,18 +216,18 @@ struct baseMetricV3 {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct cvssV3 {
-    version: Option<String>,
-    vectorString: Option<String>,
-    attackVector: Option<String>,
-    attackComplexity: Option<String>,
-    privilegesRequired: Option<String>,
-    userInteraction: Option<String>,
-    scope: Option<String>,
-    confidentialityImpact: Option<String>,
-    integrityImpact: Option<String>,
-    availabilityImpact: Option<String>,
-    baseScore: Option<f64>,
-    baseSeverity: Option<String>,
+  version: Option<String>,
+  vectorString: Option<String>,
+  attackVector: Option<String>,
+  attackComplexity: Option<String>,
+  privilegesRequired: Option<String>,
+  userInteraction: Option<String>,
+  scope: Option<String>,
+  confidentialityImpact: Option<String>,
+  integrityImpact: Option<String>,
+  availabilityImpact: Option<String>,
+  baseScore: Option<f64>,
+  baseSeverity: Option<String>,
 }
 
 // Impact
@@ -236,14 +236,14 @@ struct cvssV3 {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct baseMetricV2 {
-    cvssV2: Option<cvssV2>,
-    severity: Option<String>,
-    exploitabilityScore: Option<f64>,
-    impactScore: Option<f64>,
-    obtainAllPrivilege: Option<bool>,
-    obtainUserPrivilege: Option<bool>,
-    obtainOtherPrivilege: Option<bool>,
-    userInteractionRequired: Option<bool>,
+  cvssV2: Option<cvssV2>,
+  severity: Option<String>,
+  exploitabilityScore: Option<f64>,
+  impactScore: Option<f64>,
+  obtainAllPrivilege: Option<bool>,
+  obtainUserPrivilege: Option<bool>,
+  obtainOtherPrivilege: Option<bool>,
+  userInteractionRequired: Option<bool>,
 }
 
 // baseMetricV2
@@ -252,110 +252,110 @@ struct baseMetricV2 {
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 struct cvssV2 {
-    version: Option<String>,
-    vectorString: Option<String>,
-    accessVector: Option<String>,
-    accessComplexity: Option<String>,
-    authentication: Option<String>,
-    confidentialityImpact: Option<String>,
-    integrityImpact: Option<String>,
-    availabilityImpact: Option<String>,
-    baseScore: Option<f64>,
+  version: Option<String>,
+  vectorString: Option<String>,
+  accessVector: Option<String>,
+  accessComplexity: Option<String>,
+  authentication: Option<String>,
+  confidentialityImpact: Option<String>,
+  integrityImpact: Option<String>,
+  availabilityImpact: Option<String>,
+  baseScore: Option<f64>,
 }
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
-    // MongoDB //
-    // データベース名 = Jvn
-    // テーブル = コレクション = JvnXX
-    // レコード = ドキュメント
+  // MongoDB //
+  // データベース名 = Jvn
+  // テーブル = コレクション = JvnXX
+  // レコード = ドキュメント
 
-    // 接続文字列を解析して、options構造体に変換する
-    let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
+  // 接続文字列を解析して、options構造体に変換する
+  let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
 
-    // 手動でオプションを設定する
-    client_options.app_name = Some("My App".to_string());
+  // 手動でオプションを設定する
+  client_options.app_name = Some("My App".to_string());
 
-    // デプロイメントのハンドルを取得する
-    let mongo_client: MongoClient = MongoClient::with_options(client_options).unwrap();
+  // デプロイメントのハンドルを取得する
+  let mongo_client: MongoClient = MongoClient::with_options(client_options).unwrap();
 
-    // データベースの名前をリストアップする
-    for db_name in mongo_client.list_database_names(None, None).await.unwrap() {
-        println!("list DB: {}", db_name);
+  // データベースの名前をリストアップする
+  for db_name in mongo_client.list_database_names(None, None).await.unwrap() {
+    println!("list DB: {}", db_name);
+  }
+
+  // データベースのハンドルを取得する
+  let db: mongodb::Database = mongo_client.database("Nvd");
+
+  // データベースのコレクション名を列挙する
+  for collection_name in db.list_collection_names(None).await.unwrap() {
+    println!("list Collection: {}", collection_name);
+  }
+
+  // HTTPS Client //
+  // if let Ok(http_proxy) = std::env::var("http_proxy") {
+  //     let proxy = {
+  //         let proxy_uri = http_proxy.parse().unwrap();
+  //         let mut proxy = Proxy::new(Intercept::All, proxy_uri);
+  //         proxy.set_authorization(Authorization::basic("John Doe", "Agent1234"));
+  //         let connector = HttpsConnector::new();
+  //         let proxy_connector = ProxyConnector::from_proxy(connector, proxy).unwrap();
+  //         proxy_connector
+  //     };
+  //     let client = Client::builder().build::<_, hyper::Body>(proxy);
+  // } else if let Ok(https_proxy) = std::env::var("https_proxy") {
+  //     let proxy = {
+  //         let proxy_uri = https_proxy.parse().unwrap();
+  //         let mut proxy = Proxy::new(Intercept::All, proxy_uri);
+  //         proxy.set_authorization(Authorization::basic("John Doe", "Agent1234"));
+  //         let connector = HttpsConnector::new();
+  //         let proxy_connector = ProxyConnector::from_proxy(connector, proxy).unwrap();
+  //         proxy_connector
+  //     };
+  //     let client = Client::builder().build::<_, hyper::Body>(proxy);
+  // } else {
+  //     let https = HttpsConnector::new();
+  //     let client = Client::builder().build::<_, hyper::Body>(https);
+  // }
+
+  let https: HttpsConnector<hyper::client::HttpConnector> = HttpsConnector::new();
+  let client: Client<HttpsConnector<hyper::client::HttpConnector>> = Client::builder().build::<_, hyper::Body>(https);
+
+
+  // 年別情報
+  let utc: OffsetDateTime = OffsetDateTime::now_utc();
+  let jct: OffsetDateTime = utc.to_offset(offset!(+9));
+  let year: i32 = jct.year();
+
+  let mut year_vec: Vec<i32> = vec![];
+  for i in 2002..year+1 {
+    year_vec.push(i);
+  }
+
+  for y in year_vec {
+    let y: &str = &y.to_string();
+    let url: String = String::from("https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-") + y + ".json.gz";
+    let res: hyper::Response<hyper::Body> = client.get(url.parse().unwrap()).await.unwrap();
+    let resp: actix_web::web::Bytes = hyper::body::to_bytes(res.into_body()).await.unwrap();
+
+    let mut gz: GzDecoder<&[u8]> = GzDecoder::new(&resp[..]);
+    let mut resp_body: String = String::new();
+    gz.read_to_string(&mut resp_body).unwrap();
+    
+    let nvd_year: Nvd = serde_json::from_str(&resp_body).unwrap();
+
+    let col: String = String::from("Nvd") + y;
+    let typed_collection: mongodb::Collection<CVE_Items> = db.collection::<CVE_Items>(&col);
+    
+    let filter: bson::Document = doc! {};
+    let delete_result: mongodb::results::DeleteResult = typed_collection.delete_many(filter, None).await.unwrap();
+    println!("Deleted {} documents, col:{}", delete_result.deleted_count, col);
+    
+    for i in 0..nvd_year.CVE_Items.len() {
+      let insert_result: mongodb::results::InsertOneResult = typed_collection.insert_one(nvd_year.CVE_Items[i].clone(), None).await.unwrap();
+      println!("document ID:{}, col:{}", insert_result.inserted_id, col);
     }
+  }
 
-    // データベースのハンドルを取得する
-    let db: mongodb::Database = mongo_client.database("Nvd");
-
-    // データベースのコレクション名を列挙する
-    for collection_name in db.list_collection_names(None).await.unwrap() {
-        println!("list Collection: {}", collection_name);
-    }
-
-    // HTTPS Client //
-    // if let Ok(http_proxy) = std::env::var("http_proxy") {
-    //     let proxy = {
-    //         let proxy_uri = http_proxy.parse().unwrap();
-    //         let mut proxy = Proxy::new(Intercept::All, proxy_uri);
-    //         proxy.set_authorization(Authorization::basic("John Doe", "Agent1234"));
-    //         let connector = HttpsConnector::new();
-    //         let proxy_connector = ProxyConnector::from_proxy(connector, proxy).unwrap();
-    //         proxy_connector
-    //     };
-    //     let client = Client::builder().build::<_, hyper::Body>(proxy);
-    // } else if let Ok(https_proxy) = std::env::var("https_proxy") {
-    //     let proxy = {
-    //         let proxy_uri = https_proxy.parse().unwrap();
-    //         let mut proxy = Proxy::new(Intercept::All, proxy_uri);
-    //         proxy.set_authorization(Authorization::basic("John Doe", "Agent1234"));
-    //         let connector = HttpsConnector::new();
-    //         let proxy_connector = ProxyConnector::from_proxy(connector, proxy).unwrap();
-    //         proxy_connector
-    //     };
-    //     let client = Client::builder().build::<_, hyper::Body>(proxy);
-    // } else {
-    //     let https = HttpsConnector::new();
-    //     let client = Client::builder().build::<_, hyper::Body>(https);
-    // }
-
-    let https: HttpsConnector<hyper::client::HttpConnector> = HttpsConnector::new();
-    let client: Client<HttpsConnector<hyper::client::HttpConnector>> = Client::builder().build::<_, hyper::Body>(https);
-
-
-    // 年別情報
-    let utc: OffsetDateTime = OffsetDateTime::now_utc();
-    let jct: OffsetDateTime = utc.to_offset(offset!(+9));
-    let year: i32 = jct.year();
-
-    let mut year_vec: Vec<i32> = vec![];
-    for i in 2002..year+1 {
-        year_vec.push(i);
-    }
-
-    for y in year_vec {
-        let y: &str = &y.to_string();
-        let url: String = String::from("https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-") + y + ".json.gz";
-        let res: hyper::Response<hyper::Body> = client.get(url.parse().unwrap()).await.unwrap();
-        let resp: actix_web::web::Bytes = hyper::body::to_bytes(res.into_body()).await.unwrap();
-
-        let mut gz: GzDecoder<&[u8]> = GzDecoder::new(&resp[..]);
-        let mut resp_body: String = String::new();
-        gz.read_to_string(&mut resp_body).unwrap();
-        
-        let nvd_year: Nvd = serde_json::from_str(&resp_body).unwrap();
-
-        let col: String = String::from("Nvd") + y;
-        let typed_collection: mongodb::Collection<CVE_Items> = db.collection::<CVE_Items>(&col);
-        
-        let filter: bson::Document = doc! {};
-        let delete_result: mongodb::results::DeleteResult = typed_collection.delete_many(filter, None).await.unwrap();
-        println!("Deleted {} documents, col:{}", delete_result.deleted_count, col);
-        
-        for i in 0..nvd_year.CVE_Items.len() {
-            let insert_result: mongodb::results::InsertOneResult = typed_collection.insert_one(nvd_year.CVE_Items[i].clone(), None).await.unwrap();
-            println!("document ID:{}, col:{}", insert_result.inserted_id, col);
-        }
-    }
-
-    Ok(())
+  Ok(())
 }

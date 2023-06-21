@@ -79,7 +79,7 @@ async fn main() -> Result<()> {
   let result_dir = String::from("./src/vulns_result/");
   let result_dirpath = Path::new(&result_dir);
   if result_dirpath.is_dir() {
-    println!("Remove dir...");
+    println!("Remove dir... {:?}", result_dir);
     std::fs::remove_dir_all(&result_dir).unwrap();
   }
   std::fs::create_dir_all(&result_dir).unwrap();

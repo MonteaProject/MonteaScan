@@ -1,11 +1,11 @@
 use time::{OffsetDateTime, macros::offset};
+use mongodb::{options::ClientOptions, Client as MongoClient, bson::doc};
 use hyper::{Client, Uri};
 use hyper_tls::HttpsConnector;
 use quick_xml::de::from_str;
 use serde::{Deserialize, Serialize};
-use mongodb::{options::ClientOptions, Client as MongoClient, bson::doc};
-use std::clone::Clone;
 use serde_json::{Result};
+use std::clone::Clone;
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct Rdf {

@@ -1,5 +1,7 @@
 /.vscode
 src/config/
+src/cwe/
+src/cwe_result/
 src/scan_result/
 src/vulns_result/
 target/

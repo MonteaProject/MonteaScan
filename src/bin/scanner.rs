@@ -5,7 +5,6 @@ use time::{OffsetDateTime, macros::offset, format_description};
 use serde_json::{Result};
 use std::path::Path;
 
-
 #[derive(Deserialize, Serialize, Debug)]
 struct ScanServerList {
   server: Vec<Server>,
@@ -56,25 +55,26 @@ struct UpdateList {
 fn main() -> Result<()> {
   let result_dir = String::from("./src/scan_result/");
   let result_dirpath = Path::new(&result_dir);
+
   if result_dirpath.is_dir() {
-    println!("Remove dir...");
+    println!("Remove dir... {:?}", result_dir);
     std::fs::remove_dir_all(&result_dir).unwrap();
   }
+
   std::fs::create_dir_all(&result_dir).unwrap();
 
-  let config_file: String = String::from("config") + ".json";
-  let config_dir: String = String::from("./src/config/") + &config_file;
+  let config_file: String = String::from("./src/config/config.json");
 
   let cnf: ScanServerList = {
-    let cnf: String = std::fs::read_to_string(&config_dir).unwrap();
+    let cnf: String = std::fs::read_to_string(&config_file).unwrap();
     serde_json::from_str::<ScanServerList>(&cnf).unwrap()
   };
 
   for index in 0..cnf.server.len() {
-    let user: &String    = &cnf.server[index].user;
-    let host: &String   = &cnf.server[index].host;
-    let port: &String   = &cnf.server[index].port;
-    let key: &String    = &cnf.server[index].key;
+    let user: &String = &cnf.server[index].user;
+    let host: &String = &cnf.server[index].host;
+    let port: &String = &cnf.server[index].port;
+    let key:  &String = &cnf.server[index].key;
     let prikey: std::path::PathBuf = std::path::PathBuf::from(key);
 
     let host_port: String = host.to_owned() + ":" + port;
