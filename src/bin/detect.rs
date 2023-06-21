@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Result, Value, Value::Null};
 use std::io::{BufReader, Write};
 use time::{OffsetDateTime, macros::offset, format_description};
+use std::path::Path;
 
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -61,9 +62,9 @@ async fn main() -> Result<()> {
 
   let mut file_vec: Vec<String> = Vec::new();
 
-  let path: String = String::from("./src/scan_result/");
-  let dir: PathBuf = PathBuf::from(path);
-  let files: std::fs::ReadDir = dir.read_dir().expect("code[387]: フォルダが存在しません.");
+  let scan_path: String = String::from("./src/scan_result/");
+  let scan_dir: PathBuf = PathBuf::from(scan_path);
+  let files: std::fs::ReadDir = scan_dir.read_dir().expect("code[387]: フォルダが存在しません.");
 
   for file in files {
     let f: String = file.iter().map(|x| x.path().to_string_lossy().into_owned()).collect::<String>();
@@ -74,6 +75,14 @@ async fn main() -> Result<()> {
       file_vec.push(f);
     }
   }
+
+  let result_dir = String::from("./src/vulns_result/");
+  let result_dirpath = Path::new(&result_dir);
+  if result_dirpath.is_dir() {
+    println!("Remove dir...");
+    std::fs::remove_dir_all(&result_dir).unwrap();
+  }
+  std::fs::create_dir_all(&result_dir).unwrap();
 
   for f in file_vec {
     println!("load file: {:?}", f);
@@ -345,17 +354,15 @@ async fn main() -> Result<()> {
     let d_file: Vec<&str> = f.split('/').collect();
     let d_index: usize = d_file.len()-1;
 
-    std::fs::create_dir_all("./src/vulns_result").unwrap();
     let filename: String = String::from(d_file[d_index]);
-    let dir: String = String::from("./src/vulns_result/") + &filename;
+    let full_path: String = String::from(&result_dir) + &filename;
 
     let serialized = serde_json::to_string(&vulns_vec).unwrap();
     let mut w: File = std::fs::OpenOptions::new()
       .write(true)
       .create(true)
-      .open(dir).unwrap();
+      .open(full_path).unwrap();
     w.write_all(serialized.as_bytes()).expect("Failed to Write vulns_result...");
-
 
     println!("finished: {:?}", f);
   }

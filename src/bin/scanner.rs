@@ -3,6 +3,7 @@ use ssh2::Session;
 use std::io::{Read, Write};
 use time::{OffsetDateTime, macros::offset, format_description};
 use serde_json::{Result};
+use std::path::Path;
 
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -53,11 +54,19 @@ struct UpdateList {
 
 
 fn main() -> Result<()> {
-  let filename: String = String::from("config") + ".json";
-  let dir: String = String::from("./src/config/") + &filename;
+  let result_dir = String::from("./src/scan_result/");
+  let result_dirpath = Path::new(&result_dir);
+  if result_dirpath.is_dir() {
+    println!("Remove dir...");
+    std::fs::remove_dir_all(&result_dir).unwrap();
+  }
+  std::fs::create_dir_all(&result_dir).unwrap();
+
+  let config_file: String = String::from("config") + ".json";
+  let config_dir: String = String::from("./src/config/") + &config_file;
 
   let cnf: ScanServerList = {
-    let cnf: String = std::fs::read_to_string(&dir).unwrap();
+    let cnf: String = std::fs::read_to_string(&config_dir).unwrap();
     serde_json::from_str::<ScanServerList>(&cnf).unwrap()
   };
 
@@ -297,15 +306,14 @@ fn main() -> Result<()> {
       println!("command dnf rpm -qa Failed");
     }
 
-    std::fs::create_dir_all("./src/scan_result/").unwrap();
     let filename: String = hostname.replace('\n', "") + ".json";
-    let dir: String = String::from("./src/scan_result/") + &filename;
+    let full_path: String = String::from(&result_dir) + &filename;
 
     let serialized: String = serde_json::to_string(&localinfo).unwrap();
     let mut w: std::fs::File = std::fs::OpenOptions::new()
       .write(true)
       .create(true)
-      .open(dir).unwrap();
+      .open(full_path).unwrap();
     w.write_all(serialized.as_bytes()).expect("Failed to Write scan_result...");
   }
 
