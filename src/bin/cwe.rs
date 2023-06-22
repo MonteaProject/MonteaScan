@@ -1,4 +1,3 @@
-use time::{OffsetDateTime, macros::offset, format_description};
 use serde::{Deserialize, Serialize};
 use anyhow::Result;
 use tokio::fs::File;
@@ -33,11 +32,6 @@ struct Weakness {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
-  let utc: OffsetDateTime = OffsetDateTime::now_utc();
-  let jct: OffsetDateTime = utc.to_offset(offset!(+9));
-  let format: Vec<format_description::FormatItem<'_>> = format_description::parse("[year][month][day]")?;
-  let time: String = jct.format(&format)?;
-
   let dir = String::from("./src/cwe/");
   let dir_path = Path::new(&dir);
 
@@ -50,8 +44,8 @@ async fn main() -> Result<()> {
   let bytes = response.bytes().await?;
 
   std::fs::create_dir_all(&dir)?;
-  let filename: String = String::from("cwe_") + &time + ".zip";
-  let full_path: String = String::from(&dir) + &filename;
+  let cwe_zip: String = String::from("cwe") + ".zip";
+  let full_path: String = String::from(&dir) + &cwe_zip;
 
   let mut file = File::create(&full_path).await?;
 
@@ -68,22 +62,12 @@ async fn main() -> Result<()> {
     file.read_to_string(&mut s)?;
   }
 
-  let cwe_json: Cwe = from_str(&s)?;
+  let data: Cwe = from_str(&s)?;
 
-  let cwe_dir = String::from("./src/cwe_result/");
-  let cwe_dirpath = Path::new(&cwe_dir);
+  let cwe_json: String = String::from("cwe") + ".json";
+  let cwe_fullpath: String = String::from(&dir) + &cwe_json;
 
-  if cwe_dirpath.is_dir() {
-    println!("Remove dir... {:?}", cwe_dir);
-    std::fs::remove_dir_all(&cwe_dir)?;
-  }
-
-  std::fs::create_dir_all(&cwe_dir)?;
-
-  let cwe_file: String = String::from("cwe_") + &time + ".json";
-  let cwe_fullpath: String = String::from(&cwe_dir) + &cwe_file;
-
-  let serialized: String = serde_json::to_string(&cwe_json)?;
+  let serialized: String = serde_json::to_string(&data)?;
   let mut w = std::fs::OpenOptions::new()
     .write(true)
     .create(true)
