@@ -56,22 +56,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 continue;
               } else {
                 for(let c = 0; c < json.vulns[i].detect.length; c++) {
-                  for(let p = 0; p < json.vulns[i].detect[c].metadata.advisory.cve.length; p++) {
-                    if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "critical") {
-                      criticalTotal += 1;
-                      critical += 1;
-                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "important") {
-                      importantTotal += 1;
-                      important += 1;
-                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
-                      moderateTotal += 1;
-                      moderate += 1;
-                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "low") {
-                      lowTotal += 1;
-                      low += 1;
-                    } else {
-                      console.log("新たなCVE重要度が追加されています...");
-                    }
+                  if (json.vulns[i].detect[c].metadata.advisory.severity === "Critical") {
+                    criticalTotal += 1;
+                    critical += 1;
+                  } else if (json.vulns[i].detect[c].metadata.advisory.severity === "Important") {
+                    importantTotal += 1;
+                    important += 1;
+                  } else if (json.vulns[i].detect[c].metadata.advisory.severity === "Moderate") {
+                    moderateTotal += 1;
+                    moderate += 1;
+                  } else if (json.vulns[i].detect[c].metadata.advisory.severity === "Low") {
+                    lowTotal += 1;
+                    low += 1;
+                  } else {
+                    console.log("新たなCVE重要度が追加されています...");
                   }
                 }
               }

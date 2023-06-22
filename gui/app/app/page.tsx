@@ -1,4 +1,4 @@
-import Dashboard from './dashboard/';
+import Dashboard from './dashboard/page';
 import { Box } from "./common/components";
 
 export default async function Home() {

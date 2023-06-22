@@ -1,11 +1,11 @@
 use time::{OffsetDateTime, macros::offset, format_description};
-use std::{vec, path::PathBuf, fs::File};
 use hyper::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::{Result, Value, Value::Null};
+use std::{vec, path::PathBuf, fs::File};
 use std::io::{BufReader, Write};
 use std::path::Path;
-use quick_xml::de::from_str;
+use std::option::Option;
 
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -46,6 +46,9 @@ struct VulnsList {
   updated:     String,
   impact:      String,
   cveid:       String,
+  cwe_oval:    String,
+  cvssv3_oval: String,
+  cwe_name:    String,
   pkgname:     String,
   pkgver:      String,
   pkgrelease:  String,
@@ -76,15 +79,48 @@ struct Weakness {
   name: Option<String>
 }
 
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct CweResult {
+  time:     String,
+  hostname: String,
+  ip:       Vec<String>,
+  os:       String,
+  kernel:   String,
+  cwe_id:   String,
+  cwe_name: String,
+}
+
+
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
   println!("start...");
 
-  let mut file_vec: Vec<String> = Vec::new();
-
   let scan_path: String = String::from("./src/scan_result/");
   let scan_dir: PathBuf = PathBuf::from(scan_path);
   let files: std::fs::ReadDir = scan_dir.read_dir().expect("code[387]: フォルダが存在しません.");
+
+  // cwe
+  let cwe_dir = String::from("./src/cwe_result/");
+  let cwe_dirpath = Path::new(&cwe_dir);
+
+  if cwe_dirpath.is_dir() {
+    println!("Remove dir... {:?}", cwe_dir);
+    std::fs::remove_dir_all(&cwe_dir).unwrap();
+  }
+  std::fs::create_dir_all(&cwe_dir).unwrap();
+
+  // vulns
+  let result_dir = String::from("./src/vulns_result/");
+  let result_dirpath = Path::new(&result_dir);
+
+  if result_dirpath.is_dir() {
+    println!("Remove dir... {:?}", result_dir);
+    std::fs::remove_dir_all(&result_dir).unwrap();
+  }
+  std::fs::create_dir_all(&result_dir).unwrap();
+
+
+  let mut file_vec: Vec<String> = Vec::new();
 
   for file in files {
     let f: String = file.iter().map(|x| x.path().to_string_lossy().into_owned()).collect::<String>();
@@ -96,20 +132,14 @@ async fn main() -> Result<()> {
     }
   }
 
-  let result_dir = String::from("./src/vulns_result/");
-  let result_dirpath = Path::new(&result_dir);
-  if result_dirpath.is_dir() {
-    println!("Remove dir... {:?}", result_dir);
-    std::fs::remove_dir_all(&result_dir).unwrap();
-  }
-  std::fs::create_dir_all(&result_dir).unwrap();
-
   for f in file_vec {
     println!("load file: {:?}", f);
 
     let mut vulns_vec: Vulns = Vulns {
       vulns: vec![]
     };
+
+    let mut cwe_vec: Vec<CweResult> = Vec::new();
 
     let file: File = match File::open(&f) {
       Ok(i) => i,
@@ -219,82 +249,107 @@ async fn main() -> Result<()> {
                       updated = oval[0]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
                     }
 
-                    let mut impact: String = "-".to_string();
-                    let mut cveid: String = "-".to_string();
-                    let mut cwe_oval: String = "-".to_string();
+                    let mut impact:      String = "-".to_string();
+                    let mut cveid:       String = "-".to_string();
+                    let mut cvssv3_oval: String = "-".to_string();
+                    let mut cwe_oval:    String = "-".to_string();
+                    let mut cwe_name:    String = "-".to_string();
+
+                    let cwe_read: String = String::from("./src/cwe/cwe.json");
+                    let cwe: Cwe = {
+                      let cwe: String = std::fs::read_to_string(&cwe_read).unwrap();
+                      serde_json::from_str::<Cwe>(&cwe).unwrap()
+                    };
+
                     if oval[0]["metadata"]["advisory"]["cve"] != Null {
                       for i in 0..oval[0]["metadata"]["advisory"]["cve"].as_array().unwrap().len() {
                         if oval[0]["metadata"]["advisory"]["cve"][i]["@impact"] != Null {
                           impact = oval[0]["metadata"]["advisory"]["cve"][i]["@impact"].to_string().replace('"', "");
                         }
+
                         if oval[0]["metadata"]["advisory"]["cve"][i]["$value"] != Null {
                           cveid = oval[0]["metadata"]["advisory"]["cve"][i]["$value"].to_string().replace('"', "");
                         }
 
-                        //
+                        if oval[0]["metadata"]["advisory"]["cve"][i]["@cvss3"] != Null {
+                          let s1 = oval[0]["metadata"]["advisory"]["cve"][i]["@cvss3"].to_string().replace('"', "");
+                          let s2: Vec<&str> = s1.split('/').collect();
+                          cvssv3_oval = s2[0].to_string();
+                        }
+
                         if oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"] != Null {
                           cwe_oval = oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"].to_string().replace('"', "");
+
+                          let cwe_ovalid = &cwe_oval.replace("CWE-", "");
+                          for i in 0..cwe.Weaknesses.Weakness.len() {
+                            let cwe_id = &cwe.Weaknesses.Weakness[i].id.clone().unwrap_or(0.to_string());
+
+                            if cwe_ovalid == cwe_id {
+                              cwe_name = cwe.Weaknesses.Weakness[i].name.clone().unwrap_or("None".to_string());
+
+                              let cwe_list: CweResult = CweResult{
+                                time:     time.clone(),
+                                hostname: hostname.clone(),
+                                ip:       ip.clone(),
+                                os:       os.clone(),
+                                kernel:   kernel.clone(),
+                                cwe_id:   cwe_id.clone(),
+                                cwe_name: cwe_name.clone()
+                              };
+                              cwe_vec.push(cwe_list);
+                            }
+                          }
                         }
-
-                        let utc: OffsetDateTime = OffsetDateTime::now_utc();
-                        let jct: OffsetDateTime = utc.to_offset(offset!(+9));
-                        let format: Vec<format_description::FormatItem<'_>> = format_description::parse("[year][month][day]").unwrap();
-                        let time: String = jct.format(&format).unwrap();
-
-                        let cwe_dir = String::from("./src/cwe_result/");
-                        let cwe_dirpath = Path::new(&cwe_dir);
-
-                        if cwe_dirpath.is_dir() {
-                          println!("Remove dir... {:?}", cwe_dir);
-                          std::fs::remove_dir_all(&cwe_dir).unwrap();
-                        }
-
-                        std::fs::create_dir_all(&cwe_dir).unwrap();
-
-                        let cwe_read: String = String::from("./src/cwe/cwe.json");
-
-                        let cwe: Cwe = {
-                          let cwe: String = std::fs::read_to_string(&cwe_read).unwrap();
-                          from_str::<Cwe>(&cwe).unwrap()
+                        
+                        let vulns_list: VulnsList = VulnsList {
+                          time:        time.clone(),
+                          hostname:    hostname.clone(),
+                          ip:          ip.clone(),
+                          os:          os.clone(),
+                          kernel:      kernel.clone(),
+                          issued:      issued.clone(),
+                          updated:     updated.clone(),
+                          impact:      impact.clone(),
+                          cveid:       cveid.clone(),
+                          cwe_oval:    cwe_oval.clone(),
+                          cwe_name:    cwe_name.clone(),
+                          cvssv3_oval: cvssv3_oval.clone(),
+                          pkgname:     scan_p.pkgname.clone(),
+                          pkgver:      scan_p.pkgver.clone(),
+                          pkgrelease:  scan_p.pkgrelease.clone(),
+                          update_flag: scan_p.update_flag.clone(),
+                          upver:       scan_p.upver.clone(),
+                          uprelease:   scan_p.uprelease.clone(),
+                          pkgarch:     scan_p.pkgarch.clone(),
+                          detect:      oval.clone()
                         };
-
-                        println!("{:?}", cwe);
-
-                        // let cwe_write: String = String::from("cwe_") + &time + ".json";
-                        // let full_path: String = String::from(&cwe_dir) + &cwe_write;
-
-                        // let serialized: String = serde_json::to_string(&cwe).unwrap();
-                        // let mut w: std::fs::File = std::fs::OpenOptions::new()
-                        //   .write(true)
-                        //   .create(true)
-                        //   .open(full_path).unwrap();
-                        // w.write_all(serialized.as_bytes()).expect("Failed to Write cwe_result...");
-                        //
-
+                        vulns_vec.vulns.push(vulns_list);
                       }
+                    } else {
+                      let vulns_list: VulnsList = VulnsList {
+                        time:        time.clone(),
+                        hostname:    hostname.clone(),
+                        ip:          ip.clone(),
+                        os:          os.clone(),
+                        kernel:      kernel.clone(),
+                        issued:      issued.clone(),
+                        updated:     updated.clone(),
+                        impact:      impact.clone(),
+                        cveid:       cveid.clone(),
+                        cwe_oval:    cwe_oval.clone(),
+                        cwe_name:    cwe_name.clone(),
+                        cvssv3_oval: cvssv3_oval.clone(),
+                        pkgname:     scan_p.pkgname.clone(),
+                        pkgver:      scan_p.pkgver.clone(),
+                        pkgrelease:  scan_p.pkgrelease.clone(),
+                        update_flag: scan_p.update_flag.clone(),
+                        upver:       scan_p.upver.clone(),
+                        uprelease:   scan_p.uprelease.clone(),
+                        pkgarch:     scan_p.pkgarch.clone(),
+                        detect:      oval.clone()
+                      };
+                      vulns_vec.vulns.push(vulns_list);
                     }
-
-                    let vulns_list: VulnsList = VulnsList {
-                      time:       time.clone(),
-                      hostname:   hostname.clone(),
-                      ip:         ip.clone(),
-                      os:         os.clone(),
-                      kernel:     kernel.clone(),
-                      issued:     issued.clone(),
-                      updated:    updated.clone(),
-                      impact:     impact.clone(),
-                      cveid:      cveid.clone(),
-                      pkgname:    scan_p.pkgname.clone(),
-                      pkgver:     scan_p.pkgver.clone(),
-                      pkgrelease: scan_p.pkgrelease.clone(),
-                      update_flag:scan_p.update_flag.clone(),
-                      upver:      scan_p.upver.clone(),
-                      uprelease:  scan_p.uprelease.clone(),
-                      pkgarch:    scan_p.pkgarch.clone(),
-                      detect:     oval.clone()
-                    };
-
-                    vulns_vec.vulns.push(vulns_list);
                   }
                 }
               }
@@ -334,40 +389,109 @@ async fn main() -> Result<()> {
                       updated = oval[0]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
                     }
 
-                    let mut impact: String = "-".to_string();
-                    let mut cveid: String = "-".to_string();
+                    let mut impact:      String = "-".to_string();
+                    let mut cveid:       String = "-".to_string();
+                    let mut cvssv3_oval: String = "-".to_string();
+                    let mut cwe_oval:    String = "-".to_string();
+                    let mut cwe_name:    String = "-".to_string();
+
+                    let cwe_read: String = String::from("./src/cwe/cwe.json");
+                    let cwe: Cwe = {
+                      let cwe: String = std::fs::read_to_string(&cwe_read).unwrap();
+                      serde_json::from_str::<Cwe>(&cwe).unwrap()
+                    };
+
                     if oval[0]["metadata"]["advisory"]["cve"] != Null {
                       for i in 0..oval[0]["metadata"]["advisory"]["cve"].as_array().unwrap().len() {
                         if oval[0]["metadata"]["advisory"]["cve"][i]["@impact"] != Null {
                           impact = oval[0]["metadata"]["advisory"]["cve"][i]["@impact"].to_string().replace('"', "");
                         }
+
                         if oval[0]["metadata"]["advisory"]["cve"][i]["$value"] != Null {
                           cveid = oval[0]["metadata"]["advisory"]["cve"][i]["$value"].to_string().replace('"', "");
                         }
+
+                        if oval[0]["metadata"]["advisory"]["cve"][i]["@cvss3"] != Null {
+                          let s1 = oval[0]["metadata"]["advisory"]["cve"][i]["@cvss3"].to_string().replace('"', "");
+                          let s2: Vec<&str> = s1.split('/').collect();
+                          cvssv3_oval = s2[0].to_string();
+                        }
+
+                        if oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"] != Null {
+                          cwe_oval = oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"].to_string().replace('"', "");
+
+                          let cwe_ovalid = &cwe_oval.replace("CWE-", "");
+                          for i in 0..cwe.Weaknesses.Weakness.len() {
+                            let cwe_id = &cwe.Weaknesses.Weakness[i].id.clone().unwrap_or(0.to_string());
+
+                            if cwe_ovalid == cwe_id {
+                              cwe_name = cwe.Weaknesses.Weakness[i].name.clone().unwrap_or("None".to_string());
+
+                              let cwe_list: CweResult = CweResult{
+                                time:     time.clone(),
+                                hostname: hostname.clone(),
+                                ip:       ip.clone(),
+                                os:       os.clone(),
+                                kernel:   kernel.clone(),
+                                cwe_id:   cwe_id.clone(),
+                                cwe_name: cwe_name.clone()
+                              };
+                              cwe_vec.push(cwe_list);
+                            }
+                          }
+                        }
+                        
+                        let vulns_list: VulnsList = VulnsList {
+                          time:        time.clone(),
+                          hostname:    hostname.clone(),
+                          ip:          ip.clone(),
+                          os:          os.clone(),
+                          kernel:      kernel.clone(),
+                          issued:      issued.clone(),
+                          updated:     updated.clone(),
+                          impact:      impact.clone(),
+                          cveid:       cveid.clone(),
+                          cwe_oval:    cwe_oval.clone(),
+                          cwe_name:    cwe_name.clone(),
+                          cvssv3_oval: cvssv3_oval.clone(),
+                          pkgname:     scan_p.pkgname.clone(),
+                          pkgver:      scan_p.pkgver.clone(),
+                          pkgrelease:  scan_p.pkgrelease.clone(),
+                          update_flag: scan_p.update_flag.clone(),
+                          upver:       scan_p.upver.clone(),
+                          uprelease:   scan_p.uprelease.clone(),
+                          pkgarch:     scan_p.pkgarch.clone(),
+                          detect:      oval.clone()
+                        };
+
+                        vulns_vec.vulns.push(vulns_list);
                       }
+                    } else {
+                      let vulns_list: VulnsList = VulnsList {
+                        time:        time.clone(),
+                        hostname:    hostname.clone(),
+                        ip:          ip.clone(),
+                        os:          os.clone(),
+                        kernel:      kernel.clone(),
+                        issued:      issued.clone(),
+                        updated:     updated.clone(),
+                        impact:      impact.clone(),
+                        cveid:       cveid.clone(),
+                        cwe_oval:    cwe_oval.clone(),
+                        cwe_name:    cwe_name.clone(),
+                        cvssv3_oval: cvssv3_oval.clone(),
+                        pkgname:     scan_p.pkgname.clone(),
+                        pkgver:      scan_p.pkgver.clone(),
+                        pkgrelease:  scan_p.pkgrelease.clone(),
+                        update_flag: scan_p.update_flag.clone(),
+                        upver:       scan_p.upver.clone(),
+                        uprelease:   scan_p.uprelease.clone(),
+                        pkgarch:     scan_p.pkgarch.clone(),
+                        detect:      oval.clone()
+                      };
+
+                      vulns_vec.vulns.push(vulns_list);
                     }
-
-                    let vulns_list: VulnsList = VulnsList {
-                      time:       time.clone(),
-                      hostname:   hostname.clone(),
-                      ip:         ip.clone(),
-                      os:         os.clone(),
-                      kernel:     kernel.clone(),
-                      issued:     issued.clone(),
-                      updated:    updated.clone(),
-                      impact:     impact.clone(),
-                      cveid:      cveid.clone(),
-                      pkgname:    scan_p.pkgname.clone(),
-                      pkgver:     scan_p.pkgver.clone(),
-                      pkgrelease: scan_p.pkgrelease.clone(),
-                      update_flag:scan_p.update_flag.clone(),
-                      upver:      scan_p.upver.clone(),
-                      uprelease:  scan_p.uprelease.clone(),
-                      pkgarch:    scan_p.pkgarch.clone(),
-                      detect:     oval.clone()
-                    };
-
-                    vulns_vec.vulns.push(vulns_list);
                   }
                 }
               }
@@ -381,29 +505,35 @@ async fn main() -> Result<()> {
 
         if vulns_vec.vulns.len() == detect_flag {
 
-          let issued: String = "-".to_string();
-          let updated: String = "-".to_string();
-          let impact: String = "-".to_string();
-          let cveid: String = "-".to_string();
+          let issued:      String = "-".to_string();
+          let updated:     String = "-".to_string();
+          let impact:      String = "-".to_string();
+          let cveid:       String = "-".to_string();
+          let cwe_oval:    String = "-".to_string();
+          let cwe_name:    String = "-".to_string();
+          let cvssv3_oval: String = "-".to_string();
           
           let vulns_list: VulnsList = VulnsList {
-            time:       time.clone(),
-            hostname:   hostname.clone(),
-            ip:         ip.clone(),
-            os:         os.clone(),
-            kernel:     kernel.clone(),
-            issued:     issued.clone(),
-            updated:    updated.clone(),
-            impact:     impact.clone(),
-            cveid:      cveid.clone(),
-            pkgname:    scan_p.pkgname.clone(),
-            pkgver:     scan_p.pkgver.clone(),
-            pkgrelease: scan_p.pkgrelease.clone(),
-            update_flag:scan_p.update_flag.clone(),
-            upver:      scan_p.upver.clone(),
-            uprelease:  scan_p.uprelease.clone(),
-            pkgarch:    scan_p.pkgarch.clone(),
-            detect:     Null
+            time:        time.clone(),
+            hostname:    hostname.clone(),
+            ip:          ip.clone(),
+            os:          os.clone(),
+            kernel:      kernel.clone(),
+            issued:      issued.clone(),
+            updated:     updated.clone(),
+            impact:      impact.clone(),
+            cveid:       cveid.clone(),
+            cwe_oval:    cwe_oval.clone(),
+            cwe_name:    cwe_name.clone(),
+            cvssv3_oval: cvssv3_oval.clone(),
+            pkgname:     scan_p.pkgname.clone(),
+            pkgver:      scan_p.pkgver.clone(),
+            pkgrelease:  scan_p.pkgrelease.clone(),
+            update_flag: scan_p.update_flag.clone(),
+            upver:       scan_p.upver.clone(),
+            uprelease:   scan_p.uprelease.clone(),
+            pkgarch:     scan_p.pkgarch.clone(),
+            detect:      Null
           };
 
           vulns_vec.vulns.push(vulns_list);
@@ -425,6 +555,23 @@ async fn main() -> Result<()> {
       .create(true)
       .open(full_path).unwrap();
     w.write_all(serialized.as_bytes()).expect("Failed to Write vulns_result...");
+
+    // CWE
+    let utc: OffsetDateTime = OffsetDateTime::now_utc();
+    let jct: OffsetDateTime = utc.to_offset(offset!(+9));
+    let format: Vec<format_description::FormatItem<'_>> = format_description::parse("[year][month][day]").unwrap();
+    let time_ymd: String = jct.format(&format).unwrap();
+
+    let cwe_write: String = String::from("cwe_") + &time_ymd + ".json";
+    let full_path: String = String::from(&cwe_dir) + &cwe_write;
+
+    let serialized: String = serde_json::to_string(&cwe_vec).unwrap();
+    let mut w: std::fs::File = std::fs::OpenOptions::new()
+      .write(true)
+      .create(true)
+      .open(full_path).unwrap();
+    w.write_all(serialized.as_bytes()).expect("Failed to Write cwe_result...");
+    
 
     println!("finished: {:?}", f);
   }
