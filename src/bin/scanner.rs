@@ -1,9 +1,10 @@
-use serde_derive::{Deserialize, Serialize};
-use ssh2::Session;
-use std::io::{Read, Write};
 use time::{OffsetDateTime, macros::offset, format_description};
+use ssh2::Session;
+use serde_derive::{Deserialize, Serialize};
 use serde_json::{Result};
+use std::io::{Read, Write};
 use std::path::Path;
+
 
 #[derive(Deserialize, Serialize, Debug)]
 struct ScanServerList {
@@ -50,7 +51,6 @@ struct UpdateList {
   ver : String,
   repo: String
 }
-
 
 fn main() -> Result<()> {
   let result_dir = String::from("./src/scan_result/");

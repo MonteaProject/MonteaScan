@@ -1,12 +1,10 @@
-use hyper::Client;
-use hyper_tls::HttpsConnector;
-use quick_xml::de::from_str;
-use serde::{Deserialize, Serialize};
 use mongodb::{options::ClientOptions, Client as MongoClient, bson::doc};
-use std::clone::Clone;
+use serde::{Deserialize, Serialize};
 use serde_json::{Result};
 use std::io::Read;
+use std::clone::Clone;
 use bzip2::read::BzDecoder;
+use quick_xml::de::from_str;
 
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -162,9 +160,6 @@ async fn main() -> Result<()> {
         println!("list Collection: {}", collection_name);
     }
 
-    let https: HttpsConnector<hyper::client::HttpConnector> = HttpsConnector::new();
-    let client: Client<HttpsConnector<hyper::client::HttpConnector>> = Client::builder().build::<_, hyper::Body>(https);
-
     let mut rhel_ver: Vec<i32> = vec![];
     for i in 6..10 {
         rhel_ver.push(i);
@@ -173,10 +168,11 @@ async fn main() -> Result<()> {
     for v in rhel_ver {
         let v: &str = &v.to_string();
         let url: String = String::from("https://access.redhat.com/security/data/oval/v2/RHEL") + v + "/rhel-" + v + ".oval.xml.bz2";
-        let res: hyper::Response<hyper::Body> = client.get(url.parse().unwrap()).await.unwrap();
-        let resp: actix_web::web::Bytes = hyper::body::to_bytes(res.into_body()).await.unwrap();
 
-        let mut gz: BzDecoder<&[u8]> = BzDecoder::new(&resp[..]);
+        let response = reqwest::get(&url).await.unwrap();
+        let bytes = response.bytes().await.unwrap();
+
+        let mut gz: BzDecoder<&[u8]> = BzDecoder::new(&bytes[..]);
         let mut resp_body: String = String::new();
         gz.read_to_string(&mut resp_body).unwrap();
 

@@ -1,14 +1,11 @@
 use time::{OffsetDateTime, macros::offset};
 use mongodb::{options::ClientOptions, Client as MongoClient, bson::doc};
-use hyper::Client;
-use hyper_tls::HttpsConnector;
 use serde::{Deserialize, Serialize};
 use serde_json::{Result};
 use std::clone::Clone;
 use std::io::Read;
 use flate2::read::GzDecoder;
-use hyper_proxy::{Proxy, ProxyConnector, Intercept};
-use headers::Authorization;
+
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 #[allow(dead_code)]
@@ -292,36 +289,6 @@ async fn main() -> Result<()> {
     println!("list Collection: {}", collection_name);
   }
 
-  // HTTPS Client //
-  // if let Ok(http_proxy) = std::env::var("http_proxy") {
-  //     let proxy = {
-  //         let proxy_uri = http_proxy.parse().unwrap();
-  //         let mut proxy = Proxy::new(Intercept::All, proxy_uri);
-  //         proxy.set_authorization(Authorization::basic("John Doe", "Agent1234"));
-  //         let connector = HttpsConnector::new();
-  //         let proxy_connector = ProxyConnector::from_proxy(connector, proxy).unwrap();
-  //         proxy_connector
-  //     };
-  //     let client = Client::builder().build::<_, hyper::Body>(proxy);
-  // } else if let Ok(https_proxy) = std::env::var("https_proxy") {
-  //     let proxy = {
-  //         let proxy_uri = https_proxy.parse().unwrap();
-  //         let mut proxy = Proxy::new(Intercept::All, proxy_uri);
-  //         proxy.set_authorization(Authorization::basic("John Doe", "Agent1234"));
-  //         let connector = HttpsConnector::new();
-  //         let proxy_connector = ProxyConnector::from_proxy(connector, proxy).unwrap();
-  //         proxy_connector
-  //     };
-  //     let client = Client::builder().build::<_, hyper::Body>(proxy);
-  // } else {
-  //     let https = HttpsConnector::new();
-  //     let client = Client::builder().build::<_, hyper::Body>(https);
-  // }
-
-  let https: HttpsConnector<hyper::client::HttpConnector> = HttpsConnector::new();
-  let client: Client<HttpsConnector<hyper::client::HttpConnector>> = Client::builder().build::<_, hyper::Body>(https);
-
-
   // 年別情報
   let utc: OffsetDateTime = OffsetDateTime::now_utc();
   let jct: OffsetDateTime = utc.to_offset(offset!(+9));
@@ -335,10 +302,11 @@ async fn main() -> Result<()> {
   for y in year_vec {
     let y: &str = &y.to_string();
     let url: String = String::from("https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-") + y + ".json.gz";
-    let res: hyper::Response<hyper::Body> = client.get(url.parse().unwrap()).await.unwrap();
-    let resp: actix_web::web::Bytes = hyper::body::to_bytes(res.into_body()).await.unwrap();
 
-    let mut gz: GzDecoder<&[u8]> = GzDecoder::new(&resp[..]);
+    let response = reqwest::get(&url).await.unwrap();
+    let bytes = response.bytes().await.unwrap();
+
+    let mut gz: GzDecoder<&[u8]> = GzDecoder::new(&bytes[..]);
     let mut resp_body: String = String::new();
     gz.read_to_string(&mut resp_body).unwrap();
     

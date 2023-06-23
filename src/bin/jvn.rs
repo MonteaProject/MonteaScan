@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Result};
 use std::clone::Clone;
 
+
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct Rdf {
     item: Vec<Items>

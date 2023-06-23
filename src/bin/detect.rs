@@ -1,5 +1,4 @@
 use time::{OffsetDateTime, macros::offset, format_description};
-use hyper::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::{Result, Value, Value::Null};
 use std::{vec, path::PathBuf, fs::File};
@@ -187,10 +186,9 @@ async fn main() -> Result<()> {
     if majorver.len() != 1 && url.len() != 1 {
       println!("URLエラー...");
     } else {
-      let client: Client<hyper::client::HttpConnector> = Client::new();
-      let res: hyper::Response<hyper::Body> = client.get(url[0].parse().unwrap()).await.unwrap();
-      let resp: actix_web::web::Bytes = hyper::body::to_bytes(res.into_body()).await.unwrap();
-      let data: String = String::from_utf8(resp.to_vec()).expect("response was not valid utf-8");
+      let response = reqwest::get(&url[0]).await.unwrap();
+      let bytes = response.bytes().await.unwrap();
+      let data: String = String::from_utf8(bytes.to_vec()).expect("response was not valid utf-8");
 
       let v: Value = serde_json::from_str(&data).unwrap();
 
