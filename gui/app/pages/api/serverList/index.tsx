@@ -28,32 +28,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         eachVulnsCount.push(impact);
       } else {
         for (let v of dirList) {
-          const json = JSON.parse(readFileSync(`../../src/vulns_result/${v}`, "utf8")) as Vulns;
-          if (!json.vulns[0]) {
+          const json = JSON.parse(readFileSync(`../../src/vulns_result/${v}`, "utf8")) as Vulns[];
+          if (!json[0]) {
             console.log("/vulns_result/のファイル内にデータが記録されていません...");
           } else {
-            let hostname  = json.vulns[0].hostname;
-            let os        = json.vulns[0].os;
-            let kernel    = json.vulns[0].kernel;
-            let time      = json.vulns[0].time;
+            let hostname  = json[0].hostname;
+            let os        = json[0].os;
+            let kernel    = json[0].kernel;
+            let time      = json[0].time;
             let total     = 0;
             let critical  = 0;
             let important = 0;
             let moderate  = 0;
             let low       = 0;
-            for(let i = 0; i < json.vulns.length; i++) {
-              if (json.vulns[i].detect === null) {
+            for(let i = 0; i < json.length; i++) {
+              if (json[i].detect === null) {
                 continue;
               } else {
-                for(let c = 0; c < json.vulns[i].detect.length; c++) {
-                  for(let p = 0; p < json.vulns[i].detect[c].metadata.advisory.cve.length; p++) {
-                    if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "critical") {
+                for(let c = 0; c < json[i].detect.length; c++) {
+                  for(let p = 0; p < json[i].detect[c].metadata.advisory.cve.length; p++) {
+                    if (json[i].detect[c].metadata.advisory.cve[p]["@impact"] === "critical") {
                       critical += 1;
-                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "important") {
+                    } else if (json[i].detect[c].metadata.advisory.cve[p]["@impact"] === "important") {
                       important += 1;
-                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
+                    } else if (json[i].detect[c].metadata.advisory.cve[p]["@impact"] === "moderate") {
                       moderate += 1;
-                    } else if (json.vulns[i].detect[c].metadata.advisory.cve[p]["@impact"] === "low") {
+                    } else if (json[i].detect[c].metadata.advisory.cve[p]["@impact"] === "low") {
                       low += 1;
                     } else {
                       console.log("新たなCVE重要度が追加されています...");

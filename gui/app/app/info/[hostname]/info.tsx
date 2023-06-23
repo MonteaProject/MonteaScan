@@ -2,6 +2,8 @@
 import "./info.scss";
 import { useEffect, useState, useMemo } from "react";
 import { notFound } from "next/navigation";
+import { Vulns, pkgDetect, Cve, Reference, Bugzilla, Criterion, Criteria2, Criterion2 } from "../../types/cveTypes";
+import { rhelCPE, cpeVec } from "../../types/cpeTypes";
 import {
   Box,
   Link,
@@ -48,7 +50,7 @@ function CweTable({v, d}: any) {
           </Tr>
         </Thead>
         <Tbody>
-          {v.metadata.advisory.cve.map((c: string) => {
+          {v.metadata.advisory.cve.map((c: Cve) => {
             return (
               <Tr>
                 <Td>{c["$value"]}</Td>
@@ -183,7 +185,7 @@ function ReferenceTable({v}: any) {
         </Tr>
       </Thead>
       <Tbody>
-        {v.metadata.reference.map((r: string) => {
+        {v.metadata.reference.map((r: Reference) => {
           return (
             <Tr>
               <Td>{r["@source"]}</Td>
@@ -231,7 +233,7 @@ function AdvisoryTable({v}: any) {
 // "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
 function CvssTable({v}: any) {
   let rhelCpe: any[] = [];
-  v.metadata.advisory.cve.map((c: any) => {
+  v.metadata.advisory.cve.map((c: Cve) => {
     let cvssVec = c["@cvss3"].split("/");
     let cveId   = c["$value"];
 
@@ -376,7 +378,7 @@ function CvssTable({v}: any) {
   
   return (
     <Box>
-      {rhelCpe.map((r) => {
+      {rhelCpe.map((r: rhelCPE) => {
         return (
           <Box>
             <Heading size="sm" mb="-2" mt="10" textTransform="none"><Tooltip label='test' fontSize='md'>
@@ -491,7 +493,7 @@ function BugzillaTable({v}: any) {
           </Tr>
         </Thead>
         <Tbody>
-          {v.metadata.advisory.bugzilla.map((b: string) => {
+          {v.metadata.advisory.bugzilla.map((b: Bugzilla) => {
             return (
               <Tr>
                 <Td>{b["@id"]}</Td>
@@ -711,7 +713,7 @@ function CpeTable({v}: any) {
           </Tr>
         </Thead>
         <Tbody>
-        {cpeVec.map((v) => {
+        {cpeVec.map((v: cpeVec) => {
           return (
             <Tr>
               <Td>{v.kind === "" ? "全て" : v.kind}</Td>
@@ -744,7 +746,7 @@ function SubjectTable({v}: any) {
           </Tr>
         </Thead>
         <Tbody>
-          {v.criteria.criterion.map((criterion: string) => {
+          {v.criteria.criterion.map((criterion: Criterion) => {
             return (
               <Tr>
                 <Td>{criterion["@comment"]}</Td>
@@ -753,7 +755,7 @@ function SubjectTable({v}: any) {
           })}
         </Tbody>
       </Table>
-      {v.criteria.criteria.map((c: any) => {
+      {v.criteria.criteria.map((c: Criteria2) => {
         return (
           <Table variant='simple' mt="5">
             <Thead>
@@ -765,7 +767,7 @@ function SubjectTable({v}: any) {
               </Tr>
             </Thead>
             <Tbody>
-              {c.criterion.map((c: any) => {
+              {c.criterion.map((c: Criterion2) => {
                 return (
                   <Tr>
                     <Td>{c["@comment"]}</Td>
@@ -857,7 +859,7 @@ function MyTbody({d}: any) {
   }
   return (
     <tbody className="responsive-info-table__body">
-      {d.detect.map((v: any) => {
+      {d.detect.map((v: pkgDetect) => {
         return (
             <button className="responsive-info-table__button" onClick={() => {
               handleClick();
@@ -903,7 +905,7 @@ function MyTbody({d}: any) {
 }
 
 export default async function Info ({ infoPass }: { infoPass: string }) {
-  const [data, setData]         = useState([]);
+  const [data, setData]         = useState<Vulns[]>([]);
   const [sortType, setSortType] = useState("pkgAsc");
 
   const sortedData = useMemo(() => {
@@ -1002,7 +1004,7 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
     }
 
     const data = await res.json();
-    setData(data.vulns);
+    setData(data);
   };
 
   const PkgAsc = () => {
@@ -1278,7 +1280,7 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
             </th>
           </tr>
         </thead>
-        {sortedData.map((d) => (
+        {sortedData.map((d: Vulns) => (
           <MyTbody
             d = {d}
           />

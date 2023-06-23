@@ -41,31 +41,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         totalVulnsCount.push(count);
       } else {
         for (let v of dirList) {
-          const json = JSON.parse(readFileSync(`../../src/vulns_result/${v}`, "utf8")) as Vulns;
-          if (!json.vulns[0]) {
+          const json = JSON.parse(readFileSync(`../../src/vulns_result/${v}`, "utf8")) as Vulns[];
+          if (!json[0]) {
             console.log("/vulns_result/のファイル内にデータが記録されていません...");
           } else {
-            let hostname  = json.vulns[0].hostname;
+            let hostname  = json[0].hostname;
             let total     = 0;
             let critical  = 0;
             let important = 0;
             let moderate  = 0;
             let low       = 0;
-            for(let i = 0; i < json.vulns.length; i++) {
-              if (json.vulns[i].detect === null) {
+            for(let i = 0; i < json.length; i++) {
+              if (json[i].detect === null) {
                 continue;
               } else {
-                for(let c = 0; c < json.vulns[i].detect.length; c++) {
-                  if (json.vulns[i].detect[c].metadata.advisory.severity === "Critical") {
+                for(let c = 0; c < json[i].detect.length; c++) {
+                  if (json[i].detect[c].metadata.advisory.severity === "Critical") {
                     criticalTotal += 1;
                     critical += 1;
-                  } else if (json.vulns[i].detect[c].metadata.advisory.severity === "Important") {
+                  } else if (json[i].detect[c].metadata.advisory.severity === "Important") {
                     importantTotal += 1;
                     important += 1;
-                  } else if (json.vulns[i].detect[c].metadata.advisory.severity === "Moderate") {
+                  } else if (json[i].detect[c].metadata.advisory.severity === "Moderate") {
                     moderateTotal += 1;
                     moderate += 1;
-                  } else if (json.vulns[i].detect[c].metadata.advisory.severity === "Low") {
+                  } else if (json[i].detect[c].metadata.advisory.severity === "Low") {
                     lowTotal += 1;
                     low += 1;
                   } else {

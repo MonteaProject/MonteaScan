@@ -1,7 +1,7 @@
 use time::{OffsetDateTime, macros::offset, format_description};
 use serde::{Deserialize, Serialize};
 use serde_json::{Result, Value, Value::Null};
-use std::{vec, path::PathBuf, fs::File};
+use std::{path::PathBuf, fs::File};
 use std::io::{BufReader, Write};
 use std::path::Path;
 use std::option::Option;
@@ -30,11 +30,6 @@ struct PkgList {
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct Vulns {
-  vulns: Vec<VulnsList>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct VulnsList {
   time:        String,
   hostname:    String,
   ip:          Vec<String>,
@@ -133,9 +128,7 @@ async fn main() -> Result<()> {
   for f in file_vec {
     println!("load file: {:?}", f);
 
-    let mut vulns_vec: Vulns = Vulns {
-      vulns: vec![]
-    };
+    let mut vulns_vec: Vec<Vulns> = Vec::new();
 
     let file: File = match File::open(&f) {
       Ok(i) => i,
@@ -296,7 +289,7 @@ async fn main() -> Result<()> {
                           }
                         }
                         
-                        let vulns_list: VulnsList = VulnsList {
+                        let vulns_list: Vulns = Vulns {
                           time:        time.clone(),
                           hostname:    hostname.clone(),
                           ip:          ip.clone(),
@@ -318,10 +311,10 @@ async fn main() -> Result<()> {
                           pkgarch:     scan_p.pkgarch.clone(),
                           detect:      oval.clone()
                         };
-                        vulns_vec.vulns.push(vulns_list);
+                        vulns_vec.push(vulns_list);
                       }
                     } else {
-                      let vulns_list: VulnsList = VulnsList {
+                      let vulns_list: Vulns = Vulns {
                         time:        time.clone(),
                         hostname:    hostname.clone(),
                         ip:          ip.clone(),
@@ -343,7 +336,7 @@ async fn main() -> Result<()> {
                         pkgarch:     scan_p.pkgarch.clone(),
                         detect:      oval.clone()
                       };
-                      vulns_vec.vulns.push(vulns_list);
+                      vulns_vec.push(vulns_list);
                     }
                   }
                 }
@@ -436,7 +429,7 @@ async fn main() -> Result<()> {
                           }
                         }
                         
-                        let vulns_list: VulnsList = VulnsList {
+                        let vulns_list: Vulns = Vulns {
                           time:        time.clone(),
                           hostname:    hostname.clone(),
                           ip:          ip.clone(),
@@ -458,10 +451,10 @@ async fn main() -> Result<()> {
                           pkgarch:     scan_p.pkgarch.clone(),
                           detect:      oval.clone()
                         };
-                        vulns_vec.vulns.push(vulns_list);
+                        vulns_vec.push(vulns_list);
                       }
                     } else {
-                      let vulns_list: VulnsList = VulnsList {
+                      let vulns_list: Vulns = Vulns {
                         time:        time.clone(),
                         hostname:    hostname.clone(),
                         ip:          ip.clone(),
@@ -483,7 +476,7 @@ async fn main() -> Result<()> {
                         pkgarch:     scan_p.pkgarch.clone(),
                         detect:      oval.clone()
                       };
-                      vulns_vec.vulns.push(vulns_list);
+                      vulns_vec.push(vulns_list);
                     }
                   }
                 }
@@ -496,7 +489,7 @@ async fn main() -> Result<()> {
           }
         }
 
-        if vulns_vec.vulns.len() == detect_flag {
+        if vulns_vec.len() == detect_flag {
 
           let issued:      String = "-".to_string();
           let updated:     String = "-".to_string();
@@ -506,7 +499,7 @@ async fn main() -> Result<()> {
           let cwe_name:    String = "-".to_string();
           let cvssv3_oval: String = "-".to_string();
           
-          let vulns_list: VulnsList = VulnsList {
+          let vulns_list: Vulns = Vulns {
             time:        time.clone(),
             hostname:    hostname.clone(),
             ip:          ip.clone(),
@@ -529,9 +522,9 @@ async fn main() -> Result<()> {
             detect:      Null
           };
 
-          vulns_vec.vulns.push(vulns_list);
+          vulns_vec.push(vulns_list);
         } else {
-          detect_flag = vulns_vec.vulns.len();
+          detect_flag = vulns_vec.len();
         }
       }
     }

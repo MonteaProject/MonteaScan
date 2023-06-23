@@ -1,8 +1,4 @@
 export type Vulns = {
-    vulns: Detect[]
-};
-
-export type Detect = {
     time       : string,
     hostname   : string,
     ip         : string[],
@@ -22,14 +18,14 @@ export type Detect = {
     upver      : string,
     uprelease  : string,
     pkgarch    : string,
-    detect     : pkgDetect[]
+    detect     : pkgDetect[],
 };
 
 export type pkgDetect = {
     '@id'   : string,
     '@class': string,
     metadata: Metadata,
-    criteria: Criteria
+    criteria: Criteria,
 };
 
 export type Metadata = {
