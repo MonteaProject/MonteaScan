@@ -29,7 +29,6 @@ struct PkgList {
   pkgarch:     String
 }
 
-//
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct Vulns {
   vulns: Vec<VulnsList>
@@ -95,6 +94,9 @@ struct CweResult {
 async fn main() -> Result<()> {
   println!("start...");
 
+  let mut file_vec: Vec<String> = Vec::new();
+  let mut cwe_vec: Vec<CweResult> = Vec::new();
+
   let scan_path: String = String::from("./src/scan_result/");
   let scan_dir: PathBuf = PathBuf::from(scan_path);
   let files: std::fs::ReadDir = scan_dir.read_dir().expect("code[387]: フォルダが存在しません.");
@@ -119,9 +121,6 @@ async fn main() -> Result<()> {
   }
   std::fs::create_dir_all(&result_dir).unwrap();
 
-
-  let mut file_vec: Vec<String> = Vec::new();
-
   for file in files {
     let f: String = file.iter().map(|x| x.path().to_string_lossy().into_owned()).collect::<String>();
     let ext: Vec<&str> = f.split('.').collect();
@@ -138,8 +137,6 @@ async fn main() -> Result<()> {
     let mut vulns_vec: Vulns = Vulns {
       vulns: vec![]
     };
-
-    let mut cwe_vec: Vec<CweResult> = Vec::new();
 
     let file: File = match File::open(&f) {
       Ok(i) => i,
@@ -463,7 +460,6 @@ async fn main() -> Result<()> {
                           pkgarch:     scan_p.pkgarch.clone(),
                           detect:      oval.clone()
                         };
-
                         vulns_vec.vulns.push(vulns_list);
                       }
                     } else {
@@ -489,7 +485,6 @@ async fn main() -> Result<()> {
                         pkgarch:     scan_p.pkgarch.clone(),
                         detect:      oval.clone()
                       };
-
                       vulns_vec.vulns.push(vulns_list);
                     }
                   }
@@ -556,25 +551,24 @@ async fn main() -> Result<()> {
       .open(full_path).unwrap();
     w.write_all(serialized.as_bytes()).expect("Failed to Write vulns_result...");
 
-    // CWE
-    let utc: OffsetDateTime = OffsetDateTime::now_utc();
-    let jct: OffsetDateTime = utc.to_offset(offset!(+9));
-    let format: Vec<format_description::FormatItem<'_>> = format_description::parse("[year][month][day]").unwrap();
-    let time_ymd: String = jct.format(&format).unwrap();
-
-    let cwe_write: String = String::from("cwe_") + &time_ymd + ".json";
-    let full_path: String = String::from(&cwe_dir) + &cwe_write;
-
-    let serialized: String = serde_json::to_string(&cwe_vec).unwrap();
-    let mut w: std::fs::File = std::fs::OpenOptions::new()
-      .write(true)
-      .create(true)
-      .open(full_path).unwrap();
-    w.write_all(serialized.as_bytes()).expect("Failed to Write cwe_result...");
-    
-
     println!("finished: {:?}", f);
   }
+  // CWE
+  let utc: OffsetDateTime = OffsetDateTime::now_utc();
+  let jct: OffsetDateTime = utc.to_offset(offset!(+9));
+  let format: Vec<format_description::FormatItem<'_>> = format_description::parse("[year][month][day]").unwrap();
+  let time_ymd: String = jct.format(&format).unwrap();
+
+  let cwe_write: String = String::from("cwe_") + &time_ymd + ".json";
+  let full_path: String = String::from(&cwe_dir) + &cwe_write;
+
+  let serialized: String = serde_json::to_string(&cwe_vec).unwrap();
+  let mut w: std::fs::File = std::fs::OpenOptions::new()
+    .write(true)
+    .create(true)
+    .open(full_path).unwrap();
+  w.write_all(serialized.as_bytes()).expect("Failed to Write cwe_result...");
+
   println!("finished...");
 
   Ok(())
