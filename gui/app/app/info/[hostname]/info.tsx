@@ -57,6 +57,13 @@ function CweTable({v, d}: any) {
                 <Td>{c["@impact"]}</Td>
                 <Td>{c["@cwe"]}</Td>
                 <Td>{d.cwe_name}</Td>
+                {d.cwe_url_vec.map((r: string) => {
+                  return (
+                    <Link color="green.400" href={r} isExternal>
+                      <Td>{r} <ExternalLinkIcon mx="2px" /></Td>
+                    </Link>
+                  )
+                })}
                 <Link color="green.400" href={c["@href"]} isExternal>
                   <Td>{c["@href"]} <ExternalLinkIcon mx="2px" /></Td>
                 </Link>
