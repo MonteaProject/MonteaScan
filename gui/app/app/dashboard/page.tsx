@@ -1,3 +1,4 @@
+import { LineChart } from "./lineChart";
 import { VulnsList } from "../types/impactTypes";
 import NextLink from "next/link";
 import {
@@ -34,93 +35,98 @@ export default async function Dashboard() {
 
   return (
     <Box>
-      {vSum.map((s) => (
-      <StatGroup mb={4}>
-        <Stat>
-          <StatLabel>Total</StatLabel>
-          <CircularProgress max={total_per} value={total_per} size='140px' thickness='10px' color='green.400'>
-          <NextLink href="/server/">
-            <CircularProgressLabel _hover={{color: 'green.400'}}>{s.totalTotal}</CircularProgressLabel>
-          </NextLink>
-          </CircularProgress>
-        </Stat>
+      <Box>
+        {vSum.map((s) => (
+        <StatGroup mb={4}>
+          <Stat>
+            <StatLabel>Total</StatLabel>
+            <CircularProgress max={total_per} value={total_per} size='140px' thickness='10px' color='green.400'>
+            <NextLink href="/server/">
+              <CircularProgressLabel _hover={{color: 'green.400'}}>{s.totalTotal}</CircularProgressLabel>
+            </NextLink>
+            </CircularProgress>
+          </Stat>
+          
+          <Stat>
+            <StatLabel>Critical</StatLabel>
+            <CircularProgress max={total_per} value={critical_per} size='140px' thickness='10px' color='red.700'>
+            <NextLink href="/server/">
+              <CircularProgressLabel _hover={{color: 'green.400'}}>{s.criticalTotal}</CircularProgressLabel>
+            </NextLink>
+            </CircularProgress>
+          </Stat>
         
-        <Stat>
-          <StatLabel>Critical</StatLabel>
-          <CircularProgress max={total_per} value={critical_per} size='140px' thickness='10px' color='red.700'>
-          <NextLink href="/server/">
-            <CircularProgressLabel _hover={{color: 'green.400'}}>{s.criticalTotal}</CircularProgressLabel>
-          </NextLink>
-          </CircularProgress>
-        </Stat>
-      
-        <Stat>
-          <StatLabel>High</StatLabel>
-          <CircularProgress max={total_per} value={important_per} size='140px' thickness='10px' color='orange.400'>
-          <NextLink href="/server/">
-            <CircularProgressLabel _hover={{color: 'green.400'}}>{s.importantTotal}</CircularProgressLabel>
-          </NextLink>
-          </CircularProgress>
-        </Stat>
+          <Stat>
+            <StatLabel>High</StatLabel>
+            <CircularProgress max={total_per} value={important_per} size='140px' thickness='10px' color='orange.400'>
+            <NextLink href="/server/">
+              <CircularProgressLabel _hover={{color: 'green.400'}}>{s.importantTotal}</CircularProgressLabel>
+            </NextLink>
+            </CircularProgress>
+          </Stat>
 
-        <Stat>
-          <StatLabel>Medium</StatLabel>
-          <CircularProgress max={total_per} value={moderate_per} size='140px' thickness='10px' color='yellow.400'>
-          <NextLink href="/server/">
-            <CircularProgressLabel _hover={{color: 'green.400'}}>{s.moderateTotal}</CircularProgressLabel>
-          </NextLink>
-          </CircularProgress>
-        </Stat>
+          <Stat>
+            <StatLabel>Medium</StatLabel>
+            <CircularProgress max={total_per} value={moderate_per} size='140px' thickness='10px' color='yellow.400'>
+            <NextLink href="/server/">
+              <CircularProgressLabel _hover={{color: 'green.400'}}>{s.moderateTotal}</CircularProgressLabel>
+            </NextLink>
+            </CircularProgress>
+          </Stat>
 
-        <Stat>
-          <StatLabel>Low</StatLabel>
-          <CircularProgress max={total_per} value={low_per} size='140px' thickness='10px' color='blue.400'>
-          <NextLink href="/server/">
-            <CircularProgressLabel _hover={{color: 'green.400'}}>{s.lowTotal}</CircularProgressLabel>
-          </NextLink>
-          </CircularProgress>
-        </Stat>
-      </StatGroup>
-      ))}
-      
-      {vImpact.map((d) => (
-      <StatGroup>
-        <Stat>
-          <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/info/${d.hostname}`}>
-            <StatNumber _hover={{color: 'green.400'}}>{d.total}</StatNumber>
-          </NextLink>
-        </Stat>
+          <Stat>
+            <StatLabel>Low</StatLabel>
+            <CircularProgress max={total_per} value={low_per} size='140px' thickness='10px' color='blue.400'>
+            <NextLink href="/server/">
+              <CircularProgressLabel _hover={{color: 'green.400'}}>{s.lowTotal}</CircularProgressLabel>
+            </NextLink>
+            </CircularProgress>
+          </Stat>
+        </StatGroup>
+        ))}
         
-        <Stat>
-          <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/info/${d.hostname}`}>
-            <StatNumber _hover={{color: 'green.400'}}>{d.critical}</StatNumber>
-          </NextLink>
-        </Stat>
-      
-        <Stat>
-          <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/info/${d.hostname}`}>
-            <StatNumber _hover={{color: 'green.400'}}>{d.important}</StatNumber>
-          </NextLink>
-        </Stat>
+        {vImpact.map((d) => (
+        <StatGroup>
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <NextLink href={`/info/${d.hostname}`}>
+              <StatNumber _hover={{color: 'green.400'}}>{d.total}</StatNumber>
+            </NextLink>
+          </Stat>
+          
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <NextLink href={`/info/${d.hostname}`}>
+              <StatNumber _hover={{color: 'green.400'}}>{d.critical}</StatNumber>
+            </NextLink>
+          </Stat>
+        
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <NextLink href={`/info/${d.hostname}`}>
+              <StatNumber _hover={{color: 'green.400'}}>{d.important}</StatNumber>
+            </NextLink>
+          </Stat>
 
-        <Stat>
-          <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/info/${d.hostname}`}>
-            <StatNumber _hover={{color: 'green.400'}}>{d.moderate}</StatNumber>
-          </NextLink>
-        </Stat>
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <NextLink href={`/info/${d.hostname}`}>
+              <StatNumber _hover={{color: 'green.400'}}>{d.moderate}</StatNumber>
+            </NextLink>
+          </Stat>
 
-        <Stat>
-          <StatLabel>{d.hostname}</StatLabel>
-          <NextLink href={`/info/${d.hostname}`}>
-            <StatNumber _hover={{color: 'green.400'}}>{d.low}</StatNumber>
-          </NextLink>
-        </Stat>
-      </StatGroup>
-      ))}
+          <Stat>
+            <StatLabel>{d.hostname}</StatLabel>
+            <NextLink href={`/info/${d.hostname}`}>
+              <StatNumber _hover={{color: 'green.400'}}>{d.low}</StatNumber>
+            </NextLink>
+          </Stat>
+        </StatGroup>
+        ))}
+      </Box>
+      <Box>
+        <LineChart />
+      </Box>
     </Box>
   );
 }

@@ -1,7 +1,6 @@
 import "./serverList.scss";
 import { Server } from "../types/serverTypes";
 import NextLink from "next/link";
-import { Box } from "../common/components";
 import { notFound } from "next/navigation";
 
 async function getServerList() {
