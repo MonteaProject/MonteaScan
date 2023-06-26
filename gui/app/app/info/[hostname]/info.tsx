@@ -34,38 +34,76 @@ import {
 } from "../../common/components";
 
 
-function CweTable({v, d}: any) {
+function CveTable({v, d}: any) {
   return (
     <Box>
-      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>CWE情報</Heading>
-      <Table variant='simple'>
-        <Thead>
-          <Tr>
-            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CVE-ID</Th>
-            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>重要度</Th>
-            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CWE-ID</Th>
-            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>脆弱性の種類</Th>
-            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>リンク</Th>
-            <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>公開日</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {v.metadata.advisory.cve.map((c: Cve) => {
-            return (
-              <Tr>
-                <Td>{c["$value"]}</Td>
-                <Td>{c["@impact"]}</Td>
-                <Td>{c["@cwe"]}</Td>
-                <Td>{d.cwe_name}</Td>
-                <Link color="green.400" href={c["@href"]} isExternal>
-                  <Td>{c["@href"]} <ExternalLinkIcon mx="2px" /></Td>
-                </Link>
-                <Td>{c["@public"]}</Td>
-              </Tr>
-            )
-          })}
-        </Tbody>
-      </Table>
+      {v.metadata.advisory.cve.map((c: Cve) => {
+        return (
+          <Box>
+            <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>CVE情報（{c["$value"]}）</Heading>
+            <Table variant='simple'>
+                <Tr>
+                  <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CVE-ID</Th>
+                  <Td>{c["$value"]}</Td>
+                </Tr>
+                <Tr>
+                  <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>重要度</Th>
+                  <Td>{c["@impact"]}</Td>
+                </Tr>
+                <Tr>
+                  <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CVEリンク</Th>
+                  <Td>
+                    <Link color="green.400" href={c["@href"]} isExternal>
+                      {c["@href"]} <ExternalLinkIcon mx="2px" />
+                    </Link>
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CWE-ID</Th>
+                  <Td>{c["@cwe"]}</Td>
+                </Tr>
+                <Tr>
+                  <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>脆弱性の種類</Th>
+                  <Td>{d.cwe_name}</Td>
+                </Tr>
+                <Tr>
+                  <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CWEリンク</Th>
+                  <Td>
+                    {d.cwe_url_vec.map((r: string) => {
+                      return (
+                        <Link color="green.400" href={r} isExternal>
+                          {r} <ExternalLinkIcon mx="2px" />
+                        </Link>
+                      )
+                    })}
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>公開日</Th>
+                  <Td>{c["@public"].slice(0, 4) + '-' + c["@public"].slice(4, 6) + '-' + c["@public"].slice(6, 8)}</Td>
+                </Tr>
+
+                {/* <Tr>
+                  <Td>{c["$value"]}</Td>
+                  <Td>{c["@impact"]}</Td>
+                  <Td>{c["@cwe"]}</Td>
+                  <Td>{d.cwe_name}</Td>
+                  {d.cwe_url_vec.map((r: string) => {
+                    return (
+                      <Link color="green.400" href={r} isExternal>
+                        <Td>{r} <ExternalLinkIcon mx="2px" /></Td>
+                      </Link>
+                    )
+                  })}
+                  <Link color="green.400" href={c["@href"]} isExternal>
+                    <Td>{c["@href"]} <ExternalLinkIcon mx="2px" /></Td>
+                  </Link>
+                  <Td>{c["@public"]}</Td>
+                </Tr> */}
+            </Table>
+          </Box>
+        )
+      })}
     </Box>
   )
 }
@@ -118,23 +156,23 @@ function IpTable({d}: any) {
   )
 }
 
-function OvalInfo({v}: any) {
-  return (
-    <Box>
-      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>OVAL</Heading>
-      <Table variant='simple'>
-        <Tr>
-          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ID</Th>
-          <Td>{v["@id"]}</Td>
-        </Tr>
-        <Tr>
-          <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>クラス</Th>
-          <Td>{v["@class"]}</Td>
-        </Tr>
-      </Table>
-    </Box>
-  )
-}
+// function OvalInfo({v}: any) {
+//   return (
+//     <Box>
+//       <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>OVAL</Heading>
+//       <Table variant='simple'>
+//         <Tr>
+//           <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ID</Th>
+//           <Td>{v["@id"]}</Td>
+//         </Tr>
+//         <Tr>
+//           <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>クラス</Th>
+//           <Td>{v["@class"]}</Td>
+//         </Tr>
+//       </Table>
+//     </Box>
+//   )
+// }
 
 function FamilyTable({v}: any) {
   return (
@@ -788,20 +826,26 @@ function Body({d, v}: any) {
       <Heading size="sm" mb="2"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>説明</Heading>
       <p>{v.metadata.description}</p>
       <TableContainer overflowX="unset" overflowY="unset">
-        <CweTable
-          v = {v}
-          d = {d}
-        />
         <HostTable
           d = {d}
         />
         <IpTable
           d = {d}
         />
-        <OvalInfo
+        <FamilyTable
           v = {v}
         />
-        <FamilyTable
+        <CveTable
+          v = {v}
+          d = {d}
+        />
+        <BugzillaTable
+          v = {v}
+        />
+        <CvssTable
+          v = {v}
+        />
+        <AdvisoryTable
           v = {v}
         />
         <TitleTable
@@ -810,21 +854,15 @@ function Body({d, v}: any) {
         <ReferenceTable
           v = {v}
         />
-        <AdvisoryTable
-          v = {v}
-        />
-        <CvssTable
-          v = {v}
-        />
-        <BugzillaTable
-          v = {v}
-        />
         <CpeTable
           v = {v}
         />
         <SubjectTable
           v = {v}
         />
+        {/* <OvalInfo
+          v = {v}
+        /> */}
       </TableContainer>
     </Box>
   )

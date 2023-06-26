@@ -11,6 +11,7 @@ export type Vulns = {
     cvssv3_oval: string,
     cwe_oval   : string,
     cwe_name   : string,
+    cwe_url_vec: string[],
     pkgname    : string,
     pkgver     : string,
     pkgrelease : string,

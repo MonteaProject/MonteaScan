@@ -42,6 +42,7 @@ struct Vulns {
   cwe_oval:    String,
   cvssv3_oval: String,
   cwe_name:    String,
+  cwe_url_vec: Vec<String>,
   pkgname:     String,
   pkgver:      String,
   pkgrelease:  String,
@@ -242,6 +243,7 @@ async fn main() -> Result<()> {
                     let mut cvssv3_oval: String = "-".to_string();
                     let mut cwe_oval:    String = "-".to_string();
                     let mut cwe_name:    String = "-".to_string();
+                    let mut cwe_url_vec: Vec<String> = vec!["-".to_string(); 0];
 
                     let cwe_read: String = String::from("./src/cwe/cwe.json");
                     let cwe: Cwe = {
@@ -268,11 +270,19 @@ async fn main() -> Result<()> {
                         if oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"] != Null {
                           cwe_oval = oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"].to_string().replace('"', "");
 
-                          let cwe_ovalid = &cwe_oval.replace("CWE-", "");
+                          let s1: &String   = &cwe_oval.replace("CWE-", "");
+                          let s2: &String   = &s1.replace('(', "");
+                          let s3: &String   = &s2.replace(')', "");
+                          let s4: Vec<&str> = s3.split('|').collect();
+                          for i in s4 {
+                            let cwe_url = String::from("https://cwe.mitre.org/data/definitions/") + i + ".html";
+                            cwe_url_vec.push(cwe_url);
+                          }
+                          
                           for i in 0..cwe.Weaknesses.Weakness.len() {
                             let cwe_id = &cwe.Weaknesses.Weakness[i].id.clone().unwrap_or(0.to_string());
 
-                            if cwe_ovalid == cwe_id {
+                            if s1 == cwe_id {
                               cwe_name = cwe.Weaknesses.Weakness[i].name.clone().unwrap_or("None".to_string());
 
                               let cwe_list: CweResult = CweResult{
@@ -301,6 +311,7 @@ async fn main() -> Result<()> {
                           cveid:       cveid.clone(),
                           cwe_oval:    cwe_oval.clone(),
                           cwe_name:    cwe_name.clone(),
+                          cwe_url_vec: cwe_url_vec.clone(),
                           cvssv3_oval: cvssv3_oval.clone(),
                           pkgname:     scan_p.pkgname.clone(),
                           pkgver:      scan_p.pkgver.clone(),
@@ -326,6 +337,7 @@ async fn main() -> Result<()> {
                         cveid:       cveid.clone(),
                         cwe_oval:    cwe_oval.clone(),
                         cwe_name:    cwe_name.clone(),
+                        cwe_url_vec: cwe_url_vec.clone(),
                         cvssv3_oval: cvssv3_oval.clone(),
                         pkgname:     scan_p.pkgname.clone(),
                         pkgver:      scan_p.pkgver.clone(),
@@ -382,6 +394,7 @@ async fn main() -> Result<()> {
                     let mut cvssv3_oval: String = "-".to_string();
                     let mut cwe_oval:    String = "-".to_string();
                     let mut cwe_name:    String = "-".to_string();
+                    let mut cwe_url_vec: Vec<String> = vec!["-".to_string(); 0];
 
                     let cwe_read: String = String::from("./src/cwe/cwe.json");
                     let cwe: Cwe = {
@@ -408,11 +421,19 @@ async fn main() -> Result<()> {
                         if oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"] != Null {
                           cwe_oval = oval[0]["metadata"]["advisory"]["cve"][i]["@cwe"].to_string().replace('"', "");
 
-                          let cwe_ovalid = &cwe_oval.replace("CWE-", "");
+                          let s1: &String   = &cwe_oval.replace("CWE-", "");
+                          let s2: &String   = &s1.replace('(', "");
+                          let s3: &String   = &s2.replace(')', "");
+                          let s4: Vec<&str> = s3.split('|').collect();
+                          for i in s4 {
+                            let cwe_url = String::from("https://cwe.mitre.org/data/definitions/") + i + ".html";
+                            cwe_url_vec.push(cwe_url);
+                          }
+                          
                           for i in 0..cwe.Weaknesses.Weakness.len() {
                             let cwe_id = &cwe.Weaknesses.Weakness[i].id.clone().unwrap_or(0.to_string());
 
-                            if cwe_ovalid == cwe_id {
+                            if s1 == cwe_id {
                               cwe_name = cwe.Weaknesses.Weakness[i].name.clone().unwrap_or("None".to_string());
 
                               let cwe_list: CweResult = CweResult{
@@ -441,6 +462,7 @@ async fn main() -> Result<()> {
                           cveid:       cveid.clone(),
                           cwe_oval:    cwe_oval.clone(),
                           cwe_name:    cwe_name.clone(),
+                          cwe_url_vec: cwe_url_vec.clone(),
                           cvssv3_oval: cvssv3_oval.clone(),
                           pkgname:     scan_p.pkgname.clone(),
                           pkgver:      scan_p.pkgver.clone(),
@@ -466,6 +488,7 @@ async fn main() -> Result<()> {
                         cveid:       cveid.clone(),
                         cwe_oval:    cwe_oval.clone(),
                         cwe_name:    cwe_name.clone(),
+                        cwe_url_vec: cwe_url_vec.clone(),
                         cvssv3_oval: cvssv3_oval.clone(),
                         pkgname:     scan_p.pkgname.clone(),
                         pkgver:      scan_p.pkgver.clone(),
@@ -497,6 +520,7 @@ async fn main() -> Result<()> {
           let cveid:       String = "-".to_string();
           let cwe_oval:    String = "-".to_string();
           let cwe_name:    String = "-".to_string();
+          let cwe_url_vec: Vec<String> = vec!["-".to_string(); 0];
           let cvssv3_oval: String = "-".to_string();
           
           let vulns_list: Vulns = Vulns {
@@ -511,6 +535,7 @@ async fn main() -> Result<()> {
             cveid:       cveid.clone(),
             cwe_oval:    cwe_oval.clone(),
             cwe_name:    cwe_name.clone(),
+            cwe_url_vec: cwe_url_vec.clone(),
             cvssv3_oval: cvssv3_oval.clone(),
             pkgname:     scan_p.pkgname.clone(),
             pkgver:      scan_p.pkgver.clone(),

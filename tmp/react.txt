@@ -44,3 +44,14 @@ app/about/page.js
 page.tsx ルーティングに対応する UI を定義するファイル
 layout.tsx すべてのページ共通で使われるナビゲーションヘッダーなどに加えて <html> タグや <body> タグを設定する
 loading.js 特殊ファイル ローディング UI
+
+
+# npm install -force chart.js react-chartjs-2 chartjs-plugin-streaming
+
+react-chartjs-2・・・Chart.jsをReact.js上で利用できるようにしたラッパーライブラリ
+chartjs-plugin-streaming・・・リアルタイムストリーミングデータ向けのChart.jsの拡張プラグイン
+
+# npm install -force date-fns chartjs-adapter-date-fns
+Moment.js は非常に重いライブラリであるため、クライアント側の開発には推奨されません。
+最小のバンドルサイズにはchartjs-adapter-date-fns を、 i18n やタイム ゾーンのサポートなどの追加機能が含まれる
+大きなバンドルサイズにはchartjs-adapter-luxon を使用することをお勧めします。
