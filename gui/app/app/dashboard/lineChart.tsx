@@ -1,12 +1,40 @@
 "use client";
+// import React from 'react';
+// import Chart from 'chart.js/auto';
+// import { Line } from 'react-chartjs-2';
+// import StreamingPlugin from 'chartjs-plugin-streaming';
+// Chart.register(StreamingPlugin);
+// import 'chartjs-adapter-date-fns';
+// import { ja } from 'date-fns/locale';
+// import { Box } from '../common/components';
+
 import React from 'react';
-import Chart from 'chart.js/auto';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import StreamingPlugin from 'chartjs-plugin-streaming';
-Chart.register(StreamingPlugin);
 import 'chartjs-adapter-date-fns';
 import { ja } from 'date-fns/locale';
 import { Box } from '../common/components';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  StreamingPlugin
+);
 
 export function LineChart() {
   return (

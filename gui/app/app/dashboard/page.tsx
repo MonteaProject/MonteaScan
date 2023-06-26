@@ -1,4 +1,19 @@
-import { LineChart } from "./lineChart";
+import { LineChart }           from "./lineChart";
+import { LineChart2 }          from "./lineChart2";
+import { HorizontalBarChart }  from "./horizontalBarChart";
+import { DoughnutChart }       from "./doughnutChart";
+import { BubbleChart }         from "./bubbleChart";
+import { MultiTypeChart }      from "./multiTypeChart";
+import { ScatterChart }        from "./scatterChart";
+import { PolarChart }          from "./polarChart";
+import { RadarChart }          from "./radarChart";
+import { MultiLineChart }      from "./multiLineChart";
+import { AreaChart }           from "./areaChart";
+import { VerticalBarChart }    from "./verticalBarChart";
+import { HorizontalBarChart2 } from "./horizontalBarChart2";
+import { StackedBarChart }     from "./stackedBarChart";
+import { GroupedBarChart }     from "./groupedBarChart";
+
 import { VulnsList } from "../types/impactTypes";
 import NextLink from "next/link";
 import {
@@ -126,6 +141,48 @@ export default async function Dashboard() {
       </Box>
       <Box>
         <LineChart />
+      </Box>
+      <Box>
+        <HorizontalBarChart />
+      </Box>
+      <Box>
+        <DoughnutChart />
+      </Box>
+      <Box>
+        <BubbleChart />
+      </Box>
+      <Box>
+        <LineChart2 />
+      </Box>
+      <Box>
+        <MultiLineChart />
+      </Box>
+      <Box>
+        <MultiTypeChart />
+      </Box>
+      <Box>
+        <ScatterChart />
+      </Box>
+      <Box>
+        <PolarChart />
+      </Box>
+      <Box>
+        <RadarChart />
+      </Box>
+      <Box>
+        <AreaChart />
+      </Box>
+      <Box>
+        <VerticalBarChart />
+      </Box>
+      <Box>
+        <HorizontalBarChart2 />
+      </Box>
+      <Box>
+        <StackedBarChart />
+      </Box>
+      <Box>
+        <GroupedBarChart />
       </Box>
     </Box>
   );

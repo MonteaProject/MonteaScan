@@ -71,9 +71,11 @@ function CveTable({v, d}: any) {
                   <Td>
                     {d.cwe_url_vec.map((r: string) => {
                       return (
-                        <Link color="green.400" href={r} isExternal>
-                          {r} <ExternalLinkIcon mx="2px" />
-                        </Link>
+                        <Tr>
+                          <Link color="green.400" href={r} isExternal>
+                            {r} <ExternalLinkIcon mx="2px" />
+                          </Link>
+                        </Tr>
                       )
                     })}
                   </Td>
