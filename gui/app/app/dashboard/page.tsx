@@ -23,7 +23,10 @@ import {
   StatGroup,
   CircularProgress,
   CircularProgressLabel,
-  Box
+  Box,
+  Flex,
+  Tooltip,
+  InfoOutlineIcon,
 } from "../common/components";
 
 async function getVulnsList() {
@@ -139,51 +142,81 @@ export default async function Dashboard() {
         </StatGroup>
         ))}
       </Box>
-      <Box>
-        <LineChart />
-      </Box>
-      <Box>
-        <HorizontalBarChart />
-      </Box>
-      <Box>
-        <DoughnutChart />
-      </Box>
-      <Box>
-        <BubbleChart />
-      </Box>
-      <Box>
-        <LineChart2 />
-      </Box>
-      <Box>
-        <MultiLineChart />
-      </Box>
-      <Box>
-        <MultiTypeChart />
-      </Box>
-      <Box>
-        <ScatterChart />
-      </Box>
-      <Box>
-        <PolarChart />
-      </Box>
-      <Box>
-        <RadarChart />
-      </Box>
-      <Box>
-        <AreaChart />
-      </Box>
-      <Box>
-        <VerticalBarChart />
-      </Box>
-      <Box>
-        <HorizontalBarChart2 />
-      </Box>
-      <Box>
-        <StackedBarChart />
-      </Box>
-      <Box>
-        <GroupedBarChart />
-      </Box>
+      
+      <Flex mt="30px" mb="30px">
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <LineChart />
+        </Box>
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <HorizontalBarChart />
+        </Box>
+      </Flex>
+      <Flex mt="30px" mb="30px">
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <LineChart2 />
+        </Box>
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <MultiTypeChart />
+        </Box>
+      </Flex>
+      <Flex mt="30px" mb="30px">
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <DoughnutChart />
+        </Box>
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <PolarChart />
+        </Box>
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <RadarChart />
+        </Box>
+      </Flex>
+      <Flex mt="30px" mb="30px">
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <MultiLineChart />
+        </Box>
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <AreaChart />
+        </Box>
+      </Flex>
+      <Flex mt="30px" mb="30px">
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <BubbleChart />
+        </Box>
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <ScatterChart />
+        </Box>
+      </Flex>
+      <Flex mt="30px" mb="30px">
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <VerticalBarChart />
+        </Box>
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <HorizontalBarChart2 />
+        </Box>
+      </Flex>
+      <Flex mt="30px" mb="30px">
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <StackedBarChart />
+        </Box>
+        <Box w="100%">
+          <Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>
+          <GroupedBarChart />
+        </Box>
+      </Flex>
     </Box>
   );
 }
