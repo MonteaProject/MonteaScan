@@ -60,7 +60,7 @@ export default async function Dashboard() {
         {vSum.map((s) => (
         <StatGroup mb={5}>
           <Stat>
-            <StatLabel fontSize="lg"><Tooltip label='test' fontSize='md'><ViewIcon mb="1" mr="1" /></Tooltip> Total</StatLabel>
+            <StatLabel fontSize="lg">Total</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={total_per} size='180px' thickness='16px' color='green.400'>
               <NextLink href="/server/">
@@ -71,7 +71,7 @@ export default async function Dashboard() {
           </Stat>
           
           <Stat>
-            <StatLabel fontSize="lg"><Tooltip label='test' fontSize='md'><ViewIcon mb="1" mr="1" /></Tooltip> Critical</StatLabel>
+            <StatLabel fontSize="lg">Critical</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={critical_per} size='180px' thickness='16px' color='red.700'>
               <NextLink href="/server/">
@@ -82,7 +82,7 @@ export default async function Dashboard() {
           </Stat>
         
           <Stat>
-            <StatLabel fontSize="lg"><Tooltip label='test' fontSize='md'><ViewIcon mb="1" mr="1" /></Tooltip> High</StatLabel>
+            <StatLabel fontSize="lg">High</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={important_per} size='180px' thickness='16px' color='orange.400'>
               <NextLink href="/server/">
@@ -93,7 +93,7 @@ export default async function Dashboard() {
           </Stat>
 
           <Stat>
-            <StatLabel fontSize="lg"><Tooltip label='test' fontSize='md'><ViewIcon mb="1" mr="1" /></Tooltip> Medium</StatLabel>
+            <StatLabel fontSize="lg">Medium</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={moderate_per} size='180px' thickness='16px' color='yellow.400'>
               <NextLink href="/server/">
@@ -104,7 +104,7 @@ export default async function Dashboard() {
           </Stat>
 
           <Stat>
-            <StatLabel fontSize="lg"><Tooltip label='test' fontSize='md'><ViewIcon mb="1" mr="1" /></Tooltip> Low</StatLabel>
+            <StatLabel fontSize="lg">Low</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={low_per} size='180px' thickness='16px' color='blue.400'>
               <NextLink href="/server/">
