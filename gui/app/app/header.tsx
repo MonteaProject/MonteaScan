@@ -13,12 +13,14 @@ import {
   ExternalLinkIcon,
   SettingsIcon,
   LinkIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  Container
 } from "./common/components";
 
 export default function Header() {
   return (
     <Flex align="center" minH={"60px"} color="green.300" bg="white" borderBottom={1} borderStyle="solid" borderColor="gray.200">
+      <Container maxW="container.xl">
       <HStack direction={["column", "row"]} spacing="24px">
         <Box pl={10}>
           <NextLink href="/">
@@ -46,6 +48,7 @@ export default function Header() {
           </MenuList>
         </Menu>
       </HStack>
+    </Container>
     </Flex>
   );
 }

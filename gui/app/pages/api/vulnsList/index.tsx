@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (!json[0]) {
             console.log("/vulns_result/のファイル内にデータが記録されていません...");
           } else {
-            let hostname  = json[0].hostname;
+            let hostname  = json[0].hostname.substring(0, 25);
             let total     = 0;
             let critical  = 0;
             let important = 0;
