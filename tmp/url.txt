@@ -42,6 +42,7 @@ https://www.ipa.go.jp/security/vuln/scap/oval.html
 
 RockyLinux OVAL
 https://dl.rockylinux.org/pub/oval/
+https://errata.rockylinux.org/
 
 AlmaLinux OVAL
 https://repo.almalinux.org/security/oval/
