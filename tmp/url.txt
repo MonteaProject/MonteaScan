@@ -49,3 +49,13 @@ https://repo.almalinux.org/security/oval/
 
 共通脆弱性評価システムCVSS v3概説
 https://www.ipa.go.jp/security/vuln/scap/cvssv3.html
+
+Ubuntuのライフサイクルとリリースペース
+https://ubuntu.com/about/release-cycle
+
+Ubuntuのセキュリティ通知
+https://ubuntu.com/security/notices
+
+Ubuntu OVAL
+https://ubuntu.com/security/oval
+https://security-metadata.canonical.com/oval/
