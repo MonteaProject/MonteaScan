@@ -1,0 +1,35 @@
+# lsb_release -idrc
+Distributor ID: Ubuntu
+Description:    Ubuntu 22.04.2 LTS
+Release:        22.04
+Codename:       jammy
+#
+
+# apt update
+Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu jammy-updates InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu jammy-security InRelease
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+3 packages can be upgraded. Run 'apt list --upgradable' to see them.
+#
+
+# apt list --upgradable
+Listing... Done
+linux-generic/jammy-updates 5.15.0.76.74 amd64 [upgradable from: 5.15.0.75.73]
+linux-headers-generic/jammy-updates 5.15.0.76.74 amd64 [upgradable from: 5.15.0.75.73]
+linux-image-generic/jammy-updates 5.15.0.76.74 amd64 [upgradable from: 5.15.0.75.73]
+#
+
+# apt list --installed
+vim-common/jammy-updates,jammy-security,now 2:8.2.3995-1ubuntu2.8 all [installed,automatic]
+vim-runtime/jammy-updates,jammy-security,now 2:8.2.3995-1ubuntu2.8 all [installed,automatic]
+vim-tiny/jammy-updates,jammy-security,now 2:8.2.3995-1ubuntu2.8 amd64 [installed,automatic]
+vim/jammy-updates,jammy-security,now 2:8.2.3995-1ubuntu2.8 amd64 [installed,automatic]
+# 
+
+linux-headers-5.15.0-75/jammy-updates,jammy-security,now    5.15.0-75.82     all    [installed,automatic]
+linux-headers-generic/jammy-security,now                    5.15.0.75.73    amd64   [installed,upgradable   to:     5.15.0.76.74]
+linux-image-5.15.0-60-generic/now                           5.15.0-60.66    amd64   [installed,local]

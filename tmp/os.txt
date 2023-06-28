@@ -1,0 +1,9 @@
+①RedHat
+②AlmaLinux
+③RockyLinux
+④Ubuntu
+
+⑤OpenSUSE
+⑥Debian
+⑦OracleLinux
+⑧Windows

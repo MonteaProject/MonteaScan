@@ -49,3 +49,11 @@ CSIRT、セキュリティアナリスト、運用担当者など）
 デザイン向上→ ダッシュボード(折れ線グラフ、時系列など)
 OSリリース/EOLの追跡→ 新バージョンリリース、サポート終了など追跡できる仕組み
 検証環境の用意→ 30台(サポート台数分)、負荷テスト、日次実行
+
+・RedHat
+・AlmaLinux
+・RockyLinux
+・Ubuntu
+・OpenSUSE
+・Debian
+・OracleLinux
