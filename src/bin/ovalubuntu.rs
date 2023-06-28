@@ -56,14 +56,11 @@ struct UbuntuReference {
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct UbuntuAdvisory {
   #[serde(rename = "@from")]
-  from:              Option<String>,
-  severity:          Option<String>,
-//   rights:            Option<String>,
-  issued:            Option<UbuntuIssued>,
-//   updated:           Option<RhelUpdated>,
-  cve:               Option<Vec<UbuntuCve>>,
-//   bugzilla:          Option<Vec<RhelBugzilla>>,
-//   affected_cpe_list: Option<RhelAffectedCpeList>
+  from:     Option<String>,
+  severity: Option<String>,
+  issued:   Option<UbuntuIssued>,
+  cve:      Option<Vec<UbuntuCve>>,
+  bug:      Option<Vec<String>>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -73,75 +70,32 @@ struct UbuntuIssued {
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct RhelUpdated {
-  #[serde(rename = "@date")]
-  date: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct UbuntuCve {
-//   #[serde(rename = "@cvss2")]
-//   cvss2:  Option<String>,
-//   #[serde(rename = "@cvss3")]
-//   cvss3:  Option<String>,
   #[serde(rename = "@cvss_score")]
   cvss_score:  Option<String>,
   #[serde(rename = "@cvss_vector")]
-  cvss_vector:  Option<String>,
-//   #[serde(rename = "@cwe")]
-//   cwe:    Option<String>,
+  cvss_vector: Option<String>,
   #[serde(rename = "@href")]
-  href:   Option<String>,
-//   #[serde(rename = "@impact")]
-//   impact: Option<String>,
+  href:        Option<String>,
   #[serde(rename = "@severity")]
-  severity: Option<String>,
+  severity:    Option<String>,
   #[serde(rename = "@public")]
-  public: Option<String>,
+  public:      Option<String>,
   #[serde(rename = "$value")]
-  cve:    Option<String>,
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct RhelBugzilla {
-  #[serde(rename = "@href")]
-  href:     Option<String>,
-  #[serde(rename = "@id")]
-  id:       Option<String>,
-  #[serde(rename = "$value")]
-  bugzilla: Option<String>
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct RhelAffectedCpeList {
-  cpe: Option<Vec<String>>
+  cve:         Option<String>,
+  #[serde(rename = "@usns")]
+  usns:        Option<String>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct UbuntuCriteria {
   #[serde(rename = "@operator")]
   operator:  Option<String>,
-//   criterion: Option<Vec<RhelCriterion>>,
-  criteria:  Option<Vec<UbuntuCriteria2>>
-}
-
-// #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-// struct RhelCriterion {
-//   #[serde(rename = "@comment")]
-//   comment:  Option<String>,
-//   #[serde(rename = "@test_ref")]
-//   test_ref: Option<String>
-// }
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct UbuntuCriteria2 {
-  #[serde(rename = "@operator")]
-  operator:  Option<String>,
-  criterion: Option<Vec<UbuntuCriterion2>>
+  criterion: Option<Vec<UbuntuCriterion>>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct UbuntuCriterion2 {
+struct UbuntuCriterion {
   #[serde(rename = "@comment")]
   comment:  Option<String>,
   #[serde(rename = "@test_ref")]
@@ -182,10 +136,10 @@ async fn main() -> Result<()> {
     let mut resp_body: String = String::new();
     gz.read_to_string(&mut resp_body).unwrap();
 
-    let oval_rhel: OvalRhel = from_str(&resp_body).unwrap();
+    let oval_rhel: OvalUbuntu = from_str(&resp_body).unwrap();
 
     let col: String = String::from("RHEL") + v;
-    let typed_collection: mongodb::Collection<RhelDefinition> = db.collection::<RhelDefinition>(&col);
+    let typed_collection: mongodb::Collection<UbuntuDefinition> = db.collection::<UbuntuDefinition>(&col);
     
     let filter: bson::Document = doc! {};
     let delete_result: mongodb::results::DeleteResult = typed_collection.delete_many(filter, None).await.unwrap();
