@@ -60,7 +60,7 @@ export default async function Dashboard() {
         {vSum.map((s) => (
         <StatGroup mb={5}>
           <Stat>
-            <StatLabel fontSize="lg">Total</StatLabel>
+            <StatLabel fontSize="md">Total</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={total_per} size='180px' thickness='16px' color='green.400'>
               <NextLink href="/server/">
@@ -71,7 +71,7 @@ export default async function Dashboard() {
           </Stat>
           
           <Stat>
-            <StatLabel fontSize="lg">Critical</StatLabel>
+            <StatLabel fontSize="md">Critical</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={critical_per} size='180px' thickness='16px' color='red.700'>
               <NextLink href="/server/">
@@ -82,7 +82,7 @@ export default async function Dashboard() {
           </Stat>
         
           <Stat>
-            <StatLabel fontSize="lg">High</StatLabel>
+            <StatLabel fontSize="md">High</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={important_per} size='180px' thickness='16px' color='orange.400'>
               <NextLink href="/server/">
@@ -93,7 +93,7 @@ export default async function Dashboard() {
           </Stat>
 
           <Stat>
-            <StatLabel fontSize="lg">Medium</StatLabel>
+            <StatLabel fontSize="md">Medium</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={moderate_per} size='180px' thickness='16px' color='yellow.400'>
               <NextLink href="/server/">
@@ -104,7 +104,7 @@ export default async function Dashboard() {
           </Stat>
 
           <Stat>
-            <StatLabel fontSize="lg">Low</StatLabel>
+            <StatLabel fontSize="md">Low</StatLabel>
             <Center>
               <CircularProgress max={total_per} value={low_per} size='180px' thickness='16px' color='blue.400'>
               <NextLink href="/server/">

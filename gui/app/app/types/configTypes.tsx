@@ -6,5 +6,6 @@ export type EachConfig = {
     user: string,
     host: string,
     port: string,
-    key : string
+    key : string,
+    os  : string,
 };
