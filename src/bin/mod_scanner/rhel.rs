@@ -52,7 +52,7 @@ struct UpdateList {
   repo: String
 }
 
-fn main() -> Result<()> {
+pub fn main() -> Result<()> {
   let result_dir = String::from("./src/scan_result/");
   let result_dirpath = Path::new(&result_dir);
 
