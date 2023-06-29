@@ -32,7 +32,10 @@ import {
   Th,
   Td,
   TableCaption,
-  TableContainer
+  TableContainer,
+  Radio,
+  RadioGroup,
+  Stack,
 } from "../common/components";
 
 
@@ -57,13 +60,17 @@ export default async function ConfigList() {
     user: "",
     host: "",
     port: "",
-    key : ""
+    key : "",
+    os  : "",
   });
+
+  const [test, setValue] = useState("");
 
   const inputHost = useRef<HTMLInputElement>(null);
   const inputPort = useRef<HTMLInputElement>(null);
   const inputUser = useRef<HTMLInputElement>(null);
   const inputKey  = useRef<HTMLInputElement>(null);
+  const inputOS   = useRef<HTMLInputElement>(null);
   
   const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
   const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
@@ -96,6 +103,12 @@ export default async function ConfigList() {
     }
   }, []);
 
+  useEffect(() => {
+    if (inputOS.current != null) {
+      inputOS.current.focus();
+    }
+  }, []);
+
   async function patchClick() {
     const user = inputUser.current?.value;
     if (!user) throw Error("ERROR: user null...");
@@ -109,6 +122,9 @@ export default async function ConfigList() {
     const key  = inputKey.current?.value;
     if (!key) throw Error("ERROR: key null...");
 
+    // const os   = inputOS.current?.value;
+    // if (!os) throw Error("ERROR: OS null...");
+
     try {
       await fetch("/api/config/patch/", {
         method: "PATCH",
@@ -119,7 +135,8 @@ export default async function ConfigList() {
           user: user,
           host: host,
           port: port,
-          key : key
+          key : key,
+          os  : test,
         }),
         cache: "no-store"
       }).then((res) => {
@@ -170,6 +187,9 @@ export default async function ConfigList() {
     const key  = inputKey.current?.value;
     if (!key) throw Error("ERROR: key null...");
 
+    // const os   = inputOS.current?.value;
+    // if (!os) throw Error("ERROR: OS null...");
+
     try {
       await fetch("/api/config/post/", {
         method: "POST",
@@ -180,7 +200,8 @@ export default async function ConfigList() {
           user: user,
           host: host,
           port: port,
-          key : key
+          key : key,
+          os  : test,
         }),
         cache: "no-store"
       }).then((res) => {
@@ -215,11 +236,13 @@ export default async function ConfigList() {
               <Th>ユーザー名</Th>
               <Th>ポート番号</Th>
               <Th>SSH秘密鍵</Th>
+              <Th>OS</Th>
               <Th>編集</Th>
             </Tr>
           </Thead>
           <Tbody>
             <Tr>
+              <Td></Td>
               <Td></Td>
               <Td></Td>
               <Td></Td>
@@ -232,10 +255,11 @@ export default async function ConfigList() {
               <Td>{v.user}</Td>
               <Td>{v.port}</Td>
               <Td>{v.key}</Td>
+              <Td>{v.os}</Td>
               <Td>
                 <Button onClick={() => {
                   modalOpen();
-                  setEdit({ ...value, user: v.user, host: v.host, port: v.port, key: v.key});
+                  setEdit({ ...value, user: v.user, host: v.host, port: v.port, key: v.key, os: v.os });
                 }}
                 ref={finalRef}
                 colorScheme="gray">編集
@@ -262,6 +286,7 @@ export default async function ConfigList() {
           <ModalHeader>スキャン対象サーバ</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
+
             <FormControl isRequired>
               <FormLabel htmlFor="host">IPアドレス</FormLabel>
               <Input
@@ -307,6 +332,22 @@ export default async function ConfigList() {
                 MonteaScanサーバーにSSH秘密鍵、スキャン対象サーバーにSSH公開鍵が配置されている必要があります。
               </FormHelperText>
             </FormControl>
+
+            {/* <FormControl isRequired>
+              <FormLabel htmlFor="key">OS</FormLabel> */}
+              <RadioGroup defaultValue={value.os} onChange={setValue} value={test}>
+                <Stack direction='row'>
+                  <Radio value='1'>RedHat</Radio>
+                  <Radio value='2'>AlmaLinux</Radio>
+                  <Radio value='3'>RockyLinux</Radio>
+                  <Radio value='4'>Ubuntu</Radio>
+                </Stack>
+              </RadioGroup>
+              {/* <FormHelperText>
+                テスト
+              </FormHelperText>
+            </FormControl> */}
+
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="red" onClick={onAlertOpen} mr={3}>
@@ -358,6 +399,7 @@ export default async function ConfigList() {
           <ModalHeader>スキャン対象サーバ</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
+
             <FormControl isRequired>
               <FormLabel htmlFor="host">IPアドレス</FormLabel>
               <Input
@@ -403,6 +445,22 @@ export default async function ConfigList() {
                 MonteaScanサーバーにSSH秘密鍵、スキャン対象サーバーにSSH公開鍵が配置されている必要があります。
               </FormHelperText>
             </FormControl>
+
+            {/* <FormControl isRequired>
+              <FormLabel htmlFor="key">OS</FormLabel> */}
+              <RadioGroup onChange={setValue} value={test} defaultValue={value.os}>
+                <Stack direction='row'>
+                  <Radio value='1'>RedHat</Radio>
+                  <Radio value='2'>AlmaLinux</Radio>
+                  <Radio value='3'>RockyLinux</Radio>
+                  <Radio value='4'>Ubuntu</Radio>
+                </Stack>
+              </RadioGroup>
+              {/* <FormHelperText>
+                テスト
+              </FormHelperText>
+            </FormControl> */}
+
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" onClick={onModalAddClose} mr={3}>
