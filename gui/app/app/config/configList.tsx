@@ -64,66 +64,152 @@ export default async function ConfigList() {
     os  : "",
   });
 
-  const [test, setValue] = useState("");
+  const hostRef = useRef<HTMLInputElement>(null);
+  const portRef = useRef<HTMLInputElement>(null);
+  const userRef = useRef<HTMLInputElement>(null);
+  const keyRef  = useRef<HTMLInputElement>(null);
 
-  const inputHost = useRef<HTMLInputElement>(null);
-  const inputPort = useRef<HTMLInputElement>(null);
-  const inputUser = useRef<HTMLInputElement>(null);
-  const inputKey  = useRef<HTMLInputElement>(null);
-  const inputOS   = useRef<HTMLInputElement>(null);
+  const rhelRef   = useRef<HTMLInputElement>(null);
+  const almaRef   = useRef<HTMLInputElement>(null);
+  const rockyRef  = useRef<HTMLInputElement>(null);
+  const ubuntuRef = useRef<HTMLInputElement>(null);
+
+  const cancelRef  = useRef<HTMLButtonElement>(null);
+  const initialRef = useRef<HTMLButtonElement>(null);
+  const finalRef   = useRef<HTMLButtonElement>(null);
   
   const { isOpen: isAlertOpen, onOpen: onAlertOpen, onClose: onAlertClose } = useDisclosure();
   const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure();
   const { isOpen: isModalAddOpen, onOpen: onModalAddOpen, onClose: onModalAddClose } = useDisclosure();
-  const cancelRef  = useRef<HTMLButtonElement>(null);
-  const initialRef = useRef<HTMLButtonElement>(null);
-  const finalRef   = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (inputHost.current != null) {
-      inputHost.current.focus();
+    if (hostRef.current != null) {
+      hostRef.current.focus();
     }
   }, []);
 
   useEffect(() => {
-    if (inputPort.current != null) {
-      inputPort.current.focus();
+    if (portRef.current != null) {
+      portRef.current.focus();
     }
   }, []);
 
   useEffect(() => {
-    if (inputUser.current != null) {
-      inputUser.current.focus();
+    if (userRef.current != null) {
+      userRef.current.focus();
     }
   }, []);
 
   useEffect(() => {
-    if (inputKey.current != null) {
-      inputKey.current.focus();
+    if (keyRef.current != null) {
+      keyRef.current.focus();
     }
   }, []);
 
   useEffect(() => {
-    if (inputOS.current != null) {
-      inputOS.current.focus();
+    if (rhelRef.current != null) {
+      rhelRef.current.focus();
     }
   }, []);
 
-  async function patchClick() {
-    const user = inputUser.current?.value;
+  useEffect(() => {
+    if (almaRef.current != null) {
+      almaRef.current.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (rockyRef.current != null) {
+      rockyRef.current.focus();
+    }
+  }, []);
+  
+  useEffect(() => {
+    if (ubuntuRef.current != null) {
+      ubuntuRef.current.focus();
+    }
+  }, []);
+
+  async function postClick() {
+    let os;
+    if (rhelRef.current?.checked === true) {
+      os = rhelRef.current.value;
+    } else if (almaRef.current?.checked === true) {
+      os = almaRef.current.value;
+    } else if (rockyRef.current?.checked === true) {
+      os = rockyRef.current.value;
+    } else if (ubuntuRef.current?.checked === true) {
+      os = ubuntuRef.current.value;
+    } else {
+      throw Error("ERROR: os null...");
+    }
+    
+    const user = userRef.current?.value;
     if (!user) throw Error("ERROR: user null...");
 
-    const host = inputHost.current?.value;
+    const host = hostRef.current?.value;
     if (!host) throw Error("ERROR: host null...");
     
-    const port = inputPort.current?.value;
+    const port = portRef.current?.value;
     if (!port) throw Error("ERROR: port null...");
     
-    const key  = inputKey.current?.value;
+    const key  = keyRef.current?.value;
     if (!key) throw Error("ERROR: key null...");
 
-    // const os   = inputOS.current?.value;
-    // if (!os) throw Error("ERROR: OS null...");
+    try {
+      await fetch("/api/config/post/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          user: user,
+          host: host,
+          port: port,
+          key : key,
+          os  : os,
+        }),
+        cache: "no-store"
+      }).then((res) => {
+        if (res.status === 200) {
+          onModalAddClose();
+          router.push("/config/");
+        } else {
+          onModalAddClose();
+          throw new Error("Failed to post config list...");
+        }
+      });
+    } catch(e) {
+      onModalAddClose();
+      throw new Error("Failed to post config list...");
+    }
+  };
+
+  async function patchClick() {
+    let os;
+    if (rhelRef.current?.checked === true) {
+      os = rhelRef.current.value;
+    } else if (almaRef.current?.checked === true) {
+      os = almaRef.current.value;
+    } else if (rockyRef.current?.checked === true) {
+      os = rockyRef.current.value;
+    } else if (ubuntuRef.current?.checked === true) {
+      os = ubuntuRef.current.value;
+    } else {
+      throw Error("ERROR: os null...");
+    }
+
+    const user = userRef.current?.value;
+    if (!user) throw Error("ERROR: user null...");
+
+    const host = hostRef.current?.value;
+    if (!host) throw Error("ERROR: host null...");
+    
+    const port = portRef.current?.value;
+    if (!port) throw Error("ERROR: port null...");
+    
+    const key  = keyRef.current?.value;
+    if (!key) throw Error("ERROR: key null...");
 
     try {
       await fetch("/api/config/patch/", {
@@ -136,7 +222,7 @@ export default async function ConfigList() {
           host: host,
           port: port,
           key : key,
-          os  : test,
+          os  : os,
         }),
         cache: "no-store"
       }).then((res) => {
@@ -161,61 +247,19 @@ export default async function ConfigList() {
         cache: "no-store"
       }).then((res) => {
         if (res.status === 200) {
+          onAlertClose();
           onModalClose();
           router.push("/config/");
         } else {
+          onAlertClose();
           onModalClose();
           throw new Error("Failed to delete config list...");
         }
       });
     } catch(e) {
+      onAlertClose();
       onModalClose();
       throw new Error("Failed to delete config list...");
-    }
-  };
-
-  async function postClick() {
-    const user = inputUser.current?.value;
-    if (!user) throw Error("ERROR: user null...");
-
-    const host = inputHost.current?.value;
-    if (!host) throw Error("ERROR: host null...");
-    
-    const port = inputPort.current?.value;
-    if (!port) throw Error("ERROR: port null...");
-    
-    const key  = inputKey.current?.value;
-    if (!key) throw Error("ERROR: key null...");
-
-    // const os   = inputOS.current?.value;
-    // if (!os) throw Error("ERROR: OS null...");
-
-    try {
-      await fetch("/api/config/post/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          user: user,
-          host: host,
-          port: port,
-          key : key,
-          os  : test,
-        }),
-        cache: "no-store"
-      }).then((res) => {
-        if (res.status === 200) {
-          onModalAddClose();
-          router.push("/config/");
-        } else {
-          onModalAddClose();
-          throw new Error("Failed to post config list...");
-        }
-      });
-    } catch(e) {
-      onModalAddClose();
-      throw new Error("Failed to post config list...");
     }
   };
 
@@ -292,61 +336,56 @@ export default async function ConfigList() {
               <Input
                 id="host"
                 defaultValue={value.host}
-                ref={inputHost}
+                ref={hostRef}
               />
-              <FormHelperText>
-                スキャン対象サーバーのIPアドレスを入力してください。
-                IPアドレスが固定でない場合は、名前解決可能な、ホスト名を入力してください。
-              </FormHelperText>
+              <FormHelperText mb={-1.5}>スキャン対象サーバーのIPアドレスを入力してください。</FormHelperText>
+              <FormHelperText>IPアドレスが固定でない場合は、名前解決可能な、ホスト名を入力してください。</FormHelperText>
             </FormControl>
 
-            <FormControl isRequired>
+            <FormControl isRequired mt={5}>
               <FormLabel htmlFor="user">ユーザー名</FormLabel>
               <Input
                 id="user"
                 defaultValue={value.user}
-                ref={inputUser}
+                ref={userRef}
               />
               <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
             </FormControl>
 
-            <FormControl isRequired>
+            <FormControl isRequired mt={5}>
               <FormLabel htmlFor="port">ポート番号</FormLabel>
               <Input
                 id="port"
                 defaultValue={value.port}
-                ref={inputPort}
+                ref={portRef}
               />
               <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
             </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel htmlFor="key">SSH秘密鍵ファイルパス</FormLabel>
+            <FormControl isRequired mt={5}>
+              <FormLabel htmlFor="key">SSH秘密鍵ファイル名【フルパス】</FormLabel>
               <Input
                 id="key"
                 defaultValue={value.key}
-                ref={inputKey}
+                ref={keyRef}
               />
-              <FormHelperText>
-                スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。
-                MonteaScanサーバーにSSH秘密鍵、スキャン対象サーバーにSSH公開鍵が配置されている必要があります。
-              </FormHelperText>
+              <FormHelperText mb={-1.5}>スキャン対象サーバーにログイン可能な、ローカルのSSH秘密鍵ファイルをフルパスで入力してください。</FormHelperText>
+              <FormHelperText>MonteaScanサーバーにSSH秘密鍵ファイル、スキャン対象サーバーにSSH公開鍵ファイルを配置してください。</FormHelperText>
             </FormControl>
 
-            {/* <FormControl isRequired>
-              <FormLabel htmlFor="key">OS</FormLabel> */}
-              <RadioGroup defaultValue={value.os} onChange={setValue} value={test}>
-                <Stack direction='row'>
-                  <Radio value='1'>RedHat</Radio>
-                  <Radio value='2'>AlmaLinux</Radio>
-                  <Radio value='3'>RockyLinux</Radio>
-                  <Radio value='4'>Ubuntu</Radio>
-                </Stack>
-              </RadioGroup>
-              {/* <FormHelperText>
-                テスト
-              </FormHelperText>
-            </FormControl> */}
+            <FormControl isRequired mt={5}>
+              <FormLabel htmlFor="key">OS</FormLabel>
+                <RadioGroup defaultValue={value.os}>
+                  <Stack direction='row'>
+                    <Radio type="radio" id="RedHat" name="mee" value="RedHat" ref={rhelRef}>RedHat</Radio>
+                    <Radio type="radio" id="AlmaLinux" name="mee" value="AlmaLinux" ref={almaRef}>AlmaLinux</Radio>
+                    <Radio type="radio" id="RockyLinux" name="mee" value="RockyLinux" ref={rockyRef}>RockyLinux</Radio>
+                    <Radio type="radio" id="Ubuntu" name="mee" value="Ubuntu" ref={ubuntuRef}>Ubuntu</Radio>
+                  </Stack>
+                </RadioGroup>
+              <FormHelperText mb={-1.5}>スキャン対象サーバーのOSを選択してください。</FormHelperText>
+              <FormHelperText>サポートされている各種OSバージョンの詳細は、ドキュメントを参照してください。</FormHelperText>
+            </FormControl>
 
           </ModalBody>
           <ModalFooter>
@@ -405,61 +444,56 @@ export default async function ConfigList() {
               <Input
                 id="host"
                 placeholder="127.0.0.1"
-                ref={inputHost}
+                ref={hostRef}
               />
-              <FormHelperText>
-                スキャン対象サーバーのIPアドレスを入力してください。
-                IPアドレスが固定でない場合は、名前解決可能な、ホスト名を入力してください。
-              </FormHelperText>
+              <FormHelperText mb={-1.5}>スキャン対象サーバーのIPアドレスを入力してください。</FormHelperText>
+              <FormHelperText>IPアドレスが固定でない場合は、名前解決可能な、ホスト名を入力してください。</FormHelperText>
             </FormControl>
 
-            <FormControl isRequired>
+            <FormControl isRequired mt={5}>
               <FormLabel htmlFor="user">ユーザー名</FormLabel>
               <Input
                 id="user"
                 placeholder="montea"
-                ref={inputUser}
+                ref={userRef}
               />
               <FormHelperText>スキャン対象サーバーに、ログイン可能な、ユーザー名を入力してください。</FormHelperText>
             </FormControl>
 
-            <FormControl isRequired>
+            <FormControl isRequired mt={5}>
               <FormLabel htmlFor="port">ポート番号</FormLabel>
               <Input
                 id="port"
                 placeholder="22"
-                ref={inputPort}
+                ref={portRef}
               />
               <FormHelperText>スキャン対象サーバーで、SSHサーバーが起動しているポート番号を入力してください。</FormHelperText>
             </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel htmlFor="key">SSH秘密鍵ファイルパス</FormLabel>
+            <FormControl isRequired mt={5}>
+              <FormLabel htmlFor="key">SSH秘密鍵ファイル名【フルパス】</FormLabel>
               <Input
                 id="key"
                 placeholder="/home/montea/id_ed25519"
-                ref={inputKey}
+                ref={keyRef}
               />
-              <FormHelperText>
-                スキャン対象サーバにログイン可能な、SSH秘密鍵ファイルをフルパスで入力してください。
-                MonteaScanサーバーにSSH秘密鍵、スキャン対象サーバーにSSH公開鍵が配置されている必要があります。
-              </FormHelperText>
+              <FormHelperText mb={-1.5}>スキャン対象サーバーにログイン可能な、ローカルのSSH秘密鍵ファイルをフルパスで入力してください。</FormHelperText>
+              <FormHelperText>MonteaScanサーバーにSSH秘密鍵ファイル、スキャン対象サーバーにSSH公開鍵ファイルを配置してください。</FormHelperText>
             </FormControl>
 
-            {/* <FormControl isRequired>
-              <FormLabel htmlFor="key">OS</FormLabel> */}
-              <RadioGroup onChange={setValue} value={test} defaultValue={value.os}>
-                <Stack direction='row'>
-                  <Radio value='1'>RedHat</Radio>
-                  <Radio value='2'>AlmaLinux</Radio>
-                  <Radio value='3'>RockyLinux</Radio>
-                  <Radio value='4'>Ubuntu</Radio>
-                </Stack>
-              </RadioGroup>
-              {/* <FormHelperText>
-                テスト
-              </FormHelperText>
-            </FormControl> */}
+            <FormControl isRequired mt={5}>
+              <FormLabel htmlFor="key">OS</FormLabel>
+                <RadioGroup>
+                  <Stack direction='row'>
+                    <Radio type="radio" id="RedHat" name="drone" value="RedHat" ref={rhelRef}>RedHat</Radio>
+                    <Radio type="radio" id="AlmaLinux" name="drone" value="AlmaLinux" ref={almaRef}>AlmaLinux</Radio>
+                    <Radio type="radio" id="RockyLinux" name="drone" value="RockyLinux" ref={rockyRef}>RockyLinux</Radio>
+                    <Radio type="radio" id="Ubuntu" name="mee" value="Ubuntu" ref={ubuntuRef}>Ubuntu</Radio>
+                  </Stack>
+                </RadioGroup>
+              <FormHelperText mb={-1.5}>スキャン対象サーバーのOSを選択してください。</FormHelperText>
+              <FormHelperText>サポートされている各種OSバージョンの詳細は、ドキュメントを参照してください。</FormHelperText>
+            </FormControl>
 
           </ModalBody>
           <ModalFooter>
