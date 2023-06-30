@@ -1,6 +1,7 @@
-use mongodb::{options::ClientOptions, Client as MongoClient, bson::doc};
+use anyhow::{Result, Error, anyhow};
+use mongodb::{Client as MongoClient, bson::doc};
 use serde::{Deserialize, Serialize};
-use serde_json::{Result};
+// use serde_json::{Result};
 use std::io::Read;
 use std::clone::Clone;
 use bzip2::read::BzDecoder;
@@ -103,20 +104,20 @@ struct UbuntuCriterion {
 }
 
 
-#[tokio::main(flavor = "current_thread")]
-async fn main() -> Result<()> {
-  let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
-  client_options.app_name = Some("My App".to_string());
+// #[tokio::main(flavor = "current_thread")]
+pub async fn main(mongo_client: MongoClient) -> Result<()> {
+  // let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await?;
+  // client_options.app_name = Some("My App".to_string());
 
-  let mongo_client: MongoClient = MongoClient::with_options(client_options).unwrap();
+  // let mongo_client: MongoClient = MongoClient::with_options(client_options)?;
 
-  for db_name in mongo_client.list_database_names(None, None).await.unwrap() {
-    println!("list DB: {}", db_name);
-  }
+  // for db_name in mongo_client.list_database_names(None, None).await? {
+  //   println!("list DB: {}", db_name);
+  // }
 
   let db: mongodb::Database = mongo_client.database("OvalRHEL");
 
-  for collection_name in db.list_collection_names(None).await.unwrap() {
+  for collection_name in db.list_collection_names(None).await? {
     println!("list Collection: {}", collection_name);
   }
 
@@ -125,28 +126,37 @@ async fn main() -> Result<()> {
     rhel_ver.push(i);
   }
 
-  for v in rhel_ver {
-    let v: &str = &v.to_string();
-    let url: String = String::from("https://access.redhat.com/security/data/oval/v2/RHEL") + v + "/rhel-" + v + ".oval.xml.bz2";
+  let code_name: [&str; 7] = [
+    "trusty",  // Ubuntu 14.04 LTS  2019-04  2024-04
+    "xenial",  // Ubuntu 16.04 LTS  2021-04  2026-04
+    "bionic",  // Ubuntu 18.04 LTS  2023-06  2028-04
+    "focal",   // Ubuntu 20.04 LTS  2025-04  2030-04
+    "jammy",   // Ubuntu 22.04 LTS  2027-04  2032-04
+    "kinetic", // Ubuntu 22.10      2023-07  2023-07
+    "lunar",   // Ubuntu 23.04      2024-01  2024-01
+  ];
 
-    let response = reqwest::get(&url).await.unwrap();
-    let bytes = response.bytes().await.unwrap();
+  for v in code_name {
+    let url: String = String::from("com.ubuntu.") + v + ".usn.oval.xml.bz2";
+
+    let response = reqwest::get(&url).await?;
+    let bytes = response.bytes().await?;
 
     let mut gz: BzDecoder<&[u8]> = BzDecoder::new(&bytes[..]);
     let mut resp_body: String = String::new();
-    gz.read_to_string(&mut resp_body).unwrap();
+    gz.read_to_string(&mut resp_body)?;
 
-    let oval_rhel: OvalUbuntu = from_str(&resp_body).unwrap();
+    let oval_ubuntu: OvalUbuntu = from_str(&resp_body)?;
 
-    let col: String = String::from("RHEL") + v;
+    let col: String = String::from("Ubuntu-") + v;
     let typed_collection: mongodb::Collection<UbuntuDefinition> = db.collection::<UbuntuDefinition>(&col);
     
     let filter: bson::Document = doc! {};
-    let delete_result: mongodb::results::DeleteResult = typed_collection.delete_many(filter, None).await.unwrap();
+    let delete_result: mongodb::results::DeleteResult = typed_collection.delete_many(filter, None).await?;
     println!("Deleted {} documents, col:{}", delete_result.deleted_count, col);
     
-    for i in 0..oval_rhel.definitions.definition.len() {
-      let insert_result: mongodb::results::InsertOneResult = typed_collection.insert_one(oval_rhel.definitions.definition[i].clone(), None).await.unwrap();
+    for i in 0..oval_ubuntu.definitions.definition.len() {
+      let insert_result: mongodb::results::InsertOneResult = typed_collection.insert_one(oval_ubuntu.definitions.definition[i].clone(), None).await?;
       println!("document ID:{}, col:{}", insert_result.inserted_id, col);
     }
   }

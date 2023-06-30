@@ -1,32 +1,32 @@
 [package]
-name = "montea-scan"
+name    = "montea-scan"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-serde = "1.0.152"
-serde_derive = "1.0.152"
-serde_json = "1.0.93"
-ssh2 = "0.9.4"
-mongodb = "2.5.0"
-tokio = { version = "1.27.0", features = ["full"] }
-futures = "0.3.28"
-bson = "2.6.1"
-hyper = { version = "0.14.26", features = ["full"] }
-hyper-tls = "0.5.0"
-hyper-proxy = "0.9.1"
-quick-xml = { version = "0.28.2", features = ["serialize"] }
-flate2 = "1.0.26"
-time = { version = "0.3.20", features = ["parsing"]}
-headers = "0.3.8"
-bzip2 = "0.4.4"
-actix-web = { version = "4.3.1", features = ["rustls"]}
-actix-files = "0.6.2"
-log = "0.4.17"
-env_logger = "0.10.0"
-rustls = "0.20.8" # version dependent on actix-web
+anyhow         = "1.0.71"
+actix-web      = { version = "4.3.1", features = ["rustls"]}
+actix-files    = "0.6.2"
+bson           = "2.6.1"
+bzip2          = "0.4.4"
+env_logger     = "0.10.0"
+futures        = "0.3.28"
+flate2         = "1.0.26"
+headers        = "0.3.8"
+hyper          = { version = "0.14.26", features = ["full"] }
+hyper-tls      = "0.5.0"
+hyper-proxy    = "0.9.1"
+log            = "0.4.17"
+mongodb        = "2.5.0"
+quick-xml      = { version = "0.28.2", features = ["serialize"] }
+reqwest        = { version = "0.11.18", features = ["json"] }
+rustls         = "0.20.8" # version dependent on actix-web
 rustls-pemfile = "1.0.2"
-tokio-util = {version = "0.7.8", features=["compat"]}
-reqwest = { version = "0.11.18", features = ["json"] }
-anyhow = "1.0.71"
-zip = "0.6.6"
+serde          = "1.0.152"
+serde_derive   = "1.0.152"
+serde_json     = "1.0.93"
+ssh2           = "0.9.4"
+time           = { version = "0.3.20", features = ["parsing"]}
+tokio          = { version = "1.27.0", features = ["full"] }
+tokio-util     = {version = "0.7.8", features=["compat"]}
+zip            = "0.6.6"

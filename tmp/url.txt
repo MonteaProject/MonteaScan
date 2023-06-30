@@ -59,3 +59,18 @@ https://ubuntu.com/security/notices
 Ubuntu OVAL
 https://ubuntu.com/security/oval
 https://security-metadata.canonical.com/oval/
+
+RedHat EOL
+https://access.redhat.com/support/policy/updates/errata
+
+Ubuntu EOL
+https://wiki.ubuntu.com/Releases
+
+Rocky EOL
+https://wiki.rockylinux.org/rocky/version/
+
+AlmaLinux EOL
+https://wiki.almalinux.org/release-notes/
+
+OS EOL 情報
+https://endoflife.date/

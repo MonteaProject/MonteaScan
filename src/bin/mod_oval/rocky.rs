@@ -1,6 +1,7 @@
-use mongodb::{options::ClientOptions, Client as MongoClient, bson::doc};
+use anyhow::{Result, Error, anyhow};
+use mongodb::{Client as MongoClient, bson::doc};
 use serde::{Deserialize, Serialize};
-use serde_json::{Result};
+// use serde_json::{Result};
 use std::io::Read;
 use std::clone::Clone;
 use bzip2::read::BzDecoder;
@@ -114,50 +115,50 @@ struct RockyCriterion2 {
   test_ref: Option<String>
 }
 
-#[tokio::main(flavor = "current_thread")]
-async fn main() -> Result<()> {
-  let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
-  client_options.app_name = Some("My App".to_string());
+// #[tokio::main(flavor = "current_thread")]
+pub async fn main(mongo_client: MongoClient) -> Result<()> {
+  // let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await?;
+  // client_options.app_name = Some("My App".to_string());
 
-  let mongo_client: MongoClient = MongoClient::with_options(client_options).unwrap();
+  // let mongo_client: MongoClient = MongoClient::with_options(client_options)?;
 
-  for db_name in mongo_client.list_database_names(None, None).await.unwrap() {
-    println!("list DB: {}", db_name);
-  }
+  // for db_name in mongo_client.list_database_names(None, None).await? {
+  //   println!("list DB: {}", db_name);
+  // }
 
   let db: mongodb::Database = mongo_client.database("OvalRocky");
 
-  for collection_name in db.list_collection_names(None).await.unwrap() {
+  for collection_name in db.list_collection_names(None).await? {
     println!("list Collection: {}", collection_name);
   }
 
-  let mut rocky_ver: Vec<i32> = vec![];
-  for i in 8..10 {
-    rocky_ver.push(i);
-  }
+  let rocky_ver: [u8; 2] = [
+    8, // Rocky Linux 8  2024-05-31  2029-05-31
+    9  // Rocky Linux 9  2027-05-31  2032-05-31
+  ];
 
   for v in rocky_ver {
     let v: &str = &v.to_string();
     let url: String = String::from("https://dl.rockylinux.org/pub/oval/org.rockylinux.rlsa-") + v + ".xml.bz2";
 
-    let response = reqwest::get(&url).await.unwrap();
-    let bytes = response.bytes().await.unwrap();
+    let response = reqwest::get(&url).await?;
+    let bytes = response.bytes().await?;
 
     let mut gz: BzDecoder<&[u8]> = BzDecoder::new(&bytes[..]);
     let mut resp_body: String = String::new();
-    gz.read_to_string(&mut resp_body).unwrap();
+    gz.read_to_string(&mut resp_body)?;
 
-    let oval_rocky: OvalRocky = from_str(&resp_body).unwrap();
+    let oval_rocky: OvalRocky = from_str(&resp_body)?;
 
     let col: String = String::from("Rocky") + v;
     let typed_collection: mongodb::Collection<RockyDefinition> = db.collection::<RockyDefinition>(&col);
     
     let filter: bson::Document = doc! {};
-    let delete_result: mongodb::results::DeleteResult = typed_collection.delete_many(filter, None).await.unwrap();
+    let delete_result: mongodb::results::DeleteResult = typed_collection.delete_many(filter, None).await?;
     println!("Deleted {} documents, col:{}", delete_result.deleted_count, col);
     
     for i in 0..oval_rocky.definitions.definition.len() {
-      let insert_result: mongodb::results::InsertOneResult = typed_collection.insert_one(oval_rocky.definitions.definition[i].clone(), None).await.unwrap();
+      let insert_result: mongodb::results::InsertOneResult = typed_collection.insert_one(oval_rocky.definitions.definition[i].clone(), None).await?;
       println!("document ID:{}, col:{}", insert_result.inserted_id, col);
     }
   }
