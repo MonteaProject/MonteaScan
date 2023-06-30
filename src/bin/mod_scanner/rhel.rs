@@ -3,21 +3,21 @@ use ssh2::Session;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::{Result};
 use std::io::{Read, Write};
-use std::path::Path;
+use std::path::PathBuf;
 
 
-#[derive(Deserialize, Serialize, Debug)]
-struct ScanServerList {
-  server: Vec<Server>,
-}
+// #[derive(Deserialize, Serialize, Debug)]
+// struct ScanServerList {
+//   server: Vec<Server>,
+// }
 
-#[derive(Deserialize, Serialize, Debug)]
-struct Server {
-  user : String,
-  host : String,
-  port : String,
-  key  : String
-}
+// #[derive(Deserialize, Serialize, Debug)]
+// struct Server {
+//   user : String,
+//   host : String,
+//   port : String,
+//   key  : String
+// }
 
 #[derive(Deserialize, Serialize, Debug)]
 struct ScanResult {
@@ -52,32 +52,33 @@ struct UpdateList {
   repo: String
 }
 
-pub fn main() -> Result<()> {
-  let result_dir = String::from("./src/scan_result/");
-  let result_dirpath = Path::new(&result_dir);
 
-  if result_dirpath.is_dir() {
-    println!("Remove dir... {:?}", result_dir);
-    std::fs::remove_dir_all(&result_dir).unwrap();
-  }
+pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
+  // let result_dir = String::from("./src/scan_result/");
+  // let result_dirpath = Path::new(&result_dir);
 
-  std::fs::create_dir_all(&result_dir).unwrap();
+  // if result_dirpath.is_dir() {
+  //   println!("Remove dir... {:?}", result_dir);
+  //   std::fs::remove_dir_all(&result_dir).unwrap();
+  // }
 
-  let config_file: String = String::from("./src/config/config.json");
+  // std::fs::create_dir_all(&result_dir).unwrap();
 
-  let cnf: ScanServerList = {
-    let cnf: String = std::fs::read_to_string(&config_file).unwrap();
-    serde_json::from_str::<ScanServerList>(&cnf).unwrap()
-  };
+  // let config_file: String = String::from("./src/config/config.json");
 
-  for index in 0..cnf.server.len() {
-    let user: &String = &cnf.server[index].user;
-    let host: &String = &cnf.server[index].host;
-    let port: &String = &cnf.server[index].port;
-    let key:  &String = &cnf.server[index].key;
-    let prikey: std::path::PathBuf = std::path::PathBuf::from(key);
+  // let cnf: ScanServerList = {
+  //   let cnf: String = std::fs::read_to_string(&config_file).unwrap();
+  //   serde_json::from_str::<ScanServerList>(&cnf).unwrap()
+  // };
 
-    let host_port: String = host.to_owned() + ":" + port;
+  // for index in 0..cnf.server.len() {
+  //   let user: &String = &cnf.server[index].user;
+  //   let host: &String = &cnf.server[index].host;
+  //   let port: &String = &cnf.server[index].port;
+  //   let key:  &String = &cnf.server[index].key;
+  //   let prikey: std::path::PathBuf = std::path::PathBuf::from(key);
+
+  //   let host_port: String = host.to_owned() + ":" + port;
 
     // hostname
     let mut sess: Session = Session::new().unwrap();
@@ -226,7 +227,7 @@ pub fn main() -> Result<()> {
 
     // pkg
     let mut sess: Session = Session::new().unwrap();
-    let tcp: std::net::TcpStream = std::net::TcpStream::connect(host_port.clone()).unwrap();
+    let tcp: std::net::TcpStream = std::net::TcpStream::connect(host_port).unwrap();
     sess.set_tcp_stream(tcp);
     sess.handshake().unwrap();
     sess.userauth_pubkey_file(user, None, prikey.as_path(), None).unwrap();
@@ -306,8 +307,9 @@ pub fn main() -> Result<()> {
       println!("command dnf rpm -qa Failed");
     }
 
-    let filename: String = hostname.replace('\n', "") + ".json";
-    let full_path: String = String::from(&result_dir) + &filename;
+    let filename:   String = hostname.replace('\n', "") + ".json";
+    let result_dir: String = String::from("./src/scan_result/");
+    let full_path:  String = String::from(&result_dir) + &filename;
 
     let serialized: String = serde_json::to_string(&localinfo).unwrap();
     let mut w: std::fs::File = std::fs::OpenOptions::new()
@@ -315,7 +317,7 @@ pub fn main() -> Result<()> {
       .create(true)
       .open(full_path).unwrap();
     w.write_all(serialized.as_bytes()).expect("Failed to Write scan_result...");
-  }
+  // }
 
   Ok(())
 }
