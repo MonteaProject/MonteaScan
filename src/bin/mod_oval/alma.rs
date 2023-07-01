@@ -1,7 +1,6 @@
-use anyhow::{Result, Context, anyhow};
+use anyhow::Result;
 use mongodb::{Client as MongoClient, bson::doc};
 use serde::{Deserialize, Serialize};
-// use serde_json::{Result};
 use std::io::Read;
 use std::clone::Clone;
 use bzip2::read::BzDecoder;
@@ -31,18 +30,10 @@ struct AlmaDefinition {
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct AlmaMetadata {
   title:       Option<String>,
-  // affected: Option<Affected>, // None,AlmaLinux
   reference:   Option<Vec<AlmaReference>>,
   description: Option<String>,
   advisory:    Option<AlmaAdvisory>,
 }
-
-// #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-// struct Affected {
-//   #[serde(rename = "@family")]
-//   family:   Option<String>,
-//   platform: Option<Vec<String>>
-// }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct AlmaReference {
@@ -81,8 +72,6 @@ struct AlmaUpdated {
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct AlmaCve {
-  // #[serde(rename = "@cvss2")] // None,AlmaLinux
-  // cvss2: Option<String>,
   #[serde(rename = "@cvss3")]
   cvss3:  Option<String>,
   #[serde(rename = "@cwe")]
@@ -103,8 +92,6 @@ struct AlmaBugzilla {
   href: Option<String>,
   #[serde(rename = "@id")]
   id:   Option<String>,
-  // #[serde(rename = "$value")] // None,AlmaLinux
-  // bugzilla: Option<String>
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -112,7 +99,7 @@ struct AlmaAffectedCpeList {
   cpe: Option<Vec<String>>
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]  // AlmaLinux 特有
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct AlmaCriteria {
   #[serde(rename = "@operator")]
   operator:  Option<String>,
@@ -167,18 +154,8 @@ struct AlmaCriterion3 {
 }
 
 
-// #[tokio::main(flavor = "current_thread")]
 pub async fn main(mongo_client: MongoClient) -> Result<()> {
-  // let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await?;
-  // client_options.app_name = Some("My App".to_string());
-
-  // let mongo_client: MongoClient = MongoClient::with_options(client_options)?;
-
-  // for db_name in mongo_client.list_database_names(None, None).await? {
-  //   println!("list DB: {}", db_name);
-  // }
-
-  let db: mongodb::Database = mongo_client.database("OvalAlma");
+  let db: mongodb::Database = mongo_client.database("oval-alma");
 
   for collection_name in db.list_collection_names(None).await? {
     println!("list Collection: {}", collection_name);

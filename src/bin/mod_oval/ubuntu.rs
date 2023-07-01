@@ -1,7 +1,6 @@
-use anyhow::{Result, Error, anyhow};
+use anyhow::Result;
 use mongodb::{Client as MongoClient, bson::doc};
 use serde::{Deserialize, Serialize};
-// use serde_json::{Result};
 use std::io::Read;
 use std::clone::Clone;
 use bzip2::read::BzDecoder;
@@ -104,26 +103,11 @@ struct UbuntuCriterion {
 }
 
 
-// #[tokio::main(flavor = "current_thread")]
 pub async fn main(mongo_client: MongoClient) -> Result<()> {
-  // let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await?;
-  // client_options.app_name = Some("My App".to_string());
-
-  // let mongo_client: MongoClient = MongoClient::with_options(client_options)?;
-
-  // for db_name in mongo_client.list_database_names(None, None).await? {
-  //   println!("list DB: {}", db_name);
-  // }
-
-  let db: mongodb::Database = mongo_client.database("OvalRHEL");
+  let db: mongodb::Database = mongo_client.database("oval-ubuntu");
 
   for collection_name in db.list_collection_names(None).await? {
     println!("list Collection: {}", collection_name);
-  }
-
-  let mut rhel_ver: Vec<i32> = vec![];
-  for i in 6..10 {
-    rhel_ver.push(i);
   }
 
   let code_name: [&str; 7] = [
@@ -137,7 +121,7 @@ pub async fn main(mongo_client: MongoClient) -> Result<()> {
   ];
 
   for v in code_name {
-    let url: String = String::from("com.ubuntu.") + v + ".usn.oval.xml.bz2";
+    let url: String = String::from("https://security-metadata.canonical.com/oval/com.ubuntu.") + v + ".usn.oval.xml.bz2";
 
     let response = reqwest::get(&url).await?;
     let bytes = response.bytes().await?;
