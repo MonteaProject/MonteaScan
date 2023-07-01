@@ -138,7 +138,7 @@ pub async fn main(mongo_client: MongoClient) -> Result<()> {
 
     let oval_rocky: OvalRocky = from_str(&resp_body)?;
 
-    let col: String = String::from("Rocky") + v;
+    let col: String = String::from("rocky") + v;
     let typed_collection: mongodb::Collection<RockyDefinition> = db.collection::<RockyDefinition>(&col);
     
     let filter: bson::Document = doc! {};

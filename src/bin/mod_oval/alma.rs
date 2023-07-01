@@ -179,7 +179,7 @@ pub async fn main(mongo_client: MongoClient) -> Result<()> {
 
     let oval_alma: OvalAlma = from_str(&resp_body)?;
 
-    let col: String = String::from("Alma") + v;
+    let col: String = String::from("alma") + v;
     let typed_collection: mongodb::Collection<AlmaDefinition> = db.collection::<AlmaDefinition>(&col);
     
     let filter: bson::Document = doc! {};

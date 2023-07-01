@@ -132,7 +132,7 @@ pub async fn main(mongo_client: MongoClient) -> Result<()> {
 
     let oval_ubuntu: OvalUbuntu = from_str(&resp_body)?;
 
-    let col: String = String::from("Ubuntu-") + v;
+    let col: String = String::from("ubuntu-") + v;
     let typed_collection: mongodb::Collection<UbuntuDefinition> = db.collection::<UbuntuDefinition>(&col);
     
     let filter: bson::Document = doc! {};

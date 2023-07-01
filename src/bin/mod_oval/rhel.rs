@@ -170,7 +170,7 @@ pub async fn main(mongo_client: MongoClient) -> Result<()> {
 
     let oval_rhel: OvalRhel = from_str(&resp_body)?;
 
-    let col: String = String::from("RHEL") + v;
+    let col: String = String::from("rhel") + v;
     let typed_collection: mongodb::Collection<RhelDefinition> = db.collection::<RhelDefinition>(&col);
     
     let filter: bson::Document = doc! {};
