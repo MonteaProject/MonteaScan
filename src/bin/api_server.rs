@@ -4,16 +4,17 @@ use crate::mod_api::rhel::{rhel6, rhel7, rhel8, rhel9};
 use crate::mod_api::rocky::{rocky8, rocky9};
 use crate::mod_api::ubuntu::{trusty, xenial, bionic, focal, jammy, kinetic, lunar};
 
+use anyhow::Result;
 use actix_web::{web, App, middleware, HttpServer};
 use mongodb::{options::ClientOptions, Client as MongoClient};
 
 
-#[actix_web::main]
-pub async fn main() -> std::io::Result<()> {
-  let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await.unwrap();
+#[tokio::main(flavor = "multi_thread")]
+pub async fn main() -> Result<()> {
+  let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await?;
   client_options.app_name = Some("My App".to_string());
 
-  let mongo_client: MongoClient = MongoClient::with_options(client_options).unwrap();
+  let mongo_client: MongoClient = MongoClient::with_options(client_options)?;
 
   env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
   log::info!("Starting HTTP Server...");
@@ -38,7 +39,9 @@ pub async fn main() -> std::io::Result<()> {
       .service(kinetic)
       .service(lunar)
   })
-  .bind(("127.0.0.1", 7878)).unwrap()
+  .bind(("127.0.0.1", 7878))?
   .run()
-  .await
+  .await?;
+
+  Ok(())
 }
