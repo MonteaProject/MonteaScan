@@ -11,7 +11,7 @@ struct ScanResult {
   time    : String,
   hostname: String,
   ip      : Vec<String>,
-  os      : UbuntuVersion,
+  os      : String,
   kernel  : String,
   pkg     : Vec<PkgList>
 }
@@ -35,14 +35,6 @@ struct UpdateList {
   name: String,
   ver : String,
   arch: String,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-struct UbuntuVersion {
-  distributor: String,
-  description: String,
-  release:     String,
-  codename:    String,
 }
 
 
@@ -96,39 +88,15 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   sess.handshake()?;
   sess.userauth_pubkey_file(user, None, prikey.as_path(), None)?;
   let mut ch: ssh2::Channel = sess.channel_session()?;
-  ch.exec("lsb_release -idrc")?;
+  ch.exec("lsb_release -d")?;
   let mut ubuntu: String = String::new();
   ch.read_to_string(&mut ubuntu)?;
 
-  let mut distributor: String = "Null".to_string();
-  let mut description: String = "Null".to_string();
-  let mut release:     String = "Null".to_string();
-  let mut codename:    String = "Null".to_string();
-  let v: Vec<&str> = ubuntu.lines().collect();
-  
-  for i in v {
-    let s1: &str = i.trim();
-    let s2: Vec<&str> = s1.split(':').collect();
-    
-    if s2.len() == 2 {
-      match s2[0] {
-        "Distributor ID" => distributor = s2[1].to_string().replace('\t', ""),
-        "Description"    => description = s2[1].to_string().replace('\t', ""),
-        "Release"        => release     = s2[1].to_string().replace('\t', ""),
-        "Codename"       => codename    = s2[1].to_string().replace('\t', ""),
-        _                => println!("Not match any pattern..."),
-      }
-    } else {
-      println!("lsb_release len Failed...");
-    }
+  let s1: Vec<&str> = ubuntu.split(':').collect();
+  let mut os: String = "Null".to_string();
+  if s1.len() == 2 {
+    os = s1[1].to_string().replace(['\t', '\n'], "")
   }
-
-  let os: UbuntuVersion = UbuntuVersion {
-    distributor,
-    description,
-    release,
-    codename,
-  };
 
   ch.wait_close().expect("Close SSH Connection Failed...");
   
