@@ -1,7 +1,6 @@
-use anyhow::{Result, Error, anyhow};
+use anyhow::Result;
 use mongodb::{Client as MongoClient, bson::doc};
 use serde::{Deserialize, Serialize};
-// use serde_json::{Result};
 use std::io::Read;
 use std::clone::Clone;
 use bzip2::read::BzDecoder;
@@ -62,8 +61,6 @@ struct RockyAdvisory {
   rights:   Option<String>,
   issued:   Option<RockyIssued>,
   updated:  Option<RockyUpdated>,
-  // cve: Option<Vec<Cve>>,           // None,RockyLinux
-  // bugzilla: Option<Vec<Bugzilla>>, // None,RockyLinux
   affected_cpe_list: Option<RockyAffectedCpeList>
 }
 
@@ -115,18 +112,9 @@ struct RockyCriterion2 {
   test_ref: Option<String>
 }
 
-// #[tokio::main(flavor = "current_thread")]
+
 pub async fn main(mongo_client: MongoClient) -> Result<()> {
-  // let mut client_options: ClientOptions = ClientOptions::parse("mongodb://localhost:27017").await?;
-  // client_options.app_name = Some("My App".to_string());
-
-  // let mongo_client: MongoClient = MongoClient::with_options(client_options)?;
-
-  // for db_name in mongo_client.list_database_names(None, None).await? {
-  //   println!("list DB: {}", db_name);
-  // }
-
-  let db: mongodb::Database = mongo_client.database("OvalRocky");
+  let db: mongodb::Database = mongo_client.database("oval-rocky");
 
   for collection_name in db.list_collection_names(None).await? {
     println!("list Collection: {}", collection_name);
@@ -150,7 +138,7 @@ pub async fn main(mongo_client: MongoClient) -> Result<()> {
 
     let oval_rocky: OvalRocky = from_str(&resp_body)?;
 
-    let col: String = String::from("Rocky") + v;
+    let col: String = String::from("rocky") + v;
     let typed_collection: mongodb::Collection<RockyDefinition> = db.collection::<RockyDefinition>(&col);
     
     let filter: bson::Document = doc! {};
