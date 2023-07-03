@@ -60,33 +60,33 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
 
       for oval in oval_vec {
         if let Some(v) = oval.as_array() {
-          for i in 0..v.len() {
+          for x in 0..v.len() {
             let mut comment_vec: Vec<String> = Vec::new();
 
-            if let Some(v) = oval[i]["criteria"]["criterion"].as_array() {
-              for i in 0..v.len() {
-                if let Some(v) = oval[i]["criteria"]["criterion"][i]["@comment"].as_str() {
+            if let Some(v) = oval[x]["criteria"]["criterion"].as_array() {
+              for y in 0..v.len() {
+                if let Some(v) = oval[x]["criteria"]["criterion"][y]["@comment"].as_str() {
                   comment_vec.push(v.to_string());
                 }
               }
             }
 
-            if let Some(v) = oval[i]["criteria"]["criteria"].as_array() {
-              for i in 0..v.len() {
-                if let Some(v) = oval[i]["criteria"]["criteria"][i]["criterion"].as_array() {
-                  for i in 0..v.len() {
-                    if let Some(v) = oval[i]["criteria"]["criteria"][i]["criterion"][i]["@comment"].as_str() {
+            if let Some(v) = oval[x]["criteria"]["criteria"].as_array() {
+              for y in 0..v.len() {
+                if let Some(v) = oval[x]["criteria"]["criteria"][y]["criterion"].as_array() {
+                  for z in 0..v.len() {
+                    if let Some(v) = oval[x]["criteria"]["criteria"][y]["criterion"][z]["@comment"].as_str() {
                       comment_vec.push(v.to_string());
                     }
                   }
                 }
-                if let Some(v) = oval[i]["criteria"]["criteria"][i]["criteria"].as_array() {
-                  for i in 0..v.len() {
-                    if let Some(v) = oval[i]["criteria"]["criteria"][i]["criteria"][i]["criteria"].as_array() {
-                      for i in 0..v.len() {
-                        if let Some(v) = oval[i]["criteria"]["criteria"][i]["criteria"][i]["criteria"][i]["criterion"].as_array() {
-                          for i in 0..v.len() {
-                            if let Some(v) = oval[i]["criteria"]["criteria"][i]["criteria"][i]["criteria"][i]["criterion"][i]["@comment"].as_str() {
+                if let Some(v) = oval[x]["criteria"]["criteria"][y]["criteria"].as_array() {
+                  for z in 0..v.len() {
+                    if let Some(v) = oval[x]["criteria"]["criteria"][y]["criteria"][z]["criteria"].as_array() {
+                      for k in 0..v.len() {
+                        if let Some(v) = oval[x]["criteria"]["criteria"][y]["criteria"][z]["criteria"][k]["criterion"].as_array() {
+                          for r in 0..v.len() {
+                            if let Some(v) = oval[x]["criteria"]["criteria"][y]["criteria"][z]["criteria"][k]["criterion"][r]["@comment"].as_str() {
                               comment_vec.push(v.to_string());
                             }
                           }
@@ -114,13 +114,13 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                   
                   if v[1] == p {
                     let mut issued: String = "-".to_string();
-                    if oval[i]["metadata"]["advisory"]["issued"]["@date"] != Null {
-                      issued = oval[i]["metadata"]["advisory"]["issued"]["@date"].to_string().replace('"', "");
+                    if oval[x]["metadata"]["advisory"]["issued"]["@date"] != Null {
+                      issued = oval[x]["metadata"]["advisory"]["issued"]["@date"].to_string().replace('"', "");
                     }
 
                     let mut updated: String = "-".to_string();
-                    if oval[i]["metadata"]["advisory"]["updated"]["@date"] != Null {
-                      updated = oval[i]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
+                    if oval[x]["metadata"]["advisory"]["updated"]["@date"] != Null {
+                      updated = oval[x]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
                     }
 
                     let mut impact:      String = "-".to_string();
@@ -136,25 +136,54 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                       serde_json::from_str::<Cwe>(&cwe)?
                     };
 
-                    if oval[i]["metadata"]["advisory"]["cve"] != Null {
-                      if let Some(v) = oval[i]["metadata"]["advisory"]["cve"].as_array() {
-                        for i in 0..v.len() {
-                          if oval[i]["metadata"]["advisory"]["cve"][i]["@impact"] != Null {
-                            impact = oval[i]["metadata"]["advisory"]["cve"][i]["@impact"].to_string().replace('"', "");
+                    if oval[x]["metadata"]["advisory"]["cve"] != Null {
+                      if let Some(v) = oval[x]["metadata"]["advisory"]["cve"].as_array() {
+                        for y in 0..v.len() {
+                          if oval[x]["metadata"]["advisory"]["cve"][y]["@impact"] != Null {
+                            let s1 = oval[x]["metadata"]["advisory"]["cve"][y]["@impact"].to_string().replace('"', "");
+                            match &s1[..] {
+                              "Critical" => {
+                                impact = "Critical".to_string();
+                              }
+                              "Important" => {
+                                impact = "High".to_string();
+                              }
+                              "Moderate" => {
+                                impact = "Medium".to_string();
+                              }
+                              "Low" => {
+                                impact = "Low".to_string();
+                              }
+                              "critical" => {
+                                impact = "Critical".to_string();
+                              }
+                              "important" => {
+                                impact = "High".to_string();
+                              }
+                              "moderate" => {
+                                impact = "Medium".to_string();
+                              }
+                              "low" => {
+                                impact = "Low".to_string();
+                              }
+                              _ => {
+                                impact = "-".to_string();
+                              }
+                            }
                           }
       
-                          if oval[i]["metadata"]["advisory"]["cve"][i]["$value"] != Null {
-                            cveid = oval[i]["metadata"]["advisory"]["cve"][i]["$value"].to_string().replace('"', "");
+                          if oval[x]["metadata"]["advisory"]["cve"][y]["$value"] != Null {
+                            cveid = oval[x]["metadata"]["advisory"]["cve"][y]["$value"].to_string().replace('"', "");
                           }
       
-                          if oval[i]["metadata"]["advisory"]["cve"][i]["@cvss3"] != Null {
-                            let s1 = oval[i]["metadata"]["advisory"]["cve"][i]["@cvss3"].to_string().replace('"', "");
+                          if oval[x]["metadata"]["advisory"]["cve"][y]["@cvss3"] != Null {
+                            let s1 = oval[x]["metadata"]["advisory"]["cve"][y]["@cvss3"].to_string().replace('"', "");
                             let s2: Vec<&str> = s1.split('/').collect();
                             cvssv3_oval = s2[0].to_string();
                           }
       
-                          if oval[i]["metadata"]["advisory"]["cve"][i]["@cwe"] != Null {
-                            cwe_oval = oval[i]["metadata"]["advisory"]["cve"][i]["@cwe"].to_string().replace('"', "");
+                          if oval[x]["metadata"]["advisory"]["cve"][y]["@cwe"] != Null {
+                            cwe_oval = oval[x]["metadata"]["advisory"]["cve"][y]["@cwe"].to_string().replace('"', "");
       
                             let s1: &String   = &cwe_oval.replace("CWE-", "");
                             let s2: &String   = &s1.replace('(', "");

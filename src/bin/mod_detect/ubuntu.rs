@@ -59,17 +59,17 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
 
       for oval in oval_vec {
         if let Some(v) = oval.as_array() {
-          for i in 0..v.len() {
+          for x in 0..v.len() {
             let mut comment_vec: Vec<String> = Vec::new();
 
-            if let Some(v) = oval[i]["criteria"]["criteria"].as_array() {
-              for i in 0..v.len() {
-                if let Some(v) = oval[i]["criteria"]["criteria"][i]["criterion"]["@comment"].as_str() {
+            if let Some(v) = oval[x]["criteria"]["criteria"]["criterion"].as_array() {
+              for y in 0..v.len() {
+                if let Some(v) = oval[x]["criteria"]["criteria"]["criterion"][y]["@comment"].as_str() {
                   comment_vec.push(v.to_string());
                 }
               }
             }
-
+            
             for comment in comment_vec {
               // "(CVE-2014-2686) ansible package in bionic, is related to the CVE in some way and has been fixed (note: '2.5.1+dfsg-1ubuntu0.1')."
               let c: Vec<&str> = comment.split("package in").collect();
@@ -90,13 +90,13 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                     let ver: String = s3[0].trim().replace('\'', "");
 
                     if pkg == scan_p.pkgname {
-                      let v: Vec<&str> = ver.split(':').collect();
+                      // let v: Vec<&str> = ver.split(':').collect();
   
                       // 2:6.2.1+dfsg-3ubuntu1
                       let s1: String = String::from(&scan_p.pkgver);
-                      let s2: Vec<&str> = s1.split(':').collect();
+                      // let s2: Vec<&str> = s1.split(':').collect();
                       
-                      if v[1] == s2[1] {
+                      if ver == s1 {
                         let mut issued: String = "-".to_string();
                         let mut impact: String = "-".to_string();
                         let mut cveid:  String = "-".to_string();
@@ -107,23 +107,52 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                         let cwe_name: String = "-".to_string();
                         let cwe_url_vec: Vec<String> = vec!["-".to_string(); 0];
 
-                        if oval[i]["metadata"]["advisory"]["cve"] != Null {
-                          if let Some(v) = oval[i]["metadata"]["advisory"]["cve"].as_array() {
-                            for i in 0..v.len() {
-                              if oval[i]["metadata"]["advisory"]["cve"][i]["@severity"] != Null {
-                                impact = oval[i]["metadata"]["advisory"]["cve"][i]["@severity"].to_string().replace('"', "");
+                        if oval[x]["metadata"]["advisory"]["cve"] != Null {
+                          if let Some(v) = oval[x]["metadata"]["advisory"]["cve"].as_array() {
+                            for y in 0..v.len() {
+                              if oval[x]["metadata"]["advisory"]["cve"][y]["@severity"] != Null {
+                                let s1 = oval[x]["metadata"]["advisory"]["cve"][y]["@severity"].to_string().replace('"', "");
+                                match &s1[..] {
+                                  "critical" => {
+                                    impact = "Critical".to_string();
+                                  }
+                                  "high" => {
+                                    impact = "High".to_string();
+                                  }
+                                  "medium" => {
+                                    impact = "Medium".to_string();
+                                  }
+                                  "low" => {
+                                    impact = "Low".to_string();
+                                  }
+                                  "Critical" => {
+                                    impact = "Critical".to_string();
+                                  }
+                                  "High" => {
+                                    impact = "High".to_string();
+                                  }
+                                  "Medium" => {
+                                    impact = "Medium".to_string();
+                                  }
+                                  "Low" => {
+                                    impact = "Low".to_string();
+                                  }
+                                  _ => {
+                                    impact = "-".to_string();
+                                  }
+                                }
                               }
 
-                              if oval[i]["metadata"]["advisory"]["cve"][i]["$value"] != Null {
-                                cveid = oval[i]["metadata"]["advisory"]["cve"][i]["$value"].to_string().replace('"', "");
+                              if oval[x]["metadata"]["advisory"]["cve"][y]["$value"] != Null {
+                                cveid = oval[x]["metadata"]["advisory"]["cve"][y]["$value"].to_string().replace('"', "");
                               }
 
-                              if oval[i]["metadata"]["advisory"]["cve"][i]["cvss_score"] != Null {
-                                cvssv3_oval = oval[i]["metadata"]["advisory"]["cve"][i]["cvss_score"].to_string().replace('"', "");
+                              if oval[x]["metadata"]["advisory"]["cve"][y]["cvss_score"] != Null {
+                                cvssv3_oval = oval[x]["metadata"]["advisory"]["cve"][y]["cvss_score"].to_string().replace('"', "");
                               }
 
-                              if oval[i]["metadata"]["advisory"]["cve"][i]["public"] != Null {
-                                issued = oval[i]["metadata"]["advisory"]["cve"][i]["public"].to_string().replace('"', "");
+                              if oval[x]["metadata"]["advisory"]["cve"][y]["public"] != Null {
+                                issued = oval[x]["metadata"]["advisory"]["cve"][y]["public"].to_string().replace('"', "");
                               }
 
                               let vulns_list: Vulns = Vulns {

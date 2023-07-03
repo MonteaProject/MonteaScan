@@ -59,22 +59,22 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
 
       for oval in oval_vec {
         if let Some(v) = oval.as_array() {
-          for i in 0..v.len() {
+          for x in 0..v.len() {
             let mut comment_vec: Vec<String> = Vec::new();
 
-            if let Some(v) = oval[i]["criteria"]["criterion"].as_array() {
-              for i in 0..v.len() {
-                if let Some(v) = oval[i]["criteria"]["criterion"][i]["@comment"].as_str() {
+            if let Some(v) = oval[x]["criteria"]["criterion"].as_array() {
+              for y in 0..v.len() {
+                if let Some(v) = oval[x]["criteria"]["criterion"][y]["@comment"].as_str() {
                   comment_vec.push(v.to_string());
                 }
               }
             }
 
-            if let Some(v) = oval[i]["criteria"]["criteria"].as_array() {
-              for i in 0..v.len() {
-                if let Some(v) = oval[i]["criteria"]["criteria"][i]["criterion"].as_array() {
-                  for i in 0..v.len() {
-                    if let Some(v) = oval[i]["criteria"]["criteria"][i]["criterion"][i]["@comment"].as_str() {
+            if let Some(v) = oval[x]["criteria"]["criteria"].as_array() {
+              for y in 0..v.len() {
+                if let Some(v) = oval[x]["criteria"]["criteria"][y]["criterion"].as_array() {
+                  for z in 0..v.len() {
+                    if let Some(v) = oval[x]["criteria"]["criteria"][y]["criterion"][z]["@comment"].as_str() {
                       comment_vec.push(v.to_string());
                     }
                   }
@@ -95,6 +95,8 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                   let mut p: String = String::from(&scan_p.pkgver);
                   p += "-";
                   p += &scan_p.pkgrelease;
+
+                  println!("{:?},{:?}", v[1], p);
                   
                   if v[1] == p {
                     let cveid: String       = "-".to_string();
@@ -104,18 +106,47 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                     let cwe_url_vec: Vec<String> = vec!["-".to_string(); 0];
 
                     let mut issued: String = "-".to_string();
-                    if oval[i]["metadata"]["advisory"]["issued"]["@date"] != Null {
-                      issued = oval[i]["metadata"]["advisory"]["issued"]["@date"].to_string().replace('"', "");
+                    if oval[x]["metadata"]["advisory"]["issued"]["@date"] != Null {
+                      issued = oval[x]["metadata"]["advisory"]["issued"]["@date"].to_string().replace('"', "");
                     }
 
                     let mut updated: String = "-".to_string();
-                    if oval[i]["metadata"]["advisory"]["updated"]["@date"] != Null {
-                      updated = oval[i]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
+                    if oval[x]["metadata"]["advisory"]["updated"]["@date"] != Null {
+                      updated = oval[x]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
                     }
 
                     let mut impact:      String = "-".to_string();
-                    if oval[i]["metadata"]["advisory"]["severity"] != Null {
-                      impact = oval[i]["metadata"]["advisory"]["severity"].to_string().replace('"', "");
+                    if oval[x]["metadata"]["advisory"]["severity"] != Null {
+                      let s1 = oval[x]["metadata"]["advisory"]["severity"].to_string().replace('"', "");
+                      match &s1[..] {
+                        "Critical" => {
+                          impact = "Critical".to_string();
+                        }
+                        "Important" => {
+                          impact = "High".to_string();
+                        }
+                        "Moderate" => {
+                          impact = "Medium".to_string();
+                        }
+                        "Low" => {
+                          impact = "Low".to_string();
+                        }
+                        "critical" => {
+                          impact = "Critical".to_string();
+                        }
+                        "important" => {
+                          impact = "High".to_string();
+                        }
+                        "moderate" => {
+                          impact = "Medium".to_string();
+                        }
+                        "low" => {
+                          impact = "Low".to_string();
+                        }
+                        _ => {
+                          impact = "-".to_string();
+                        }
+                      }
                     }
 
                     let vulns_list: Vulns = Vulns {
