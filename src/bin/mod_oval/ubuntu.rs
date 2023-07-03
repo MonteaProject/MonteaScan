@@ -55,18 +55,10 @@ struct UbuntuReference {
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct UbuntuAdvisory {
-  #[serde(rename = "@from")]
-  from:     Option<String>,
-  severity: Option<String>,
-  issued:   Option<UbuntuIssued>,
-  cve:      Option<Vec<UbuntuCve>>,
-  bug:      Option<Vec<String>>,
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct UbuntuIssued {
-  #[serde(rename = "@date")]
-  date: Option<String>
+  rights:          Option<String>,
+  component:       Option<String>,
+  current_version: Option<String>,
+  cve:             Option<Vec<UbuntuCve>>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
@@ -81,14 +73,31 @@ struct UbuntuCve {
   severity:    Option<String>,
   #[serde(rename = "@public")]
   public:      Option<String>,
-  #[serde(rename = "$value")]
-  cve:         Option<String>,
   #[serde(rename = "@usns")]
   usns:        Option<String>,
+  #[serde(rename = "$value")]
+  cve:         Option<String>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct UbuntuCriteria {
+  extend_definition: Option<Extend>,
+  criteria:          Option<UbuntuCriteria2>,
+  
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Extend {
+  #[serde(rename = "@definition_ref")]
+  definition_ref:      Option<String>,
+  #[serde(rename = "@comment")]
+  comment:             Option<String>,
+  #[serde(rename = "@applicability_check")]
+  applicability_check: Option<String>
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct UbuntuCriteria2 {
   #[serde(rename = "@operator")]
   operator:  Option<String>,
   criterion: Option<Vec<UbuntuCriterion>>
@@ -121,7 +130,7 @@ pub async fn main(mongo_client: MongoClient) -> Result<()> {
   ];
 
   for v in code_name {
-    let url: String = String::from("https://security-metadata.canonical.com/oval/com.ubuntu.") + v + ".usn.oval.xml.bz2";
+    let url: String = String::from("https://security-metadata.canonical.com/oval/com.ubuntu.") + v + ".pkg.oval.xml.bz2";
 
     let response = reqwest::get(&url).await?;
     let bytes = response.bytes().await?;

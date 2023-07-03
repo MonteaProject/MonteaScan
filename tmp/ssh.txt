@@ -12,3 +12,12 @@ Remote
     PubkeyAuthentication yes
     AuthorizedKeysFile      .ssh/authorized_keys
 # systemctl restart sshd
+
+・ecdsaは、openssh-server バージョン 5.7からサポートされています
+　https://serverfault.com/questions/559373/openssh-doesnt-accept-ecdsa-keys
+
+# ssh -V
+OpenSSH_5.3p1, OpenSSL 1.0.1e-fips 11 Feb 2013
+
+# openssl version
+OpenSSL 1.0.1e-fips 11 Feb 2013

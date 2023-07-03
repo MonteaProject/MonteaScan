@@ -82,3 +82,23 @@ testを書く
 2.ステータス付与機能
 3.グラフ実装
 4.パッケージ化
+
+
+① Ubuntu 14.04 LTS  2019-04  2024-04
+② Ubuntu 16.04 LTS  2021-04  2026-04
+③ Ubuntu 18.04 LTS  2023-06  2028-04
+④ Ubuntu 20.04 LTS  2025-04  2030-04
+⑤ Ubuntu 22.04 LTS  2027-04  2032-04
+⑥ Ubuntu 22.10      2023-07  2023-07
+⑦ Ubuntu 23.04      2024-01  2024-01
+
+⑧ Rocky Linux 8  2024-05-31  2029-05-31
+⑨ Rocky Linux 9  2027-05-31  2032-05-31
+
+⑩ Red Hat Enterprise Linux 6  2016-05-10  2020-11-30  2024-06-30
+⑪ Red Hat Enterprise Linux 7  2019-08-06  2024-06-30  2028-06-30
+⑫ Red Hat Enterprise Linux 8  2024-05-31  2029-05-31  2032-05-31
+⑬ Red Hat Enterprise Linux 9  2027-05-31  2032-05-31  2035-05-31
+
+⑭ AlmaLinux 8  2024-05-01  2029-03-01
+⑮ AlmaLinux 9  2027-05-31  2032-05-31
