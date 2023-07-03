@@ -18,11 +18,13 @@ struct ScanResult {
 
 #[derive(Deserialize, Serialize, Debug)]
 struct PkgList {
-  pkgname    : String,
-  pkgver     : String,
+  pkgname:     String,
+  pkgver:      String,
+  pkgrelease:  String,
   update_flag: String,
-  upver      : String,
-  pkgarch    : String
+  upver:       String,
+  uprelease:   String,
+  pkgarch:     String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -160,13 +162,13 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
       let upver: &str = s1[5];
       let s2:  Vec<_> = s1[0].split('/').collect();
       let name:  &str = s2[0];
-      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), update_flag: "〇".to_string(), upver: upver.to_string(), pkgarch: arch.to_string()});
+      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: "-".to_string(), update_flag: "〇".to_string(), upver: upver.to_string(), uprelease: "-".to_string(), pkgarch: arch.to_string()});
     } else if s1.len() == 4 {
       let ver:  &str = s1[1];
       let arch: &str = s1[2];
       let s2: Vec<_> = s1[0].split('/').collect();
       let name: &str = s2[0];
-      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), update_flag: "-".to_string(), upver: ver.to_string(), pkgarch: arch.to_string()});
+      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: "-".to_string(), update_flag: "-".to_string(), upver: ver.to_string(), uprelease: "-".to_string(), pkgarch: arch.to_string()});
     } else {
       println!("--installed split Failed...");
     }

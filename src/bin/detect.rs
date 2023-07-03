@@ -60,7 +60,7 @@ struct Weaknesses {
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 struct Weakness {
   #[serde(rename = "@ID")]
-  id: Option<String>,
+  id:   Option<String>,
   #[serde(rename = "@Name")]
   name: Option<String>
 }
@@ -124,7 +124,7 @@ async fn main() -> Result<()> {
     // Ubuntu 22.04.2 LTS
     if release[0] == "Ubuntu" {
       let s1: Vec<&str> = release[1].split('.').collect();
-      let s2: String = s1[0].to_string() + s1[1];
+      let s2: String = s1[0].to_string() + "." + s1[1];
       match &s2[..] {
         "14.04" => {
           let url: String = String::from("http://127.0.0.1:7878/trusty/");
@@ -203,9 +203,9 @@ async fn main() -> Result<()> {
       }
     }
     // RedHat
-    // Red Hat Enterprise Linux release 8.2 (Ootpa)
-    else if release[0] == "Red" && release[1] == "Hat" && release[2] == "Enterprise"  && release[3] == "Linux"  && release[4] == "release" {
-      let m: Vec<&str> = release[5].split('.').collect();
+    // Red Hat Enterprise Linux Server release 6.8 (Santiago)\n
+    else if release[0] == "Red" && release[1] == "Hat" && release[2] == "Enterprise"  && release[3] == "Linux" && release[4] == "Server" && release[5] == "release" {
+      let m: Vec<&str> = release[6].split('.').collect();
       let v = m[0];
       match v {
         "6" => {

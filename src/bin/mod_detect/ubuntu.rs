@@ -92,11 +92,11 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                     if pkg == scan_p.pkgname {
                       let v: Vec<&str> = ver.split(':').collect();
   
-                      let mut p: String = String::from(&scan_p.pkgver);
-                      p += "-";
-                      p += &scan_p.pkgrelease;
+                      // 2:6.2.1+dfsg-3ubuntu1
+                      let s1: String = String::from(&scan_p.pkgver);
+                      let s2: Vec<&str> = s1.split(':').collect();
                       
-                      if v[1] == p {
+                      if v[1] == s2[1] {
                         let mut issued: String = "-".to_string();
                         let mut impact: String = "-".to_string();
                         let mut cveid:  String = "-".to_string();
