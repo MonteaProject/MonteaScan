@@ -33,6 +33,87 @@ struct Vulns {
   detect:      Value
 }
 
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaDefinition {
+  #[serde(rename = "@id")]
+  id:       Option<String>,
+  #[serde(rename = "@class")]
+  class:    Option<String>,
+  metadata: Option<AlmaMetadata>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaMetadata {
+  title:       Option<String>,
+  reference:   Option<Vec<AlmaReference>>,
+  description: Option<String>,
+  advisory:    Option<AlmaAdvisory>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaReference {
+  #[serde(rename = "@ref_id")]
+  ref_id:  Option<String>,
+  #[serde(rename = "@ref_url")]
+  ref_url: Option<String>,
+  #[serde(rename = "@source")]
+  source:  Option<String>
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaAdvisory {
+  #[serde(rename = "@from")]
+  from:              Option<String>,
+  severity:          Option<String>,
+  rights:            Option<String>,
+  issued:            Option<AlmaIssued>,
+  updated:           Option<AlmaUpdated>,
+  cve:               Option<Vec<AlmaCve>>,
+  bugzilla:          Option<Vec<AlmaBugzilla>>,
+  affected_cpe_list: Option<AlmaAffectedCpeList>
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaIssued {
+  #[serde(rename = "@date")]
+  date: Option<String>
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaUpdated {
+  #[serde(rename = "@date")]
+  date: Option<String>
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaCve {
+  #[serde(rename = "@cvss3")]
+  cvss3:  Option<String>,
+  #[serde(rename = "@cwe")]
+  cwe:    Option<String>,
+  #[serde(rename = "@href")]
+  href:   Option<String>,
+  #[serde(rename = "@impact")]
+  impact: Option<String>,
+  #[serde(rename = "@public")]
+  public: Option<String>,
+  #[serde(rename = "$value")]
+  cve:    Option<String>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaBugzilla {
+  #[serde(rename = "@href")]
+  href: Option<String>,
+  #[serde(rename = "@id")]
+  id:   Option<String>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct AlmaAffectedCpeList {
+  cpe: Option<Vec<String>>
+}
+
 
 pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String) -> Result<Vec<CweResult>> {
   let mut vulns_vec: Vec<Vulns> = Vec::new();
@@ -59,37 +140,25 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
       let kernel: String = String::from(&scan_r.kernel).replace('\n', "");
 
       for oval in oval_vec {
-        if let Some(v) = oval.as_array() {
-          for x in 0..v.len() {
-            let mut comment_vec: Vec<String> = Vec::new();
+        let mut comment_vec: Vec<&str> = Vec::new();
 
-            if let Some(v) = oval[x]["criteria"]["criterion"].as_array() {
-              for y in 0..v.len() {
-                if let Some(v) = oval[x]["criteria"]["criterion"][y]["@comment"].as_str() {
-                  comment_vec.push(v.to_string());
+        if let Some(v) = oval[0]["criteria"]["criteria"].as_array() {
+          for y in 0..v.len() {
+            if let Some(v) = oval[0]["criteria"]["criteria"][y]["criterion"].as_array() {
+              for z in 0..v.len() {
+                if let Some(v) = oval[0]["criteria"]["criteria"][y]["criterion"][z]["@comment"].as_str() {
+                  comment_vec.push(v);
                 }
               }
             }
-
-            if let Some(v) = oval[x]["criteria"]["criteria"].as_array() {
-              for y in 0..v.len() {
-                if let Some(v) = oval[x]["criteria"]["criteria"][y]["criterion"].as_array() {
-                  for z in 0..v.len() {
-                    if let Some(v) = oval[x]["criteria"]["criteria"][y]["criterion"][z]["@comment"].as_str() {
-                      comment_vec.push(v.to_string());
-                    }
-                  }
-                }
-                if let Some(v) = oval[x]["criteria"]["criteria"][y]["criteria"].as_array() {
-                  for z in 0..v.len() {
-                    if let Some(v) = oval[x]["criteria"]["criteria"][y]["criteria"][z]["criteria"].as_array() {
-                      for k in 0..v.len() {
-                        if let Some(v) = oval[x]["criteria"]["criteria"][y]["criteria"][z]["criteria"][k]["criterion"].as_array() {
-                          for r in 0..v.len() {
-                            if let Some(v) = oval[x]["criteria"]["criteria"][y]["criteria"][z]["criteria"][k]["criterion"][r]["@comment"].as_str() {
-                              comment_vec.push(v.to_string());
-                            }
-                          }
+            if let Some(v) = oval[0]["criteria"]["criteria"][y]["criteria"].as_array() {
+              for z in 0..v.len() {
+                if let Some(v) = oval[0]["criteria"]["criteria"][y]["criteria"][z]["criteria"].as_array() {
+                  for k in 0..v.len() {
+                    if let Some(v) = oval[0]["criteria"]["criteria"][y]["criteria"][z]["criteria"][k]["criterion"].as_array() {
+                      for r in 0..v.len() {
+                        if let Some(v) = oval[0]["criteria"]["criteria"][y]["criteria"][z]["criteria"][k]["criterion"][r]["@comment"].as_str() {
+                          comment_vec.push(v);
                         }
                       }
                     }
@@ -97,152 +166,144 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                 }
               }
             }
+          }
+        }
 
-            for comment in comment_vec {
-              let c: Vec<&str> = comment.split("is earlier than").collect();
+        for comment in comment_vec {
+          let c: Vec<&str> = comment.split("is earlier than").collect();
 
-              if c.len() == 2 {
-                let pkg: &str = c[0].trim();
-                let ver: &str = c[1].trim();
+          if c.len() == 2 {
+            let pkg: &str       = c[0].trim();
+            let mut ver: String = c[1].trim().to_string();
 
-                if pkg == scan_p.pkgname {
-                  let v: Vec<&str> = ver.split(':').collect();
+            if pkg == scan_p.pkgname {
+              let r1: Vec<&str> = ver.split(':').collect();
+              if r1.len() == 2 {
+                if r1[0] == "0" || r1[0] == "none" {
+                  ver = r1[1].to_string();
+                } else {
+                  let r2: Vec<&str> = r1[1].split('-').collect();
+                  if r2.len() == 2 {
+                    let r3: &str = r1[0];
+                    let r4: &str = r2[1];
+                    ver = r3.to_string() + r4;
+                  } else {
+                    ver = r1[0].to_string();
+                  }
+                }
+              }
 
-                  let mut p: String = String::from(&scan_p.pkgver);
-                  p += "-";
-                  p += &scan_p.pkgrelease;
-                  
-                  if v[1] == p {
-                    let mut issued: String = "-".to_string();
-                    if oval[x]["metadata"]["advisory"]["issued"]["@date"] != Null {
-                      issued = oval[x]["metadata"]["advisory"]["issued"]["@date"].to_string().replace('"', "");
-                    }
+              let mut p: String = String::from(&scan_p.pkgver);
+              p += "-";
+              p += &scan_p.pkgrelease;
+              
+              if ver == p {
+                let mut issued: String = "-".to_string();
+                if oval[0]["metadata"]["advisory"]["issued"]["@date"] != Null {
+                  issued = oval[0]["metadata"]["advisory"]["issued"]["@date"].to_string().replace('"', "");
+                }
 
-                    let mut updated: String = "-".to_string();
-                    if oval[x]["metadata"]["advisory"]["updated"]["@date"] != Null {
-                      updated = oval[x]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
-                    }
+                let mut updated: String = "-".to_string();
+                if oval[0]["metadata"]["advisory"]["updated"]["@date"] != Null {
+                  updated = oval[0]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
+                }
 
-                    let cvssv3_oval:     String = "-".to_string();
-                    let mut impact:      String = "-".to_string();
-                    let mut cveid:       String = "-".to_string();
-                    let mut cwe_oval:    String = "-".to_string();
-                    let mut cwe_name:    String = "-".to_string();
-                    let mut cwe_url_vec: Vec<String> = vec!["-".to_string(); 0];
+                let cvssv3_oval:     String = "-".to_string();
+                let mut impact:      String = "-".to_string();
+                let mut cveid:       String = "-".to_string();
+                let mut cwe_oval:    String = "-".to_string();
+                let mut cwe_name:    String = "-".to_string();
+                let mut cwe_url_vec: Vec<String> = vec!["-".to_string(); 0];
 
-                    let cwe_read: String = String::from("./src/cwe/cwe.json");
-                    let cwe: Cwe = {
-                      let cwe: String = std::fs::read_to_string(&cwe_read)?;
-                      serde_json::from_str::<Cwe>(&cwe)?
-                    };
+                let cwe_read: String = String::from("./src/cwe/cwe.json");
+                let cwe: Cwe = {
+                  let cwe: String = std::fs::read_to_string(&cwe_read)?;
+                  serde_json::from_str::<Cwe>(&cwe)?
+                };
 
-                    if oval[x]["metadata"]["advisory"]["cve"] != Null {
-                      if let Some(v) = oval[x]["metadata"]["advisory"]["cve"].as_array() {
-                        for y in 0..v.len() {
-                          if oval[x]["metadata"]["advisory"]["cve"][y]["@impact"] != Null {
-                            let s1 = oval[x]["metadata"]["advisory"]["cve"][y]["@impact"].to_string().replace('"', "");
-                            match &s1[..] {
-                              "Critical" => {
-                                impact = "Critical".to_string();
-                              }
-                              "Important" => {
-                                impact = "High".to_string();
-                              }
-                              "Moderate" => {
-                                impact = "Medium".to_string();
-                              }
-                              "Low" => {
-                                impact = "Low".to_string();
-                              }
-                              "critical" => {
-                                impact = "Critical".to_string();
-                              }
-                              "important" => {
-                                impact = "High".to_string();
-                              }
-                              "moderate" => {
-                                impact = "Medium".to_string();
-                              }
-                              "low" => {
-                                impact = "Low".to_string();
-                              }
-                              _ => {
-                                impact = "-".to_string();
-                              }
-                            }
+                if oval[0]["metadata"]["advisory"]["cve"] != Null {
+                  if let Some(v) = oval[0]["metadata"]["advisory"]["cve"].as_array() {
+                    for y in 0..v.len() {
+                      if oval[0]["metadata"]["advisory"]["cve"][y]["@impact"] != Null {
+                        let s1 = oval[0]["metadata"]["advisory"]["cve"][y]["@impact"].to_string().replace('"', "");
+                        match &s1[..] {
+                          "Critical" => {
+                            impact = "Critical".to_string();
                           }
-      
-                          if oval[x]["metadata"]["advisory"]["cve"][y]["$value"] != Null {
-                            cveid = oval[x]["metadata"]["advisory"]["cve"][y]["$value"].to_string().replace('"', "");
+                          "Important" => {
+                            impact = "High".to_string();
                           }
-      
-                          if oval[x]["metadata"]["advisory"]["cve"][y]["@cwe"] != Null {
-                            let s = oval[x]["metadata"]["advisory"]["cve"][y]["@cwe"].to_string().replace('"', "");
-
-                            let s5: Vec<&str> = s.split("->").collect();
-                            if s5.len() > 1 {
-                              let s6 = s5.len()-1;
-                              cwe_oval = s5[s6].to_string();
-                            } else {
-                              cwe_oval = s;
-                            }
-
-                            let s1: &String   = &cwe_oval.replace("CWE-", "");
-                            let s2: &String   = &s1.replace('(', "");
-                            let s3: &String   = &s2.replace(')', "");
-                            let s4: Vec<&str> = s3.split('|').collect();
-                            for i in s4 {
-                              let cwe_url = String::from("https://cwe.mitre.org/data/definitions/") + i + ".html";
-                              cwe_url_vec.push(cwe_url);
-                            }
-
-                            for i in 0..cwe.Weaknesses.Weakness.len() {
-                              let cwe_id = &cwe.Weaknesses.Weakness[i].id.clone().unwrap_or(0.to_string());
-      
-                              if s1 == cwe_id {
-                                cwe_name = cwe.Weaknesses.Weakness[i].name.clone().unwrap_or("None".to_string());
-      
-                                let cwe_list: CweResult = CweResult{
-                                  time:     time.clone(),
-                                  hostname: hostname.clone(),
-                                  ip:       ip.clone(),
-                                  os:       os.clone(),
-                                  kernel:   kernel.clone(),
-                                  cwe_id:   cwe_id.clone(),
-                                  cwe_name: cwe_name.clone()
-                                };
-                                cwe_vec.push(cwe_list);
-                              }
-                            }
+                          "Moderate" => {
+                            impact = "Medium".to_string();
                           }
-                          
-                          let vulns_list: Vulns = Vulns {
-                            time:        time.clone(),
-                            hostname:    hostname.clone(),
-                            ip:          ip.clone(),
-                            os:          os.clone(),
-                            kernel:      kernel.clone(),
-                            issued:      issued.clone(),
-                            updated:     updated.clone(),
-                            impact:      impact.clone(),
-                            cveid:       cveid.clone(),
-                            cwe_oval:    cwe_oval.clone(),
-                            cwe_name:    cwe_name.clone(),
-                            cwe_url_vec: cwe_url_vec.clone(),
-                            cvssv3_oval: cvssv3_oval.clone(),
-                            pkgname:     scan_p.pkgname.clone(),
-                            pkgver:      scan_p.pkgver.clone(),
-                            pkgrelease:  scan_p.pkgrelease.clone(),
-                            update_flag: scan_p.update_flag.clone(),
-                            upver:       scan_p.upver.clone(),
-                            uprelease:   scan_p.uprelease.clone(),
-                            pkgarch:     scan_p.pkgarch.clone(),
-                            detect:      oval.clone()
-                          };
-                          vulns_vec.push(vulns_list);
+                          "Low" => {
+                            impact = "Low".to_string();
+                          }
+                          "critical" => {
+                            impact = "Critical".to_string();
+                          }
+                          "important" => {
+                            impact = "High".to_string();
+                          }
+                          "moderate" => {
+                            impact = "Medium".to_string();
+                          }
+                          "low" => {
+                            impact = "Low".to_string();
+                          }
+                          _ => {
+                            impact = "-".to_string();
+                          }
                         }
                       }
-                    } else {
+  
+                      if oval[0]["metadata"]["advisory"]["cve"][y]["$value"] != Null {
+                        cveid = oval[0]["metadata"]["advisory"]["cve"][y]["$value"].to_string().replace('"', "");
+                      }
+  
+                      if oval[0]["metadata"]["advisory"]["cve"][y]["@cwe"] != Null {
+                        let s = oval[0]["metadata"]["advisory"]["cve"][y]["@cwe"].to_string().replace('"', "");
+
+                        let s5: Vec<&str> = s.split("->").collect();
+                        if s5.len() > 1 {
+                          let s6 = s5.len()-1;
+                          cwe_oval = s5[s6].to_string();
+                        } else {
+                          cwe_oval = s;
+                        }
+
+                        let s1: &String   = &cwe_oval.replace("CWE-", "");
+                        let s2: &String   = &s1.replace('(', "");
+                        let s3: &String   = &s2.replace(')', "");
+                        let s4: Vec<&str> = s3.split('|').collect();
+                        for i in s4 {
+                          let cwe_url = String::from("https://cwe.mitre.org/data/definitions/") + i + ".html";
+                          cwe_url_vec.push(cwe_url);
+                        }
+
+                        for i in 0..cwe.Weaknesses.Weakness.len() {
+                          let cwe_id = &cwe.Weaknesses.Weakness[i].id.clone().unwrap_or(0.to_string());
+  
+                          if s1 == cwe_id {
+                            cwe_name = cwe.Weaknesses.Weakness[i].name.clone().unwrap_or("None".to_string());
+  
+                            let cwe_list: CweResult = CweResult{
+                              time:     time.clone(),
+                              hostname: hostname.clone(),
+                              ip:       ip.clone(),
+                              os:       os.clone(),
+                              kernel:   kernel.clone(),
+                              cwe_id:   cwe_id.clone(),
+                              cwe_name: cwe_name.clone()
+                            };
+                            cwe_vec.push(cwe_list);
+                          }
+                        }
+                      }
+
+                      let alma_oval: Vec<AlmaDefinition> = serde_json::from_value(oval.clone())?;
+                      let alma_value: Value = serde_json::to_value(alma_oval)?;
+
                       let vulns_list: Vulns = Vulns {
                         time:        time.clone(),
                         hostname:    hostname.clone(),
@@ -264,12 +325,41 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                         upver:       scan_p.upver.clone(),
                         uprelease:   scan_p.uprelease.clone(),
                         pkgarch:     scan_p.pkgarch.clone(),
-                        detect:      oval.clone()
+                        detect:      alma_value.clone()
                       };
                       vulns_vec.push(vulns_list);
                     }
                   }
+                } else {
+                  let alma_oval: Vec<AlmaDefinition> = serde_json::from_value(oval.clone())?;
+                  let alma_value: Value = serde_json::to_value(alma_oval)?;
+
+                  let vulns_list: Vulns = Vulns {
+                    time:        time.clone(),
+                    hostname:    hostname.clone(),
+                    ip:          ip.clone(),
+                    os:          os.clone(),
+                    kernel:      kernel.clone(),
+                    issued:      issued.clone(),
+                    updated:     updated.clone(),
+                    impact:      impact.clone(),
+                    cveid:       cveid.clone(),
+                    cwe_oval:    cwe_oval.clone(),
+                    cwe_name:    cwe_name.clone(),
+                    cwe_url_vec: cwe_url_vec.clone(),
+                    cvssv3_oval: cvssv3_oval.clone(),
+                    pkgname:     scan_p.pkgname.clone(),
+                    pkgver:      scan_p.pkgver.clone(),
+                    pkgrelease:  scan_p.pkgrelease.clone(),
+                    update_flag: scan_p.update_flag.clone(),
+                    upver:       scan_p.upver.clone(),
+                    uprelease:   scan_p.uprelease.clone(),
+                    pkgarch:     scan_p.pkgarch.clone(),
+                    detect:      alma_value.clone()
+                  };
+                  vulns_vec.push(vulns_list);
                 }
+                break;
               }
             }
           }

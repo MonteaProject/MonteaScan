@@ -49,6 +49,8 @@ fn main() -> Result<()> {
     let host_port: String = host.to_owned() + ":" + port;
     let prikey: PathBuf   = PathBuf::from(key);
 
+    println!("{:?} に接続...", host);
+
     match &os[..] {
       "RedHat" => {
         if let Err(e) = scanner_rhel(user, prikey, host_port) {

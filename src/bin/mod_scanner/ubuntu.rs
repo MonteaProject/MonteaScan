@@ -53,8 +53,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   ch.read_to_string(&mut hostname)?;
   ch.wait_close().expect("Close SSH Connection Failed...");
 
-  if ch.exit_status()? == 0 {
-  } else {
+  if ch.exit_status()? != 0 {
     println!("command hostname Failed");
   }
 
@@ -78,8 +77,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   ch.read_to_string(&mut kernel)?;
   ch.wait_close().expect("Close SSH Connection Failed...");
   
-  if ch.exit_status()? == 0 {
-  } else {
+  if ch.exit_status()? != 0 {
     println!("command uname -r Failed");
   }
 
@@ -102,8 +100,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
 
   ch.wait_close().expect("Close SSH Connection Failed...");
   
-  if ch.exit_status()? == 0 {
-  } else {
+  if ch.exit_status()? != 0 {
     println!("command lsb_release Failed");
   }
 
@@ -135,8 +132,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   }
   ch.wait_close().expect("Close SSH Connection Failed...");
 
-  if ch.exit_status()? == 0 {
-  } else {
+  if ch.exit_status()? != 0 {
     println!("command ip addr Failed");
   }
 
@@ -157,27 +153,159 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
     let s1: Vec<&str> = t.split_whitespace().collect::<Vec<&str>>();
 
     if s1.len() == 6 {
-      let ver:   &str = s1[1];
-      let arch:  &str = s1[2];
-      let upver: &str = s1[5];
-      let s2:  Vec<_> = s1[0].split('/').collect();
-      let name:  &str = s2[0];
-      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: "-".to_string(), update_flag: "〇".to_string(), upver: upver.to_string(), uprelease: "-".to_string(), pkgarch: arch.to_string()});
-    } else if s1.len() == 4 {
-      let ver:  &str = s1[1];
+      let s3:  Vec<_> = s1[0].split('/').collect();
+      let name:  &str = s3[0];
+      let arch: &str  = s1[2];
+
+      let mut ver:     &str = s1[1]; // [epoch:]upstream-version[-debian-revision]
+      let mut release: &str = "-";
+
+      let r2: Vec<&str> = s1[1].split(':').collect();
+      if r2.len() == 2 {
+        if r2[0] == "0" || r2[0] == "none" {
+          let v: Vec<&str> = s1[1].split('-').collect();
+          if v.len() == 2 {
+            ver     = v[0];  // upstream-version
+            release = v[1];  // [-debian-revision]
+          }
+        } else {
+          let v: Vec<&str> = r2[1].split('-').collect();
+          if v.len() == 2 {
+            ver     = r2[0]; // [epoch:]
+            release = v[1];  // [-debian-revision]
+          }
+        }
+      } else {
+        let v: Vec<&str> = s1[1].split('-').collect();
+        if v.len() == 2 {
+          ver     = v[0];  // upstream-version
+          release = v[1];  // [-debian-revision]
+        }
+      }
+      
+      let mut upver:     &str = s1[5];
+      let mut uprelease: &str = "-";
+      let r1: Vec<&str> = s1[5].split(':').collect();
+      if r1.len() == 2 {
+        if r1[0] == "0" || r1[0] == "none" {
+          let v: Vec<&str> = r1[1].split('-').collect();
+          if v.len() == 2 {
+            upver     = v[0];
+            uprelease = v[1];
+          }
+        } else {
+          let v: Vec<&str> = r1[1].split('-').collect();
+          if v.len() == 2 {
+            upver     = r1[0];
+            uprelease = v[1];
+          }
+        }
+      } else {
+        let v: Vec<&str> = r1[1].split('-').collect();
+        if v.len() == 2 {
+          upver     = v[0];
+          uprelease = v[1];
+        }
+      }
+      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), update_flag: "〇".to_string(), upver: upver.to_string(), uprelease: uprelease.to_string(), pkgarch: arch.to_string()});
+    }
+    else if s1.len() == 5 {
+      // ["libmm-glib0/now", "1.20.0-1~ubuntu22.04.1", "amd64", "[インストール済み、1.20.0-1~ubuntu22.04.2", "にアップグレード可]"]
+      let s3:  Vec<_> = s1[0].split('/').collect();
+      let name:  &str = s3[0];
+      let arch: &str  = s1[2];
+
+      let mut ver:     &str = s1[1]; // [epoch:]upstream-version[-debian-revision]
+      let mut release: &str = "-";
+
+      let r2: Vec<&str> = s1[1].split(':').collect();
+      if r2.len() == 2 {
+        if r2[0] == "0" || r2[0] == "none" {
+          let v: Vec<&str> = s1[1].split('-').collect();
+          if v.len() == 2 {
+            ver     = v[0];  // upstream-version
+            release = v[1];  // [-debian-revision]
+          }
+        } else {
+          let v: Vec<&str> = r2[1].split('-').collect();
+          if v.len() == 2 {
+            ver     = r2[0]; // [epoch:]
+            release = v[1];  // [-debian-revision]
+          }
+        }
+      } else {
+        let v: Vec<&str> = s1[1].split('-').collect();
+        if v.len() == 2 {
+          ver     = v[0];  // upstream-version
+          release = v[1];  // [-debian-revision]
+        }
+      }
+      
+      let upver:     &str = "-";
+      let uprelease: &str = "-";
+      // let r1: Vec<&str> = s1[5].split(':').collect();
+      // if r1.len() == 2 {
+      //   if r1[0] == "0" || r1[0] == "none" {
+      //     let v: Vec<&str> = r1[1].split('-').collect();
+      //     if v.len() == 2 {
+      //       upver     = v[0];
+      //       uprelease = v[1];
+      //     }
+      //   } else {
+      //     let v: Vec<&str> = r1[1].split('-').collect();
+      //     if v.len() == 2 {
+      //       upver     = r1[0];
+      //       uprelease = v[1];
+      //     }
+      //   }
+      // } else {
+      //   let v: Vec<&str> = r1[1].split('-').collect();
+      //   if v.len() == 2 {
+      //     upver     = v[0];
+      //     uprelease = v[1];
+      //   }
+      // }
+      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), update_flag: "-".to_string(), upver: upver.to_string(), uprelease: uprelease.to_string(), pkgarch: arch.to_string()});
+    }
+    else if s1.len() == 4 {
+      let s3: Vec<_> = s1[0].split('/').collect();
+      let name: &str = s3[0];
       let arch: &str = s1[2];
-      let s2: Vec<_> = s1[0].split('/').collect();
-      let name: &str = s2[0];
-      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: "-".to_string(), update_flag: "-".to_string(), upver: ver.to_string(), uprelease: "-".to_string(), pkgarch: arch.to_string()});
+
+      let mut ver:     &str = s1[1];
+      let mut release: &str = "-";
+
+      let r2: Vec<&str> = s1[1].split(':').collect();
+      if r2.len() == 2 {
+        if r2[0] == "0" || r2[0] == "none" {
+          let v: Vec<&str> = s1[1].split('-').collect();
+          if v.len() == 2 {
+            ver     = v[0];
+            release = v[1];
+          }
+        } else {
+          let v: Vec<&str> = r2[1].split('-').collect();
+          if v.len() == 2 {
+            ver     = r2[0];
+            release = v[1];
+          }
+        }
+      } else {
+        let v: Vec<&str> = s1[1].split('-').collect();
+        if v.len() == 2 {
+          ver     = v[0];
+          release = v[1];
+        }
+      }
+      localinfo.pkg.push(PkgList { pkgname: name.to_string(), pkgver: ver.to_string(), pkgrelease: release.to_string(), update_flag: "-".to_string(), upver: ver.to_string(), uprelease: release.to_string(), pkgarch: arch.to_string()});
     } else {
-      println!("--installed split Failed...");
+      println!("I1002...");
     }
   }
   ch.wait_close().expect("Close SSH Connection Failed...");
   
-  if ch.exit_status()? == 0 {
-  } else {
-    println!("command dnf rpm -qa Failed");
+  if ch.exit_status()? != 2 {
+    println!("command apt list --installed Failed {:?}", ch.exit_status());
   }
 
   let filename:   String = hostname.replace('\n', "") + ".json";

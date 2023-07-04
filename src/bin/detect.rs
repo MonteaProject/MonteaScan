@@ -65,8 +65,7 @@ struct Weakness {
   name: Option<String>
 }
 
-
-#[tokio::main(flavor = "current_thread")]
+#[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<()> {
   println!("start...");
 

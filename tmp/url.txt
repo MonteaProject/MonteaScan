@@ -74,3 +74,12 @@ https://wiki.almalinux.org/release-notes/
 
 OS EOL 情報
 https://endoflife.date/
+
+Debian パッケージのバージョン番号の形式
+https://manpages.ubuntu.com/manpages/trusty/ja/man5/deb-version.5.html
+
+EPOC
+https://mag.osdn.jp/14/01/10/090000/2
+
+yum コマンドの出力は grep してはいけない (grep するには向いていない)
+https://w.vmeta.jp/tdiary/20131030.html

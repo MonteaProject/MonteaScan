@@ -53,8 +53,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   ch.read_to_string(&mut hostname)?;
   ch.wait_close().expect("Close SSH Connection Failed...");
 
-  if ch.exit_status()? == 0 {
-  } else {
+  if ch.exit_status()? != 0 {
     println!("command hostname Failed");
   }
 
@@ -78,8 +77,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   ch.read_to_string(&mut kernel)?;
   ch.wait_close().expect("Close SSH Connection Failed...");
   
-  if ch.exit_status()? == 0 {
-  } else {
+  if ch.exit_status()? != 0 {
     println!("command uname -r Failed");
   }
 
@@ -95,8 +93,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   ch.read_to_string(&mut os)?;
   ch.wait_close().expect("Close SSH Connection Failed...");
   
-  if ch.exit_status()? == 0 {
-  } else {
+  if ch.exit_status()? != 0 {
     println!("command system-release Failed");
   }
 
@@ -128,8 +125,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   }
   ch.wait_close().expect("Close SSH Connection Failed...");
 
-  if ch.exit_status()? == 0 {
-  } else {
+  if ch.exit_status()? != 0 {
     println!("command ip addr Failed");
   }
 
@@ -140,14 +136,13 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   sess.handshake()?;
   sess.userauth_pubkey_file(user, None, prikey.as_path(), None)?;
   let mut ch: ssh2::Channel = sess.channel_session()?;
-  ch.exec("dnf makecache --assumeyes")?;
+  ch.exec("yum makecache --assumeyes")?;
   let mut makecache: String = String::new();
   ch.read_to_string(&mut makecache)?;
   ch.wait_close().expect("Close SSH Connection Failed...");
   
-  if ch.exit_status()? == 0 {
-  } else {
-    println!("command dnf makecache Failed");
+  if ch.exit_status()? != 0 {
+    println!("command yum makecache Failed");
   }
 
   // check-update
@@ -161,7 +156,7 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   sess.handshake()?;
   sess.userauth_pubkey_file(user, None, prikey.as_path(), None)?;
   let mut ch: ssh2::Channel = sess.channel_session()?;
-  ch.exec("dnf check-update --assumeyes")?;
+  ch.exec("yum check-update --assumeyes")?;
   let mut check_update: String = String::new();
   ch.read_to_string(&mut check_update)?;
 
@@ -176,14 +171,13 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
       let repo: &str = u[2];
       updateinfo.update.push(UpdateList { name: name.to_string(), ver: ver.to_string(), repo: repo.to_string() });
     } else {
-      println!("len 3 Failed");
+      println!("I1001...");
     }
   }
   ch.wait_close().expect("Close SSH Connection Failed...");
   
-  if ch.exit_status()? == 0 {
-  } else {
-    println!("command dnf check-update Failed");
+  if ch.exit_status()? != 100 {
+    println!("command yum check-update Failed... {:?}", ch.exit_status());
   }
 
   // pkg
@@ -263,9 +257,8 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   }
   ch.wait_close().expect("Close SSH Connection Failed...");
   
-  if ch.exit_status()? == 0 {
-  } else {
-    println!("command dnf rpm -qa Failed");
+  if ch.exit_status()? != 0 {
+    println!("command Failed: rpm -qa");
   }
 
   let filename:   String = hostname.replace('\n', "") + ".json";
