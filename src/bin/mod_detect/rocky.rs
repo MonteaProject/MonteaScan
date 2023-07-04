@@ -96,8 +96,6 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                   p += "-";
                   p += &scan_p.pkgrelease;
 
-                  println!("{:?},{:?}", v[1], p);
-                  
                   if v[1] == p {
                     let cveid: String       = "-".to_string();
                     let cvssv3_oval: String = "-".to_string();

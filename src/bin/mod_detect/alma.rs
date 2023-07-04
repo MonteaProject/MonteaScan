@@ -123,9 +123,9 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                       updated = oval[x]["metadata"]["advisory"]["updated"]["@date"].to_string().replace('"', "");
                     }
 
+                    let cvssv3_oval:     String = "-".to_string();
                     let mut impact:      String = "-".to_string();
                     let mut cveid:       String = "-".to_string();
-                    let mut cvssv3_oval: String = "-".to_string();
                     let mut cwe_oval:    String = "-".to_string();
                     let mut cwe_name:    String = "-".to_string();
                     let mut cwe_url_vec: Vec<String> = vec!["-".to_string(); 0];
@@ -176,15 +176,17 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                             cveid = oval[x]["metadata"]["advisory"]["cve"][y]["$value"].to_string().replace('"', "");
                           }
       
-                          if oval[x]["metadata"]["advisory"]["cve"][y]["@cvss3"] != Null {
-                            let s1 = oval[x]["metadata"]["advisory"]["cve"][y]["@cvss3"].to_string().replace('"', "");
-                            let s2: Vec<&str> = s1.split('/').collect();
-                            cvssv3_oval = s2[0].to_string();
-                          }
-      
                           if oval[x]["metadata"]["advisory"]["cve"][y]["@cwe"] != Null {
-                            cwe_oval = oval[x]["metadata"]["advisory"]["cve"][y]["@cwe"].to_string().replace('"', "");
-      
+                            let s = oval[x]["metadata"]["advisory"]["cve"][y]["@cwe"].to_string().replace('"', "");
+
+                            let s5: Vec<&str> = s.split("->").collect();
+                            if s5.len() > 1 {
+                              let s6 = s5.len()-1;
+                              cwe_oval = s5[s6].to_string();
+                            } else {
+                              cwe_oval = s;
+                            }
+
                             let s1: &String   = &cwe_oval.replace("CWE-", "");
                             let s2: &String   = &s1.replace('(', "");
                             let s3: &String   = &s2.replace(')', "");
@@ -193,7 +195,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                               let cwe_url = String::from("https://cwe.mitre.org/data/definitions/") + i + ".html";
                               cwe_url_vec.push(cwe_url);
                             }
-                            
+
                             for i in 0..cwe.Weaknesses.Weakness.len() {
                               let cwe_id = &cwe.Weaknesses.Weakness[i].id.clone().unwrap_or(0.to_string());
       

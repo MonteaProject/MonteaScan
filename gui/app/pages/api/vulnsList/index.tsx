@@ -52,25 +52,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let moderate  = 0;
             let low       = 0;
             for(let i = 0; i < json.length; i++) {
-              if (json[i].detect === null) {
+              if (json[i].impact === "-") {
                 continue;
               } else {
-                for(let c = 0; c < json[i].detect.length; c++) {
-                  if (json[i].detect[c].metadata.advisory.severity === "Critical") {
-                    criticalTotal += 1;
-                    critical += 1;
-                  } else if (json[i].detect[c].metadata.advisory.severity === "Important") {
-                    importantTotal += 1;
-                    important += 1;
-                  } else if (json[i].detect[c].metadata.advisory.severity === "Moderate") {
-                    moderateTotal += 1;
-                    moderate += 1;
-                  } else if (json[i].detect[c].metadata.advisory.severity === "Low") {
-                    lowTotal += 1;
-                    low += 1;
-                  } else {
-                    console.log("新たなCVE重要度が追加されています...");
-                  }
+                if (json[i].impact === "Critical") {
+                  criticalTotal += 1;
+                  critical += 1;
+                } else if (json[i].impact === "High") {
+                  importantTotal += 1;
+                  important += 1;
+                } else if (json[i].impact === "Medium") {
+                  moderateTotal += 1;
+                  moderate += 1;
+                } else if (json[i].impact === "Low") {
+                  lowTotal += 1;
+                  low += 1;
+                } else {
+                  console.log("Found new cve impact...", json[i].impact);
                 }
               }
             }
