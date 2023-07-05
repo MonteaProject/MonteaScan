@@ -44,59 +44,59 @@ pub struct Vulns {
   cwe_url  : Vec<String>,
 
   // oval
-  // oval : Oval,
+  oval : Oval,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Oval {
-  title:       Option<String>,
-  family:      Option<String>,
-  platform:    Option<Vec<String>>,
-  description: Option<String>,
-  reference:   Option<Vec<Reference>>,
-  cpe:         Option<Vec<String>>,
-  cve:         Option<Cve>,
-  cvss:        Option<Cvss>,
-  advisory:    Option<Advisory>,
-  bugzilla:    Option<Vec<Bugzilla>>,
+pub struct Oval {
+  title:       String,
+  family:      String,
+  platform:    Vec<String>,
+  description: String,
+  reference:   Vec<Reference>,
+  cpe:         Vec<String>,
+  cve:         Cve,
+  cvss:        Cvss,
+  advisory:    Advisory,
+  bugzilla:    Vec<Bugzilla>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Reference {
-  ref_id:  Option<String>,
-  ref_url: Option<String>,
-  source:  Option<String>,
+pub struct Reference {
+  ref_id:  String,
+  ref_url: String,
+  source:  String,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Cve {
-  score:  Option<String>,
-  cwe:    Option<String>,
-  href:   Option<String>,
-  impact: Option<String>,
-  public: Option<String>,
+pub struct Cve {
+  score:  String,
+  cwe:    String,
+  href:   String,
+  impact: String,
+  public: String,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Cvss {
-  score:  Option<String>,
-  vector: Option<String>,
+pub struct Cvss {
+  score:  String,
+  vector: String,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Advisory {
-  from:     Option<String>,
-  severity: Option<String>,
-  rights:   Option<String>,
-  issued:   Option<String>,
-  updated:  Option<String>,
+pub struct Advisory {
+  from:     String,
+  severity: String,
+  rights:   String,
+  issued:   String,
+  updated:  String,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-struct Bugzilla {
-  href:        Option<String>,
-  id:          Option<String>,
-  description: Option<String>,
+pub struct Bugzilla {
+  href:        String,
+  id:          String,
+  description: String,
 }
 //////////////////////////////////////////////////////////
 

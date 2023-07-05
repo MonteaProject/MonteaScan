@@ -1,9 +1,8 @@
-use crate::{Vulns, ScanResult, CweResult, Cwe};
+use crate::{Vulns, ScanResult, CweResult, Cwe, Oval, Reference as OvalReference, Cve as OvalCve, Cvss as OvalCvss, Advisory as OvalAdvisory, Bugzilla as OvalBugzilla};
 
 use anyhow::Result;
 use time::{OffsetDateTime, macros::offset, format_description};
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, Value::Null};
 use std::fs::File;
 use std::io::Write;
 
@@ -382,6 +381,86 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
       let cwe_name:     String = "-".to_string();
       let cwe_url: Vec<String> = vec!["-".to_string(); 0];
       let cvssv3_oval:  String = "-".to_string();
+
+      ////////////////////////////////////////////
+      let ref_id:  String = "-".to_string();
+      let ref_url: String = "-".to_string();
+      let source:  String = "-".to_string();
+      let score  : String = "-".to_string();
+      let cwe    : String = "-".to_string();
+      let href   : String = "-".to_string();
+      let impact : String = "-".to_string();
+      let public : String = "-".to_string();
+      let score  : String = "-".to_string();
+      let vector : String = "-".to_string();
+      let from     : String = "-".to_string();
+      let severity : String = "-".to_string();
+      let rights   : String = "-".to_string();
+      let issued   : String = "-".to_string();
+      let updated  : String = "-".to_string();
+      let href        : String = "-".to_string();
+      let id          : String = "-".to_string();
+      let description : String = "-".to_string();
+      let bugzilla: OvalBugzilla = OvalBugzilla {
+        href,
+        id,
+        description,
+      };
+      let reference: OvalReference = OvalReference {
+        ref_id,
+        ref_url,
+        source,
+      };
+
+      // 
+      let title   : String = "-".to_string();
+      let family  : String = "-".to_string();
+      let platform: Vec<String> = vec![
+        "-".to_string(),
+      ];
+      let description: String = "-".to_string();
+      let reference: Vec<OvalReference> = vec![
+        reference,
+      ];
+      let cpe: Vec<String> = vec![
+        "-".to_string(),
+      ];
+      let cve: OvalCve = OvalCve {
+        score,
+        cwe,
+        href,
+        impact,
+        public,
+      };
+      let cvss: OvalCvss = OvalCvss {
+        score,
+        vector,
+      };
+      let advisory: OvalAdvisory = OvalAdvisory {
+        from,
+        severity,
+        rights,
+        issued,
+        updated,
+      };
+      let bugzilla: Vec<OvalBugzilla> = vec![
+        bugzilla,
+      ];
+
+      //
+      let oval: Oval = Oval {
+        title,
+        family,
+        platform,
+        description,
+        reference,
+        cpe,
+        cve,
+        cvss,
+        advisory,
+        bugzilla
+      };
+      ////////////////////////////////////////////
       
       let vulns_list: Vulns = Vulns {
         time     : time.clone(),
@@ -404,7 +483,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
         pkgarch     : scan_p.pkgarch.clone(),
         cwe_name    : cwe_name.clone(),
         cwe_url     : cwe_url.clone(),
-        // oval : Null
+        oval,
       };
       vulns_vec.push(vulns_list);
     } else {
