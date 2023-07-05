@@ -12,17 +12,93 @@ use std::io::{BufReader, Write};
 use std::path::Path;
 use std::option::Option;
 
+//////////////////////////////////////////////////////////
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+pub struct Vulns {
+  // host
+  time     : String,
+  hostname : String,
+  ip       : Vec<String>,
+  os       : String,
+  kernel   : String,
+
+  // cve
+  cveid       : String,
+  impact      : String,
+  cvssv3_oval : String,
+  cwe_oval    : String,
+  issued      : String,
+  updated     : String,
+
+  // package
+  pkgname     : String,
+  pkgver      : String,
+  pkgrelease  : String,
+  update_flag : String,
+  upver       : String,
+  uprelease   : String,
+  pkgarch     : String,
+
+  // custom
+  cwe_name : String,
+  cwe_url  : Vec<String>,
+
+  // oval
+  // oval : Oval,
+}
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
-pub struct CweResult {
-  time:     String,
-  hostname: String,
-  ip:       Vec<String>,
-  os:       String,
-  kernel:   String,
-  cwe_id:   String,
-  cwe_name: String,
+struct Oval {
+  title:       Option<String>,
+  family:      Option<String>,
+  platform:    Option<Vec<String>>,
+  description: Option<String>,
+  reference:   Option<Vec<Reference>>,
+  cpe:         Option<Vec<String>>,
+  cve:         Option<Cve>,
+  cvss:        Option<Cvss>,
+  advisory:    Option<Advisory>,
+  bugzilla:    Option<Vec<Bugzilla>>,
 }
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Reference {
+  ref_id:  Option<String>,
+  ref_url: Option<String>,
+  source:  Option<String>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Cve {
+  score:  Option<String>,
+  cwe:    Option<String>,
+  href:   Option<String>,
+  impact: Option<String>,
+  public: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Cvss {
+  score:  Option<String>,
+  vector: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Advisory {
+  from:     Option<String>,
+  severity: Option<String>,
+  rights:   Option<String>,
+  issued:   Option<String>,
+  updated:  Option<String>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+struct Bugzilla {
+  href:        Option<String>,
+  id:          Option<String>,
+  description: Option<String>,
+}
+//////////////////////////////////////////////////////////
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 pub struct ScanResult {
@@ -44,10 +120,23 @@ struct PkgList {
   uprelease:   String,
   pkgarch:     String
 }
+//////////////////////////////////////////////////////////
+
+#[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
+pub struct CweResult {
+  time:     String,
+  hostname: String,
+  ip:       Vec<String>,
+  os:       String,
+  kernel:   String,
+  cwe_id:   String,
+  cwe_name: String,
+}
+//////////////////////////////////////////////////////////
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]
 #[allow(non_snake_case)]
-struct Cwe {
+pub struct Cwe {
   Weaknesses: Weaknesses
 }
 
@@ -64,6 +153,7 @@ struct Weakness {
   #[serde(rename = "@Name")]
   name: Option<String>
 }
+
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<()> {
