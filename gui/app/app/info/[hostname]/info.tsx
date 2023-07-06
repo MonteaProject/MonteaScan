@@ -2,7 +2,7 @@
 import "./info.scss";
 import { useEffect, useState, useMemo } from "react";
 import { notFound } from "next/navigation";
-import { Vulns, pkgDetect, Cve, Reference, Bugzilla, Criterion, Criteria2, Criterion2 } from "../../types/cveTypes";
+import { Vulns, Oval, Reference, Cve, Cvss, Advisory, Bugzilla } from "../../types/cveTypes";
 import { rhelCPE, cpeVec } from "../../types/cpeTypes";
 import {
   Box,
@@ -34,33 +34,37 @@ import {
 } from "../../common/components";
 
 
-function CveTable({v, d}: any) {
+function CveTable({d}: any) {
   return (
     <Box>
-      {v.metadata.advisory.cve.map((c: Cve) => {
+      {/* {v.metadata.advisory.cve.map((c: Cve) => {
         return (
-          <Box>
-            <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>CVE情報（{c["$value"]}）</Heading>
+          <Box> */}
+            <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>CVE情報（{d.oval.cve.score}）</Heading>
             <Table variant='simple'>
                 <Tr>
                   <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CVE-ID</Th>
-                  <Td>{c["$value"]}</Td>
+                  {/* <Td>{c["$value"]}</Td> */}
+                  <Td>{d.oval.cve.score}</Td>
                 </Tr>
                 <Tr>
                   <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>重要度</Th>
-                  <Td>{c["@impact"]}</Td>
+                  {/* <Td>{c["@impact"]}</Td> */}
+                  <Td>{d.oval.cve.impact}</Td>
                 </Tr>
                 <Tr>
                   <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CVEリンク</Th>
                   <Td>
-                    <Link color="green.400" href={c["@href"]} isExternal>
-                      {c["@href"]} <ExternalLinkIcon mx="2px" />
+                    <Link color="green.400" href={d.oval.cve.href} isExternal>
+                      {/* {c["@href"]} <ExternalLinkIcon mx="2px" /> */}
+                      {d.oval.cve.href} <ExternalLinkIcon mx="2px" />
                     </Link>
                   </Td>
                 </Tr>
                 <Tr>
                   <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CWE-ID</Th>
-                  <Td>{c["@cwe"]}</Td>
+                  {/* <Td>{c["@cwe"]}</Td> */}
+                  <Td>{d.oval.cve.cwe}</Td>
                 </Tr>
                 <Tr>
                   <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>脆弱性の種類</Th>
@@ -69,7 +73,7 @@ function CveTable({v, d}: any) {
                 <Tr>
                   <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CWEリンク</Th>
                   <Td>
-                    {d.cwe_url_vec.map((r: string) => {
+                    {d.cwe_url.map((r: string) => {
                       return (
                         <Tr>
                           <Link color="green.400" href={r} isExternal>
@@ -82,7 +86,8 @@ function CveTable({v, d}: any) {
                 </Tr>
                 <Tr>
                   <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>公開日</Th>
-                  <Td>{c["@public"].slice(0, 4) + '-' + c["@public"].slice(4, 6) + '-' + c["@public"].slice(6, 8)}</Td>
+                  {/* <Td>{c["@public"].slice(0, 4) + '-' + c["@public"].slice(4, 6) + '-' + c["@public"].slice(6, 8)}</Td> */}
+                  <Td>{d.oval.cve.public.slice(0, 4) + '-' + d.oval.cve.public.slice(4, 6) + '-' + d.oval.cve.public.slice(6, 8)}</Td>
                 </Tr>
 
                 {/* <Tr>
@@ -103,9 +108,9 @@ function CveTable({v, d}: any) {
                   <Td>{c["@public"]}</Td>
                 </Tr> */}
             </Table>
-          </Box>
+          {/* </Box>
         )
-      })}
+      })} */}
     </Box>
   )
 }
@@ -158,36 +163,18 @@ function IpTable({d}: any) {
   )
 }
 
-// function OvalInfo({v}: any) {
-//   return (
-//     <Box>
-//       <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>OVAL</Heading>
-//       <Table variant='simple'>
-//         <Tr>
-//           <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ID</Th>
-//           <Td>{v["@id"]}</Td>
-//         </Tr>
-//         <Tr>
-//           <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>クラス</Th>
-//           <Td>{v["@class"]}</Td>
-//         </Tr>
-//       </Table>
-//     </Box>
-//   )
-// }
-
-function FamilyTable({v}: any) {
+function FamilyTable({d}: any) {
   return (
     <Box>
       <Heading size="sm" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>対象プラットフォーム</Heading>
       <Table variant='simple'>
         <Tr>
           <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>ファミリー</Th>
-          <Td>{v.metadata.affected["@family"]}</Td>
+          <Td>{d.oval.family}</Td>
         </Tr>
         <Tr>
           <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>影響プラットフォーム</Th>
-          {v.metadata.affected.platform.map((p: string) => {
+          {d.oval.platform.map((p: string) => {
             return (
               <Td>{p}</Td>
             )
@@ -198,21 +185,22 @@ function FamilyTable({v}: any) {
   )
 }
 
-function TitleTable({v}: any) {
+function TitleTable({d}: any) {
   return (
     <Box>
       <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>タイトル</Heading>
       <Table variant='simple'>
         <Tr>
           <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>タイトル</Th>
-          <Td>{v.metadata.title}</Td>
+          {/* <Td>{v.metadata.title}</Td> */}
+          <Td>{d.oval.title}</Td>
         </Tr>
       </Table>
     </Box>
   )
 }
 
-function ReferenceTable({v}: any) {
+function ReferenceTable({d}: any) {
   return (
     <Box>
       <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>リファレンス</Heading>
@@ -225,13 +213,18 @@ function ReferenceTable({v}: any) {
         </Tr>
       </Thead>
       <Tbody>
-        {v.metadata.reference.map((r: Reference) => {
+        {/* {v.metadata.reference.map((r: Reference) => { */}
+        {d.oval.reference.map((r: any) => {
           return (
             <Tr>
-              <Td>{r["@source"]}</Td>
-              <Td>{r["@ref_id"]}</Td>
-              <Link color="green.400" href={r["@ref_url"]} isExternal>
-                <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td>
+              {/* <Td>{r["@source"]}</Td> */}
+              <Td>{r.source}</Td>
+              {/* <Td>{r["@ref_id"]}</Td> */}
+              <Td>{r.ref_id}</Td>
+              {/* <Link color="green.400" href={r["@ref_url"]} isExternal> */}
+              <Link color="green.400" href={r.ref_url} isExternal>
+                {/* <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td> */}
+                <Td>{r.ref_url} <ExternalLinkIcon mx="2px" /></Td>
               </Link>
             </Tr>
           )
@@ -242,7 +235,7 @@ function ReferenceTable({v}: any) {
   )
 }
 
-function AdvisoryTable({v}: any) {
+function AdvisoryTable({d}: any) {
   return (
     <Box>
       <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>アドバイザリー</Heading>
@@ -258,11 +251,16 @@ function AdvisoryTable({v}: any) {
         </Thead>
         <Tbody>
           <Tr>
-            <Td>{v.metadata.advisory["@from"]}</Td>
+            {/* <Td>{v.metadata.advisory["@from"]}</Td>
             <Td>{v.metadata.advisory.severity}</Td>
             <Td>{v.metadata.advisory.rights}</Td>
             <Td>{v.metadata.advisory.issued["@date"]}</Td>
-            <Td>{v.metadata.advisory.updated["@date"]}</Td>
+            <Td>{v.metadata.advisory.updated["@date"]}</Td> */}
+            <Td>{d.oval.advisory.form}</Td>
+            <Td>{d.oval.advisory.severity}</Td>
+            <Td>{d.oval.advisory.rights}</Td>
+            <Td>{d.oval.advisory.issued}</Td>
+            <Td>{d.oval.advisory.updated}</Td>
           </Tr>
         </Tbody>
       </Table>
@@ -271,11 +269,13 @@ function AdvisoryTable({v}: any) {
 }
 
 // "7.8/CVSS:3.0/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
-function CvssTable({v}: any) {
+function CvssTable({d}: any) {
   let rhelCpe: any[] = [];
-  v.metadata.advisory.cve.map((c: Cve) => {
-    let cvssVec = c["@cvss3"].split("/");
-    let cveId   = c["$value"];
+  // v.metadata.advisory.cve.map((c: Cve) => {
+    // let cvssVec = c["@cvss3"].split("/");
+    // let cveId   = c["$value"];
+    let cvssVec = d.oval.cvss.vector.split("/");
+    let cveId   = d.oval.cve.score;
 
     if (cvssVec.length === 10) {
       let score = cvssVec[0];
@@ -414,7 +414,8 @@ function CvssTable({v}: any) {
     } else {
       console.log("CVSSの形式が変更されています...");
     }
-  })
+  // }
+  // )
   
   return (
     <Box>
@@ -520,7 +521,7 @@ function CvssTable({v}: any) {
   )
 }
 
-function BugzillaTable({v}: any) {
+function BugzillaTable({d}: any) {
   return (
     <Box>
       <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>RedHat Bugzilla</Heading>
@@ -533,7 +534,18 @@ function BugzillaTable({v}: any) {
           </Tr>
         </Thead>
         <Tbody>
-          {v.metadata.advisory.bugzilla.map((b: Bugzilla) => {
+          {d.oval.bugzilla.map((b: any) => {
+            return (
+              <Tr>
+                <Td>{b.id}</Td>
+                <Link color="green.400" href={b.href} isExternal>
+                  <Td>{b.href} <ExternalLinkIcon mx="2px" /></Td>
+                </Link>
+                <Td>{b.description}</Td>
+              </Tr>
+            )
+          })}
+          {/* {v.metadata.advisory.bugzilla.map((b: Bugzilla) => {
             return (
               <Tr>
                 <Td>{b["@id"]}</Td>
@@ -543,16 +555,17 @@ function BugzillaTable({v}: any) {
                 <Td>{b["$value"]}</Td>
               </Tr>
             )
-          })}
+          })} */}
         </Tbody>
       </Table>
     </Box>
   )
 }
 
-function CpeTable({v}: any) {
+function CpeTable({d}: any) {
   let cpeVec: any[] = [];
-  v.metadata.advisory.affected_cpe_list.cpe.map((cpe: string) => {
+  // v.metadata.advisory.affected_cpe_list.cpe.map((cpe: string) => {
+  d.oval.cpe.map((cpe: string) => {
     if (cpe.split(":").length === 1) {
       cpeVec.push(
         {
@@ -772,61 +785,61 @@ function CpeTable({v}: any) {
   )
 }
 
-function SubjectTable({v}: any) {
-  return (
-    <Box>
-      <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>対象条件</Heading>
-      <Table variant='simple'>
-        <Thead>
-          <Tr>
-            <Th>
-              <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
-              {v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {v.criteria.criterion.map((criterion: Criterion) => {
-            return (
-              <Tr>
-                <Td>{criterion["@comment"]}</Td>
-              </Tr>
-            )
-          })}
-        </Tbody>
-      </Table>
-      {v.criteria.criteria.map((c: Criteria2) => {
-        return (
-          <Table variant='simple' mt="5">
-            <Thead>
-              <Tr>
-                <Th>
-                  <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
-                  {c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}
-                </Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {c.criterion.map((c: Criterion2) => {
-                return (
-                  <Tr>
-                    <Td>{c["@comment"]}</Td>
-                  </Tr>
-                )
-              })}
-            </Tbody>
-          </Table>
-        )
-      })}
-    </Box>
-  )
-}
+// function SubjectTable({d}: any) {
+//   return (
+//     <Box>
+//       <Heading size="sm" mb="2" mt="10"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>対象条件</Heading>
+//       <Table variant='simple'>
+//         <Thead>
+//           <Tr>
+//             <Th>
+//               <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+//               {v.criteria["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}
+//             </Th>
+//           </Tr>
+//         </Thead>
+//         <Tbody>
+//           {v.criteria.criterion.map((criterion: Criterion) => {
+//             return (
+//               <Tr>
+//                 <Td>{criterion["@comment"]}</Td>
+//               </Tr>
+//             )
+//           })}
+//         </Tbody>
+//       </Table>
+//       {v.criteria.criteria.map((c: Criteria2) => {
+//         return (
+//           <Table variant='simple' mt="5">
+//             <Thead>
+//               <Tr>
+//                 <Th>
+//                   <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
+//                   {c["@operator"] === "OR" ? "対象条件：いずれかに該当する場合" : "対象条件：いずれも該当する場合"}
+//                 </Th>
+//               </Tr>
+//             </Thead>
+//             <Tbody>
+//               {c.criterion.map((c: Criterion2) => {
+//                 return (
+//                   <Tr>
+//                     <Td>{c["@comment"]}</Td>
+//                   </Tr>
+//                 )
+//               })}
+//             </Tbody>
+//           </Table>
+//         )
+//       })}
+//     </Box>
+//   )
+// }
 
-function Body({d, v}: any) {
+function Body({d}: any) {
   return (
     <Box>
       <Heading size="sm" mb="2"><Tooltip label='test' fontSize='md'><InfoOutlineIcon mb="1" mr="1" /></Tooltip>説明</Heading>
-      <p>{v.metadata.description}</p>
+      <p>{d.oval.description}</p>
       <TableContainer overflowX="unset" overflowY="unset">
         <HostTable
           d = {d}
@@ -835,33 +848,32 @@ function Body({d, v}: any) {
           d = {d}
         />
         <FamilyTable
-          v = {v}
+          d = {d}
         />
         <CveTable
-          v = {v}
           d = {d}
         />
         <BugzillaTable
-          v = {v}
+          d = {d}
         />
         <CvssTable
-          v = {v}
+          d = {d}
         />
         <AdvisoryTable
-          v = {v}
+          d = {d}
         />
         <TitleTable
-          v = {v}
+          d = {d}
         />
         <ReferenceTable
-          v = {v}
+          d = {d}
         />
         <CpeTable
-          v = {v}
+          d = {d}
         />
-        <SubjectTable
-          v = {v}
-        />
+        {/* <SubjectTable
+          d = {d}
+        /> */}
         {/* <OvalInfo
           v = {v}
         /> */}
@@ -899,8 +911,8 @@ function MyTbody({d}: any) {
   }
   return (
     <tbody className="responsive-info-table__body">
-      {d.detect.map((v: pkgDetect) => {
-        return (
+      {/* {d.detect.map((v: pkgDetect) => {
+        return ( */}
             <button className="responsive-info-table__button" onClick={() => {
               handleClick();
             }}>
@@ -931,15 +943,15 @@ function MyTbody({d}: any) {
                   <DrawerBody>
                     <Body
                       d = {d}
-                      v = {v}
+                      // v = {v}
                     />
                   </DrawerBody>
                   <DrawerFooter>検出時刻: {d.time}</DrawerFooter>
                 </DrawerContent>
               </Drawer>
             </button>
-        )
-      })}
+        {/* )
+      })} */}
     </tbody>
   )
 }

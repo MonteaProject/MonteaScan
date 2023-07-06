@@ -1,109 +1,69 @@
 export type Vulns = {
-    time       : string,
-    hostname   : string,
-    ip         : string[],
-    os         : string,
-    kernel     : string,
-    issued     : string,
-    updated    : string,
-    impact     : string,
-    cveid      : string,
-    cvssv3_oval: string,
-    cwe_oval   : string,
-    cwe_name   : string,
-    cwe_url_vec: string[],
-    pkgname    : string,
-    pkgver     : string,
-    pkgrelease : string,
-    update_flag: string,
-    upver      : string,
-    uprelease  : string,
-    pkgarch    : string,
-    detect     : pkgDetect[],
-};
+  time        : string,
+  hostname    : string,
+  ip          : string[],
+  os          : string,
+  kernel      : string,
+  cveid       : string,
+  impact      : string,
+  cvssv3_oval : string,
+  cwe_oval    : string,
+  issued      : string,
+  updated     : string,
+  pkgname     : string,
+  pkgver      : string,
+  pkgrelease  : string,
+  update_flag : string,
+  upver       : string,
+  uprelease   : string,
+  pkgarch     : string,
+  cwe_name    : string,
+  cwe_url     : string[],
+  oval        : Oval,
+}
 
-export type pkgDetect = {
-    '@id'   : string,
-    '@class': string,
-    metadata: Metadata,
-    criteria: Criteria,
-};
-
-export type Metadata = {
-    title      : string,
-    affected   : Affected,
-    reference  : Reference[],
-    description: string,
-    advisory   : Advisory
-};
-
-export type Affected = {
-    '@family': string,
-    platform : string[]
-};
+export type Oval = {
+  title:       string,
+  family:      string,
+  platform:    string[],
+  description: string,
+  reference:   Reference[],
+  cpe:         string[],
+  cve:         Cve,
+  cvss:        Cvss,
+  advisory:    Advisory,
+  bugzilla:    Bugzilla[],
+}
 
 export type Reference = {
-    '@ref_id' : string,
-    '@ref_url': string,
-    '@source' : string
-};
-
-export type Advisory = {
-    "@from"          : string,
-    severity         : string,
-    rights           : string,
-    issued           : Issued,
-    updated          : Updated,
-    cve              : Cve[],
-    bugzilla         : Bugzilla[],
-    affected_cpe_list: Cpe
-};
-
-export type Issued = {
-    "@date": string
-};
-
-export type Updated = {
-    "@date": string
-};
+  ref_id:  string,
+  ref_url: string,
+  source:  string,
+}
 
 export type Cve = {
-    "@cvss2" : string,
-    "@cvss3" : string,
-    "@cwe"   : string,
-    "@href"  : string,
-    "@impact": string,
-    "@public": string,
-    "$value" : string
-};
+  score:  string,
+  cwe:    string,
+  href:   string,
+  impact: string,
+  public: string,
+}
+
+export type Cvss = {
+  score:  string,
+  vector: string,
+}
+
+export type Advisory = {
+  from:     string,
+  severity: string,
+  rights:   string,
+  issued:   string,
+  updated:  string,
+}
 
 export type Bugzilla = {
-    "@href" : string,
-    "@id"   : string,
-    "$value": string
-};
-
-export type Cpe = {
-    cpe: string[]
-};
-
-export type Criteria = {
-    "@operator": string,
-    criterion  : Criterion[],
-    criteria   : Criteria2[]
-};
-
-export type Criterion = {
-    "@comment" : string,
-    "@test_ref": string
-};
-
-export type Criteria2 = {
-    "@operator": string,
-    criterion  : Criterion2[]
-};
-
-export type Criterion2 = {
-    "@comment" : string,
-    "@test_ref": string
-};
+  href:        string,
+  id:          string,
+  description: string,
+}
