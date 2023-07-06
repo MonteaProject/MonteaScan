@@ -167,6 +167,55 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
     let os: String = String::from(&scan_r.os).replace('\n', "");
     let kernel: String = String::from(&scan_r.kernel).replace('\n', "");
 
+    let mut ref_id  : String = "-".to_string();
+    let mut ref_url : String = "-".to_string();
+    let mut source  : String = "-".to_string();
+
+    let mut cve_score  : String = "-".to_string();
+    let mut oval_cwe   : String = "-".to_string();
+    let mut href       : String = "-".to_string();
+    let mut cve_impact : String = "-".to_string();
+    let mut public     : String = "-".to_string();
+
+    let cvss_score : String = "-".to_string();
+    let mut vector : String = "-".to_string();
+
+    let mut from     : String = "-".to_string();
+    let mut severity : String = "-".to_string();
+    let mut rights   : String = "-".to_string();
+    let mut oval_issued  : String = "-".to_string();
+    let mut oval_updated : String = "-".to_string();
+
+    let mut bugzi_href : String = "-".to_string();
+    let mut id         : String = "-".to_string();
+    let bugzi_des      : String = "-".to_string();
+
+    let init_platform : String = "-".to_string();
+    let mut init_cpe  : String = "-".to_string();
+
+    let mut title : String = "-".to_string();
+    let family    : String = "-".to_string();
+    
+    let mut description : String = "-".to_string();
+    
+    let platform : Vec<String> = vec![init_platform; 0];
+    let mut cpe  : Vec<String> = vec![init_cpe; 0];
+
+    let oval_ref: OvalReference = OvalReference {
+      ref_id : ref_id.clone(),
+      ref_url: ref_url.clone(),
+      source : source.clone(),
+    };
+    let mut reference : Vec<OvalReference> = vec![oval_ref; 0];
+
+    let oval_bugzi: OvalBugzilla = OvalBugzilla {
+      href       : bugzi_href.clone(),
+      id         : id.clone(),
+      description: bugzi_des.clone(),
+    };
+    let mut bugzilla : Vec<OvalBugzilla> = vec![oval_bugzi; 0];
+
+
     for v1 in s.clone() {
       for v in v1 {
         let mut comment_vec: Vec<String> = Vec::new();
@@ -252,21 +301,88 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                 };
 
                 if let Some(m) = v.metadata.clone() {
+                  if let Some(r) = m.title {
+                    title = r;
+                  }
+                  if let Some(r) = m.description {
+                    description = r;
+                  }
+                  if let Some(r) = m.reference {
+                    for r1 in r {
+                      if let Some(r2) = r1.ref_id {
+                        ref_id = r2;
+                      }
+                      if let Some(r3) = r1.ref_url {
+                        ref_url = r3;
+                      }
+                      if let Some(r4) = r1.source {
+                        source = r4;
+                      }
+                      let oval_ref: OvalReference = OvalReference {
+                        ref_id : ref_id.clone(),
+                        ref_url: ref_url.clone(),
+                        source : source.clone(),
+                      };
+                      reference.push(oval_ref);
+                    }
+                  }
                   if let Some(m1) = m.advisory {
+                    if let Some(r) = m1.from {
+                      from = r;
+                    }
+                    if let Some(r1) = m1.rights {
+                      rights = r1;
+                    }
+                    if let Some(r2) = m1.severity {
+                      severity = r2;
+                    }
+                    if let Some(r3) = m1.affected_cpe_list {
+                      if let Some(r4) = r3.cpe {
+                        for r5 in r4 {
+                          init_cpe = r5;
+                          cpe.push(init_cpe);
+                        }
+                      }
+                    }
+                    if let Some(r6) = m1.bugzilla {
+                      for r7 in r6 {
+                        if let Some(r8) = r7.href {
+                          bugzi_href = r8;
+                        }
+                        if let Some(r9) = r7.id {
+                          id = r9;
+                        }
+                        let oval_bugzi: OvalBugzilla = OvalBugzilla {
+                          href       : bugzi_href.clone(),
+                          id         : id.clone(),
+                          description: bugzi_des.clone(),
+                        };
+                        bugzilla.push(oval_bugzi);
+                      }
+                    }
                     if let Some(m2) = m1.issued {
                       if let Some(m3) = m2.date {
                         issued = m3.replace('"', "");
+                        oval_issued = m3.replace('"', "");
                       }
                     }
                     if let Some(m4) = m1.updated {
                       if let Some(m5) = m4.date {
                         updated = m5.replace('"', "");
+                        oval_updated = m5.replace('"', "");
                       }
                     }
                     if let Some(m6) = m1.cve {
                       for m7 in m6 {
+                        if let Some(r) = m7.href {
+                          href = r;
+                        }
+                        if let Some(r1) = m7.public {
+                          public = r1;
+                        }
                         if let Some(m8) = m7.impact {
                           let s1 = m8.replace('"', "");
+                          cve_impact = m8.replace('"', "");
                           match &s1[..] {
                             "Critical" => {
                               impact = "Critical".to_string();
@@ -299,6 +415,11 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                         }
                         if let Some(m9) = m7.cve {
                           cveid = m9.replace('"', "");
+                          cve_score = m9.replace('"', "");
+                        }
+                        if let Some(m10) = m7.cvss3 {
+                          let s1 = m10.replace('"', "");
+                          vector      = s1.to_string();
                         }
                         if let Some(m10) = m7.cwe {
                           let s = m10.replace('"', "");
@@ -306,8 +427,10 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                           if s5.len() > 1 {
                             let s6 = s5.len()-1;
                             cwe_oval = s5[s6].to_string();
+                            oval_cwe = s5[s6].to_string();
                           } else {
-                            cwe_oval = s;
+                            cwe_oval = s.clone();
+                            oval_cwe = s.clone();
                           }
 
                           let s1: &String   = &cwe_oval.replace("CWE-", "");
@@ -338,6 +461,38 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                             }
                           }
                         }
+
+                        let cve : OvalCve = OvalCve {
+                          score : cve_score.clone(),
+                          cwe   : oval_cwe.clone(),
+                          href  : href.clone(),
+                          impact: cve_impact.clone(),
+                          public: public.clone(),
+                        };
+                        let cvss : OvalCvss = OvalCvss {
+                          score : cvss_score.clone(),
+                          vector: vector.clone(),
+                        };
+                        let advisory : OvalAdvisory = OvalAdvisory {
+                          from    : from.clone(),
+                          severity: severity.clone(),
+                          rights  : rights.clone(),
+                          issued  : oval_issued.clone(),
+                          updated : oval_updated.clone(),
+                        };
+                        let oval: Oval = Oval {
+                          title:       title.clone(),
+                          family:      family.clone(),
+                          platform:    platform.clone(),
+                          description: description.clone(),
+                          reference:   reference.clone(),
+                          cpe:         cpe.clone(),
+                          cve:         cve.clone(),
+                          cvss:        cvss.clone(),
+                          advisory:    advisory.clone(),
+                          bugzilla:    bugzilla.clone()
+                        };
+
                         let vulns_list: Vulns = Vulns {
                           time     : time.clone(),
                           hostname : hostname.clone(),
@@ -359,7 +514,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                           pkgarch     : scan_p.pkgarch.clone(),
                           cwe_name : cwe_name.clone(),
                           cwe_url  : cwe_url.clone(),
-                          // oval : v.clone(),
+                          oval : oval.clone(),
                         };
                         vulns_vec.push(vulns_list);
                       }
@@ -382,85 +537,36 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
       let cwe_url: Vec<String> = vec!["-".to_string(); 0];
       let cvssv3_oval:  String = "-".to_string();
 
-      ////////////////////////////////////////////
-      let ref_id:  String = "-".to_string();
-      let ref_url: String = "-".to_string();
-      let source:  String = "-".to_string();
-      let score  : String = "-".to_string();
-      let cwe    : String = "-".to_string();
-      let href   : String = "-".to_string();
-      let impact : String = "-".to_string();
-      let public : String = "-".to_string();
-      let score  : String = "-".to_string();
-      let vector : String = "-".to_string();
-      let from     : String = "-".to_string();
-      let severity : String = "-".to_string();
-      let rights   : String = "-".to_string();
-      let issued   : String = "-".to_string();
-      let updated  : String = "-".to_string();
-      let href        : String = "-".to_string();
-      let id          : String = "-".to_string();
-      let description : String = "-".to_string();
-      let bugzilla: OvalBugzilla = OvalBugzilla {
-        href,
-        id,
-        description,
+      let cve : OvalCve = OvalCve {
+        score : cve_score.clone(),
+        cwe   : oval_cwe.clone(),
+        href  : href.clone(),
+        impact: cve_impact.clone(),
+        public: public.clone(),
       };
-      let reference: OvalReference = OvalReference {
-        ref_id,
-        ref_url,
-        source,
+      let cvss : OvalCvss = OvalCvss {
+        score : cvss_score.clone(),
+        vector: vector.clone(),
       };
-
-      // 
-      let title   : String = "-".to_string();
-      let family  : String = "-".to_string();
-      let platform: Vec<String> = vec![
-        "-".to_string(),
-      ];
-      let description: String = "-".to_string();
-      let reference: Vec<OvalReference> = vec![
-        reference,
-      ];
-      let cpe: Vec<String> = vec![
-        "-".to_string(),
-      ];
-      let cve: OvalCve = OvalCve {
-        score,
-        cwe,
-        href,
-        impact,
-        public,
+      let advisory : OvalAdvisory = OvalAdvisory {
+        from    : from.clone(),
+        severity: severity.clone(),
+        rights  : rights.clone(),
+        issued  : oval_issued.clone(),
+        updated : oval_updated.clone(),
       };
-      let cvss: OvalCvss = OvalCvss {
-        score,
-        vector,
-      };
-      let advisory: OvalAdvisory = OvalAdvisory {
-        from,
-        severity,
-        rights,
-        issued,
-        updated,
-      };
-      let bugzilla: Vec<OvalBugzilla> = vec![
-        bugzilla,
-      ];
-
-      //
       let oval: Oval = Oval {
-        title,
-        family,
-        platform,
-        description,
-        reference,
-        cpe,
-        cve,
-        cvss,
-        advisory,
-        bugzilla
+        title:       title.clone(),
+        family:      family.clone(),
+        platform:    platform.clone(),
+        description: description.clone(),
+        reference:   reference.clone(),
+        cpe:         cpe.clone(),
+        cve:         cve.clone(),
+        cvss:        cvss.clone(),
+        advisory:    advisory.clone(),
+        bugzilla:    bugzilla.clone()
       };
-      ////////////////////////////////////////////
       
       let vulns_list: Vulns = Vulns {
         time     : time.clone(),
