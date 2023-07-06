@@ -406,11 +406,12 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                           cve_score = m8.replace('"', "");
                         }
                         if let Some(m9) = m7.cvss3 {
+                          // "5.4/CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N"
                           let s1 = m9.replace('"', "");
-                          vector      = s1.to_string();
                           let s2: Vec<&str> = s1.split('/').collect();
                           cvssv3_oval = s2[0].to_string();
                           cvss_score  = s2[0].to_string();
+                          vector      = s1;
                         }
                         if let Some(m10) = m7.cwe {
                           let s = m10.replace('"', "");

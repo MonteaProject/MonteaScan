@@ -171,7 +171,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
       id,
       description: bugzi_des,
     };
-    let bugzilla : Vec<OvalBugzilla> = vec![oval_bugzi; 0];
+    let bugzilla : Vec<OvalBugzilla> = vec![oval_bugzi; 1];
 
 
     for v1 in s.clone() {
@@ -232,7 +232,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                 let cvssv3_oval:  String = "-".to_string();
                 let cwe_oval:     String = "-".to_string();
                 let cwe_name:     String = "-".to_string();
-                let cwe_url: Vec<String> = vec!["-".to_string(); 0];
+                let cwe_url: Vec<String> = vec!["-".to_string(); 1];
 
                 let mut issued : String = "-".to_string();
                 let mut updated: String = "-".to_string();

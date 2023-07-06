@@ -120,8 +120,10 @@ pub fn main(user: &str, prikey: PathBuf, host_port: String) -> Result<()> {
   for i in &v {
     let t: &str = i.trim();
     let u: Vec<&str> = t.split_whitespace().collect::<Vec<&str>>();
-    let ipaddr: String = String::from(u[1]) + "_!_" + u[3];
-    localinfo.ip.push(ipaddr);
+    if u[3] != "mtu" {
+      let ipaddr: String = String::from(u[1]) + "_!_" + u[3];
+      localinfo.ip.push(ipaddr);
+    }
   }
   ch.wait_close().expect("Close SSH Connection Failed...");
 

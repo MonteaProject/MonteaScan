@@ -256,7 +256,7 @@ function AdvisoryTable({d}: any) {
             <Td>{v.metadata.advisory.rights}</Td>
             <Td>{v.metadata.advisory.issued["@date"]}</Td>
             <Td>{v.metadata.advisory.updated["@date"]}</Td> */}
-            <Td>{d.oval.advisory.form}</Td>
+            <Td>{d.oval.advisory.from}</Td>
             <Td>{d.oval.advisory.severity}</Td>
             <Td>{d.oval.advisory.rights}</Td>
             <Td>{d.oval.advisory.issued}</Td>
@@ -538,9 +538,11 @@ function BugzillaTable({d}: any) {
             return (
               <Tr>
                 <Td>{b.id}</Td>
-                <Link color="green.400" href={b.href} isExternal>
-                  <Td>{b.href} <ExternalLinkIcon mx="2px" /></Td>
-                </Link>
+                <Td>
+                  <Link color="green.400" href={b.href} isExternal>
+                    {b.href} <ExternalLinkIcon mx="2px" />
+                  </Link>
+                </Td>
                 <Td>{b.description}</Td>
               </Tr>
             )

@@ -129,7 +129,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
     let mut source  : String = "-".to_string();
 
     let mut cve_score  : String = "-".to_string();
-    let mut oval_cwe   : String = "-".to_string();
+    let oval_cwe   : String = "-".to_string();
     let mut href       : String = "-".to_string();
     let mut cve_impact : String = "-".to_string();
     let mut public     : String = "-".to_string();
@@ -143,8 +143,8 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
     let mut oval_issued  : String = "-".to_string();
     let oval_updated     : String = "-".to_string();
 
-    let bugzi_href : String = "-".to_string();
-    let id         : String = "-".to_string();
+    let mut bugzi_href : String = "-".to_string();
+    let mut id         : String = "-".to_string();
     let bugzi_des  : String = "-".to_string();
 
     let mut init_platform : String = "-".to_string();
@@ -166,11 +166,11 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
     let mut reference : Vec<OvalReference> = vec![oval_ref; 0];
 
     let oval_bugzi: OvalBugzilla = OvalBugzilla {
-      href       : bugzi_href,
-      id,
-      description: bugzi_des,
+      href       : bugzi_href.clone(),
+      id         : id.clone(),
+      description: bugzi_des.clone(),
     };
-    let bugzilla : Vec<OvalBugzilla> = vec![oval_bugzi; 0];
+    let mut bugzilla : Vec<OvalBugzilla> = vec![oval_bugzi; 0];
 
 
     for v1 in s.clone() {
@@ -236,7 +236,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                     let updated:    String = "-".to_string();
                     let cwe_oval:   String = "-".to_string();
                     let cwe_name:   String = "-".to_string();
-                    let cwe_url: Vec<String> = vec!["-".to_string(); 0];
+                    let cwe_url: Vec<String> = vec!["-".to_string(); 1];
                     let mut cvssv3_oval: String = "-".to_string();
 
                     if let Some(m) = v.metadata.clone() {
@@ -324,19 +324,61 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                               cvss_score  = m6.replace('"', "");
                             }
                             if let Some(m7) = m3.public {
-                              oval_issued = m7.replace('"', "");
-                              issued = m7.replace('"', "");
+                              let test = m7.replace('"', "");
+                              let mut s1 = String::new();
+                              for i in test.chars().enumerate() {
+                                  match i.0 {
+                                      // n if n < 1 => {continue}
+                                      n if n > 3 => {break}
+                                      _ => {s1.push(i.1)}
+                                  }
+                              }
+                              let mut s2 = String::new();
+                              for i in test.chars().enumerate() {
+                                  match i.0 {
+                                      n if n < 4 => {continue}
+                                      n if n > 5 => {break}
+                                      _ => {s2.push(i.1)}
+                                  }
+                              }
+                              let mut s3 = String::new();
+                              for i in test.chars().enumerate() {
+                                  match i.0 {
+                                      n if n < 6 => {continue}
+                                      n if n > 8 => {break}
+                                      _ => {s3.push(i.1)}
+                                  }
+                              }
+                              issued = s1.clone() + "-" + &s2 + "-" + &s3;
+                              oval_issued = s1.clone() + "-" + &s2 + "-" + &s3;
                               public = m7.replace('"', "");
                             }
                             if let Some(m8) = m3.cvss_vector {
-                              vector = m8.replace('"', "");
+                              // "5.9",
+                              // "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H", -> 5.9/CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H
+                              let cvss: &str = &m8.replace('"', "");
+                              vector = cvss_score.clone() + "/" + cvss;
                             }
                             if let Some(m9) = m3.href {
                               href = m9.replace('"', "");
                             }
+
                             if let Some(m10) = m3.usns {
-                              oval_cwe = m10.replace('"', "");
+                              let m11 = m10.replace('"', "");
+                              let s5: Vec<&str> = m11.split(',').collect();
+                              for i in s5 {
+                                id = "USN-".to_string() + i;
+                                bugzi_href = String::from("https://ubuntu.com/security/notices/USN-") + i + ".html";
+                                // bugzi_des = "-".to_string();
+                                let oval_bugzi: OvalBugzilla = OvalBugzilla {
+                                  href       : bugzi_href.clone(),
+                                  id         : id.clone(),
+                                  description: bugzi_des.clone(),
+                                };
+                                bugzilla.push(oval_bugzi);
+                              }
                             }
+
                             let cve : OvalCve = OvalCve {
                               score : cve_score.clone(),
                               cwe   : oval_cwe.clone(),

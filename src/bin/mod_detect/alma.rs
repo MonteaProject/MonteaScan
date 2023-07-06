@@ -198,7 +198,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
     
     let mut description : String = "-".to_string();
     
-    let platform : Vec<String> = vec![init_platform; 0];
+    let platform : Vec<String> = vec![init_platform; 1];
     let mut cpe  : Vec<String> = vec![init_cpe; 0];
 
     let oval_ref: OvalReference = OvalReference {
@@ -418,8 +418,9 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                           cve_score = m9.replace('"', "");
                         }
                         if let Some(m10) = m7.cvss3 {
+                          // "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N" -> -/CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
                           let s1 = m10.replace('"', "");
-                          vector      = s1.to_string();
+                          vector = "-/".to_owned() + &s1;
                         }
                         if let Some(m10) = m7.cwe {
                           let s = m10.replace('"', "");
