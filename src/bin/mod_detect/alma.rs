@@ -180,11 +180,11 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
     let cvss_score : String = "-".to_string();
     let mut vector : String = "-".to_string();
 
-    let mut from     : String = "-".to_string();
-    let mut severity : String = "-".to_string();
-    let mut rights   : String = "-".to_string();
-    let mut oval_issued  : String = "-".to_string();
-    let mut oval_updated : String = "-".to_string();
+    let mut from        : String = "-".to_string();
+    let mut severity    : String = "-".to_string();
+    let mut rights      : String = "-".to_string();
+    let mut oval_issued : String = "-".to_string();
+    let mut oval_updated: String = "-".to_string();
 
     let mut bugzi_href : String = "-".to_string();
     let mut id         : String = "-".to_string();
@@ -199,21 +199,24 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
     let mut description : String = "-".to_string();
     
     let platform : Vec<String> = vec![init_platform; 1];
-    let mut cpe  : Vec<String> = vec![init_cpe; 0];
+    // let mut cpe  : Vec<String> = vec![init_cpe; 0];
+    let mut cpe  : Vec<String> = Vec::new();
 
     let oval_ref: OvalReference = OvalReference {
       ref_id : ref_id.clone(),
       ref_url: ref_url.clone(),
       source : source.clone(),
     };
-    let mut reference : Vec<OvalReference> = vec![oval_ref; 0];
+    // let mut reference : Vec<OvalReference> = vec![oval_ref; 0];
+    let mut reference : Vec<OvalReference> = Vec::new();
 
     let oval_bugzi: OvalBugzilla = OvalBugzilla {
       href       : bugzi_href.clone(),
       id         : id.clone(),
       description: bugzi_des.clone(),
     };
-    let mut bugzilla : Vec<OvalBugzilla> = vec![oval_bugzi; 0];
+    // let mut bugzilla : Vec<OvalBugzilla> = vec![oval_bugzi; 0];
+    let mut bugzilla : Vec<OvalBugzilla> = Vec::new();
 
 
     for v1 in s.clone() {
@@ -323,7 +326,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                         ref_url: ref_url.clone(),
                         source : source.clone(),
                       };
-                      reference.push(oval_ref);
+                      reference.push(oval_ref.clone());
                     }
                   }
                   if let Some(m1) = m.advisory {
@@ -340,7 +343,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                       if let Some(r4) = r3.cpe {
                         for r5 in r4 {
                           init_cpe = r5;
-                          cpe.push(init_cpe);
+                          cpe.push(init_cpe.clone());
                         }
                       }
                     }
@@ -357,7 +360,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                           id         : id.clone(),
                           description: bugzi_des.clone(),
                         };
-                        bugzilla.push(oval_bugzi);
+                        bugzilla.push(oval_bugzi.clone());
                       }
                     }
                     if let Some(m2) = m1.issued {
@@ -481,6 +484,20 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                           issued  : oval_issued.clone(),
                           updated : oval_updated.clone(),
                         };
+
+                        if reference.is_empty() {
+                          reference.push(oval_ref.clone());
+                        }
+                        // if cpe.is_empty() {
+                        //   cpe.push(init_cpe.clone());
+                        // }
+                        if bugzilla.is_empty() {
+                          bugzilla.push(oval_bugzi.clone());
+                        }
+                        if cwe_url.is_empty() {
+                          cwe_url.push("-".to_string());
+                        }
+
                         let oval: Oval = Oval {
                           title:       title.clone(),
                           family:      family.clone(),
@@ -515,7 +532,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                           pkgarch     : scan_p.pkgarch.clone(),
                           cwe_name : cwe_name.clone(),
                           cwe_url  : cwe_url.clone(),
-                          oval : oval.clone(),
+                          oval : Some(oval.clone()),
                         };
                         vulns_vec.push(vulns_list);
                       }
@@ -538,36 +555,36 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
       let cwe_url: Vec<String> = vec!["-".to_string(); 0];
       let cvssv3_oval:  String = "-".to_string();
 
-      let cve : OvalCve = OvalCve {
-        score : cve_score.clone(),
-        cwe   : oval_cwe.clone(),
-        href  : href.clone(),
-        impact: cve_impact.clone(),
-        public: public.clone(),
-      };
-      let cvss : OvalCvss = OvalCvss {
-        score : cvss_score.clone(),
-        vector: vector.clone(),
-      };
-      let advisory : OvalAdvisory = OvalAdvisory {
-        from    : from.clone(),
-        severity: severity.clone(),
-        rights  : rights.clone(),
-        issued  : oval_issued.clone(),
-        updated : oval_updated.clone(),
-      };
-      let oval: Oval = Oval {
-        title:       title.clone(),
-        family:      family.clone(),
-        platform:    platform.clone(),
-        description: description.clone(),
-        reference:   reference.clone(),
-        cpe:         cpe.clone(),
-        cve:         cve.clone(),
-        cvss:        cvss.clone(),
-        advisory:    advisory.clone(),
-        bugzilla:    bugzilla.clone()
-      };
+      // let cve : OvalCve = OvalCve {
+      //   score : cve_score.clone(),
+      //   cwe   : oval_cwe.clone(),
+      //   href  : href.clone(),
+      //   impact: cve_impact.clone(),
+      //   public: public.clone(),
+      // };
+      // let cvss : OvalCvss = OvalCvss {
+      //   score : cvss_score.clone(),
+      //   vector: vector.clone(),
+      // };
+      // let advisory : OvalAdvisory = OvalAdvisory {
+      //   from    : from.clone(),
+      //   severity: severity.clone(),
+      //   rights  : rights.clone(),
+      //   issued  : oval_issued.clone(),
+      //   updated : oval_updated.clone(),
+      // };
+      // let oval: Oval = Oval {
+      //   title:       title.clone(),
+      //   family:      family.clone(),
+      //   platform:    platform.clone(),
+      //   description: description.clone(),
+      //   reference:   reference.clone(),
+      //   cpe:         cpe.clone(),
+      //   cve:         cve.clone(),
+      //   cvss:        cvss.clone(),
+      //   advisory:    advisory.clone(),
+      //   bugzilla:    bugzilla.clone()
+      // };
       
       let vulns_list: Vulns = Vulns {
         time     : time.clone(),
@@ -590,7 +607,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
         pkgarch     : scan_p.pkgarch.clone(),
         cwe_name    : cwe_name.clone(),
         cwe_url     : cwe_url.clone(),
-        oval,
+        oval: None
       };
       vulns_vec.push(vulns_list);
     } else {

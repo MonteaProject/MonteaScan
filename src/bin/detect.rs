@@ -44,7 +44,7 @@ pub struct Vulns {
   cwe_url  : Vec<String>,
 
   // oval
-  oval : Oval,
+  oval : Option<Oval>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Debug, Clone)]

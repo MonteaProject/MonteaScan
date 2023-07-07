@@ -156,15 +156,15 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
     
     let mut description : String = "-".to_string();
     
-    let mut platform : Vec<String> = vec![init_platform; 0];
-    let mut cpe      : Vec<String> = vec![init_cpe; 0];
+    let mut platform : Vec<String> = Vec::new();
+    let mut cpe      : Vec<String> = Vec::new();
 
     let oval_ref: OvalReference = OvalReference {
       ref_id : ref_id.clone(),
       ref_url: ref_url.clone(),
       source : source.clone(),
     };
-    let mut reference : Vec<OvalReference> = vec![oval_ref; 0];
+    let mut reference : Vec<OvalReference> = Vec::new();
 
     let oval_bugzi: OvalBugzilla = OvalBugzilla {
       href       : bugzi_href,
@@ -255,7 +255,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                         ref_url: ref_url.clone(),
                         source : source.clone(),
                       };
-                      reference.push(oval_ref);
+                      reference.push(oval_ref.clone());
                     }
                   }
                   if let Some(r5) = m.affected {
@@ -265,7 +265,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                     if let Some(r7) = r5.platform {
                       for r8 in r7 {
                         init_platform = r8;
-                        platform.push(init_platform);
+                        platform.push(init_platform.clone());
                       }
                     }
                   }
@@ -280,7 +280,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                       if let Some(r6) = r5.cpe {
                         for r7 in r6 {
                           init_cpe = r7;
-                          cpe.push(init_cpe);
+                          cpe.push(init_cpe.clone());
                         }
                       }
                     }
@@ -336,6 +336,16 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                       }
                     }
 
+                    if platform.is_empty() {
+                      platform.push(init_platform.clone());
+                    }
+                    // if cpe.is_empty() {
+                    //   cpe.push(init_cpe.clone());
+                    // }
+                    if reference.is_empty() {
+                      reference.push(oval_ref.clone());
+                    }
+
                     let cve : OvalCve = OvalCve {
                       score : cve_score.clone(),
                       cwe   : oval_cwe.clone(),
@@ -388,7 +398,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
                       pkgarch     : scan_p.pkgarch.clone(),
                       cwe_name : cwe_name.clone(),
                       cwe_url  : cwe_url.clone(),
-                      oval : oval.clone(),
+                      oval : Some(oval.clone()),
                     };
                     vulns_vec.push(vulns_list);
                   }
@@ -409,36 +419,36 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
       let cwe_url: Vec<String> = vec!["-".to_string(); 0];
       let cvssv3_oval:  String = "-".to_string();
 
-      let cve : OvalCve = OvalCve {
-        score : cve_score,
-        cwe   : oval_cwe,
-        href,
-        impact: cve_impact,
-        public,
-      };
-      let cvss : OvalCvss = OvalCvss {
-        score : cvss_score,
-        vector,
-      };
-      let advisory : OvalAdvisory = OvalAdvisory {
-        from,
-        severity,
-        rights,
-        issued  : oval_issued,
-        updated : oval_updated,
-      };
-      let oval: Oval = Oval {
-        title      : title.clone(),
-        family     : family.clone(),
-        platform   : platform.clone(),
-        description: description.clone(),
-        reference  : reference.clone(),
-        cpe        : cpe.clone(),
-        cve        : cve.clone(),
-        cvss       : cvss.clone(),
-        advisory   : advisory.clone(),
-        bugzilla   : bugzilla.clone()
-      };
+      // let cve : OvalCve = OvalCve {
+      //   score : cve_score,
+      //   cwe   : oval_cwe,
+      //   href,
+      //   impact: cve_impact,
+      //   public,
+      // };
+      // let cvss : OvalCvss = OvalCvss {
+      //   score : cvss_score,
+      //   vector,
+      // };
+      // let advisory : OvalAdvisory = OvalAdvisory {
+      //   from,
+      //   severity,
+      //   rights,
+      //   issued  : oval_issued,
+      //   updated : oval_updated,
+      // };
+      // let oval: Oval = Oval {
+      //   title      : title.clone(),
+      //   family     : family.clone(),
+      //   platform   : platform.clone(),
+      //   description: description.clone(),
+      //   reference  : reference.clone(),
+      //   cpe        : cpe.clone(),
+      //   cve        : cve.clone(),
+      //   cvss       : cvss.clone(),
+      //   advisory   : advisory.clone(),
+      //   bugzilla   : bugzilla.clone()
+      // };
       
       let vulns_list: Vulns = Vulns {
         time     : time.clone(),
@@ -461,7 +471,7 @@ pub async fn main(url: String, scan_r: ScanResult, f: String, result_dir: String
         pkgarch     : scan_p.pkgarch.clone(),
         cwe_name    : cwe_name.clone(),
         cwe_url     : cwe_url.clone(),
-        oval,
+        oval: None,
       };
       vulns_vec.push(vulns_list);
     } else {

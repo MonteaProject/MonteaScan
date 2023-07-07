@@ -83,3 +83,6 @@ https://mag.osdn.jp/14/01/10/090000/2
 
 yum コマンドの出力は grep してはいけない (grep するには向いていない)
 https://w.vmeta.jp/tdiary/20131030.html
+
+バッグポート
+https://vuls.biz/blog/articles/20220329a/#:~:text=%E3%83%90%E3%83%83%E3%82%AF%E3%83%9D%E3%83%BC%E3%83%88%20(%E8%8B%B1%3A%20backporting),%E7%A7%BB%E6%A4%8D%E3%81%99%E3%82%8B%E3%82%A2%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E3%81%93%E3%81%A8%E3%80%82
