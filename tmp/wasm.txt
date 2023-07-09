@@ -1,0 +1,85 @@
+コンテナの次、と言われているWebAssemblyを調べてみた
+
+WebAssembly（WASM）とは
+＞Webブラウザ上で高速に実行可能なバイナリフォーマット(⇒軽量)
+＞JavaScript以外の言語で書かれたプログラムをWebブラウザ上で実行することを可能にする技術
+
+WebAssembly System Interface（WASI）とは
+＞WASMをWebブラウザ以外の環境でも実行可能にするため、ファイルシステムなど、OSごとに異なるAPI(OSの基本的なシステムコール)を抽象化する業界標準仕様
+＞WASM自体にOSのファイルシステムやネットワークにアクセスする機能はない(⇒サンドボックス、セキュア)
+＞WASIの登場により、WASMはWebブラウザでもWindowsやMacでも、Dockerコンテナでも共通のバイナリで実行可能なバイナリフォーマットへと進化(⇒ポータブル)
+
+WASIまわりの用語
+・WebAssembly Component Model　とは
+＞WASMで作られた様々なコンポーネントを組み合わせてアプリケーションを構築するための仕様
+＞例えば、C言語とRustとGoで開発されたそれぞれのWASMコンポーネントや
+　WASMアプリケーションの実行をホストするプラットフォームの機能を組み合わせて、アプリケーションを構築できるようになる(⇒言語フリー)
+・「WIT」（WebAssembly Interface Type）
+＞コンポーネント同士がやり取りするためのインターフェイスを定義するIDL（Interface Definition Language(フォーマット)）
+＞ソケット、ファイスシステム、Logging、HTTP、Blob、キュー、SQLなどの様々なインターフェイスを定義できる
+・「World」
+＞WITで定義されたインターフェイスを複数束ねて名前を付けたもの
+＞例えば、ソケットとファイルシステムとロギングのインターフェイスをまとめたコマンドラインの機能を提供する「CLI World」、
+　SQLとロギングのインターフェイスをまとめた「DB World」など、様々なWITを組み合わせて、独自のWorldが作れる（まとめれる）
+＞開発者視点でも、このコンポーネントがどのようなインターフェイスを持つかをWorldで記述することで、ドキュメントになる
+
+WASM Runtime
+＞WASMのバイナリフォーマットをネイティブコードに変換する
+＞WASMのバイナリフォーマットはそのまま実行できないため、WASM Runtimeがネイティブコードに変換することで実行可能になる
+
+WASM Runtimeの有名どころ
+・wasmtime...Rustで作られた、リファレンス実装的なランタイム（Bytecode Alliance 主催）
+・wasmer...パッケージマネージャーや、PHP/Rubyなどのスクリプト言語からの呼び出しも対応（Wasmer社 主催）
+・WasmEdge...dockerで使われている、現在最速の Wasm VMを謳っている（CNCF 主催）
+・WebAssembly Micro Runtime(WAMR)...組み込みデバイスで動かすことを前提とした軽量のWASM Runtime（Bytecode Alliance 主催）
+
+Bytecode Alliance
+＞WASIの実装と普及を推進する非営利団体
+
+Cloud Native Computing Foundation
+＞クラウドネイティブコンピューティング技術を推進する非営利団体
+　https://www.cncf.io/projects/
+＞プロジェクトを育てているところ(gRPC/Kubernetes/fluentd/Prometheus/envoy)
+
+wasm-pack
+＞Rust で npm パッケージを構築するためのツール
+
+〇
+Rust と WASM のドキュメント
+https://rustwasm.github.io/docs.html
+
+Rust から WASM にコンパイルする（wasm-packはwasm-bindgenのWrapperなのでwasm-bindgenの流儀を知る必要があるらしい）
+https://developer.mozilla.org/ja/docs/WebAssembly/Rust_to_wasm
+
+ドキュメントへようこそwasm-pack!
+https://rustwasm.github.io/docs/wasm-pack/
+
+序章
+https://rustwasm.github.io/docs/wasm-bindgen/
+
+知っておくべきツール
+https://rustwasm.github.io/docs/book/reference/tools.html
+
+WASM JavaScript API の使用
+https://developer.mozilla.org/ja/docs/WebAssembly/Using_the_JavaScript_API
+
+〇
+WASMの概要
+https://developer.mozilla.org/ja/docs/WebAssembly/Concepts
+
+WASIの概念
+https://hacks.mozilla.org/2019/03/standardizing-wasi-a-webassembly-system-interface/
+
+〇
+WASM
+https://webassembly.org/
+
+WASM/WASI GitHub
+https://github.com/WebAssembly
+https://github.com/WebAssembly/WASI
+
+WASI Top
+https://wasi.dev/
+
+Bytecode Alliance/wasmtime GitHub
+https://github.com/bytecodealliance
