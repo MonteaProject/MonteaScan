@@ -57,8 +57,8 @@ export default async function Dashboard() {
   return (
     <Box>
       <Box>
-        {vSum.map((s) => (
-        <StatGroup mb={5}>
+        {vSum.map((s, i) => (
+        <StatGroup key={i} mb={5}>
           <Stat>
             <StatLabel fontSize="md">Total</StatLabel>
             <Center>
@@ -116,8 +116,8 @@ export default async function Dashboard() {
         </StatGroup>
         ))}
         
-        {vImpact.map((d) => (
-        <StatGroup mb={5}>
+        {vImpact.map((d, i) => (
+        <StatGroup key={i} mb={5}>
           <Stat>
             <StatLabel fontSize="lg">{d.hostname}</StatLabel>
             <NextLink href={`/info/${d.hostname}`}>

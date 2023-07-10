@@ -73,11 +73,11 @@ function CveTable({d}: any) {
                 <Tr>
                   <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>CWEリンク</Th>
                   <Td>
-                    {d.cwe_url.map((r: string) => {
+                    {d.cwe_url.map((v: string, i: any) => {
                       return (
-                        <Tr>
-                          <Link color="green.400" href={r} isExternal>
-                            {r} <ExternalLinkIcon mx="2px" />
+                        <Tr key={i}>
+                          <Link color="green.400" href={v} isExternal>
+                            {v} <ExternalLinkIcon mx="2px" />
                           </Link>
                         </Tr>
                       )
@@ -149,11 +149,11 @@ function IpTable({d}: any) {
           </Tr>
         </Thead>
         <Tbody>
-        {d.ip.map((i: string) => {
+        {d.ip.map((v: string, i: any) => {
           return (
-            <Tr>
-              <Td>{i.split('_!_')[1]}</Td>
-              <Td>{i.split('_!_')[0]}</Td>
+            <Tr key={i}>
+              <Td>{v.split('_!_')[1]}</Td>
+              <Td>{v.split('_!_')[0]}</Td>
             </Tr>
           )
         })}
@@ -174,9 +174,9 @@ function FamilyTable({d}: any) {
         </Tr>
         <Tr>
           <Th><Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>影響プラットフォーム</Th>
-          {d.oval.platform.map((p: string) => {
+          {d.oval.platform.map((v: string, i: any) => {
             return (
-              <Td>{p}</Td>
+              <Td key={i}>{v}</Td>
             )
           })}
         </Tr>
@@ -214,17 +214,17 @@ function ReferenceTable({d}: any) {
       </Thead>
       <Tbody>
         {/* {v.metadata.reference.map((r: Reference) => { */}
-        {d.oval.reference.map((r: any) => {
+        {d.oval.reference.map((v: any, i: any) => {
           return (
-            <Tr>
+            <Tr key={i}>
               {/* <Td>{r["@source"]}</Td> */}
-              <Td>{r.source}</Td>
+              <Td>{v.source}</Td>
               {/* <Td>{r["@ref_id"]}</Td> */}
-              <Td>{r.ref_id}</Td>
+              <Td>{v.ref_id}</Td>
               {/* <Link color="green.400" href={r["@ref_url"]} isExternal> */}
-              <Link color="green.400" href={r.ref_url} isExternal>
+              <Link color="green.400" href={v.ref_url} isExternal>
                 {/* <Td>{r["@ref_url"]} <ExternalLinkIcon mx="2px" /></Td> */}
-                <Td>{r.ref_url} <ExternalLinkIcon mx="2px" /></Td>
+                <Td>{v.ref_url} <ExternalLinkIcon mx="2px" /></Td>
               </Link>
             </Tr>
           )
@@ -419,11 +419,11 @@ function CvssTable({d}: any) {
   
   return (
     <Box>
-      {rhelCpe.map((r: rhelCPE) => {
+      {rhelCpe.map((v: rhelCPE, i: any) => {
         return (
-          <Box>
+          <Box key={i}>
             <Heading size="sm" mb="-2" mt="10" textTransform="none"><Tooltip label='test' fontSize='md'>
-              <InfoOutlineIcon mb="1" mr="1" /></Tooltip>CVSS v3情報（{r.cveId}）
+              <InfoOutlineIcon mb="1" mr="1" /></Tooltip>CVSS v3情報（{v.cveId}）
             </Heading>
             <Table variant='simple'>
               <Thead>
@@ -445,7 +445,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     CVSS v3 基本評価値（スコア）
                   </Th>
-                  <Td>{r.score}</Td>
+                  <Td>{v.score}</Td>
                   <Td>-</Td>
                 </Tr>
                 <Tr>
@@ -453,7 +453,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     攻撃元区分（攻撃の難易度を評価）
                   </Th>
-                  <Td>{r.attackVector_value}</Td>
+                  <Td>{v.attackVector_value}</Td>
                   <Td>-</Td>
                 </Tr>
                 <Tr>
@@ -461,7 +461,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     攻撃条件の複雑さ（攻撃の難易度を評価）
                   </Th>
-                  <Td>{r.attackComplexity_value}</Td>
+                  <Td>{v.attackComplexity_value}</Td>
                   <Td>-</Td>
                 </Tr>
                 <Tr>
@@ -469,7 +469,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     攻撃に必要な特権レベル（攻撃の難易度を評価）
                   </Th>
-                  <Td>{r.privilegesRequired_value}</Td>
+                  <Td>{v.privilegesRequired_value}</Td>
                   <Td>-</Td>
                 </Tr>
                 <Tr>
@@ -477,7 +477,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     利用者の関与（攻撃の難易度を評価）
                   </Th>
-                  <Td>{r.userInteraction_value}</Td>
+                  <Td>{v.userInteraction_value}</Td>
                   <Td>-</Td>
                 </Tr>
                 <Tr>
@@ -485,7 +485,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     影響の想定範囲（脆弱性による影響の広がりを評価）
                   </Th>
-                  <Td>{r.scope_value}</Td>
+                  <Td>{v.scope_value}</Td>
                   <Td>-</Td>
                 </Tr>
                 <Tr>
@@ -493,7 +493,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     機密性への影響（攻撃による影響を評価）
                   </Th>
-                  <Td>{r.confidentiality_value}</Td>
+                  <Td>{v.confidentiality_value}</Td>
                   <Td>-</Td>
                 </Tr>
                 <Tr>
@@ -501,7 +501,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     完全性への影響（攻撃による影響を評価）
                   </Th>
-                  <Td>{r.integrity_value}</Td>
+                  <Td>{v.integrity_value}</Td>
                   <Td>-</Td>
                 </Tr>
                 <Tr>
@@ -509,7 +509,7 @@ function CvssTable({d}: any) {
                     <Tooltip label='test' fontSize='md'><InfoIcon mb="1" mr="1" /></Tooltip>
                     可用性への影響（攻撃による影響を評価）
                   </Th>
-                  <Td>{r.availability_value}</Td>
+                  <Td>{v.availability_value}</Td>
                   <Td>-</Td>
                 </Tr>
               </Tbody>
@@ -534,16 +534,16 @@ function BugzillaTable({d}: any) {
           </Tr>
         </Thead>
         <Tbody>
-          {d.oval.bugzilla.map((b: any) => {
+          {d.oval.bugzilla.map((v: any, i: any) => {
             return (
-              <Tr>
-                <Td>{b.id}</Td>
+              <Tr key={i}>
+                <Td>{v.id}</Td>
                 <Td>
-                  <Link color="green.400" href={b.href} isExternal>
-                    {b.href} <ExternalLinkIcon mx="2px" />
+                  <Link color="green.400" href={v.href} isExternal>
+                    {v.href} <ExternalLinkIcon mx="2px" />
                   </Link>
                 </Td>
-                <Td>{b.description}</Td>
+                <Td>{v.description}</Td>
               </Tr>
             )
           })}
@@ -768,9 +768,9 @@ function CpeTable({d}: any) {
           </Tr>
         </Thead>
         <Tbody>
-        {cpeVec.map((v: cpeVec) => {
+        {cpeVec.map((v: cpeVec, i: any) => {
           return (
-            <Tr>
+            <Tr key={i}>
               <Td>{v.kind === "" ? "全て" : v.kind}</Td>
               <Td>{v.vendor === "" ? "全て" : v.vendor}</Td>
               <Td>{v.product === "" ? "全て" : v.product}</Td>
@@ -1334,8 +1334,8 @@ export default async function Info ({ infoPass }: { infoPass: string }) {
             </th>
           </tr>
         </thead>
-        {sortedData.map((d: Vulns) => (
-          <MyTbody
+        {sortedData.map((d: Vulns, i: any) => (
+          <MyTbody key={i}
             d = {d}
           />
         ))}

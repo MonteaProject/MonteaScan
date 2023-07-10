@@ -1,18 +1,44 @@
-Unixインストール
-    curl https://sh.rustup.rs -sSf | sh
-    source "$HOME/.cargo/env"
+Rust install ~ WASM compile
+  Unixインストール
+    # curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    # source "$HOME/.cargo/env"
+  WASMをcargoのビルドターゲットに追加
+    # rustup target add wasm32-wasi
+  Rustプロジェクト作成
+    # cargo new hello-world
+  .wasmビルド
+    # cargo build --target wasm32-wasi
+  targetフォルダ内
+    # ls target/wasm32-wasi/debug/
+
+WASM を WasmRuntimeで実行
+  wasmtimeインストール
+  # curl https://wasmtime.dev/install.sh -sSf | bash
+  .wasm 実行
+  # wasmtime target/wasm32-wasi/debug/hello-world.wasm
+  Hello, world!
+
+Cargoのサブコマンド cargo wasiの導入
+  # cargo install cargo-wasi
+  # cargo wasi --version
+  cargo-wasi 0.1.28 (e811d4889b 2023-06-12)
+  # cargo wasi run
+  Hello, world!
 
 Rustバージョン
-    # cargo --version
-    cargo 1.69.0 (6e9a83356 2023-04-12)
-    # rustc -V
-    rustc 1.69.0 (84c898d65 2023-04-16)
-    # rustup -V
-    rustup 1.26.0 (5af9b9484 2023-04-05)
-    info: This is the version for the rustup toolchain manager, not the rustc compiler.
-    info: The currently active `rustc` version is `rustc 1.69.0 (84c898d65 2023-04-16)`
+  # cargo --version
+  cargo 1.69.0 (6e9a83356 2023-04-12)
+  # rustc -V
+  rustc 1.69.0 (84c898d65 2023-04-16)
+  # rustup -V
+  rustup 1.26.0 (5af9b9484 2023-04-05)
+  info: This is the version for the rustup toolchain manager, not the rustc compiler.
+  info: The currently active `rustc` version is `rustc 1.69.0 (84c898d65 2023-04-16)`
+wasmtimeバージョン
+  # wasmtime -V
+  wasmtime-cli 10.0.1
 
 VSCode拡張機能
-    rust-analyzer
-        rust-analyzer.check.Command
-        clippy
+  rust-analyzer
+    rust-analyzer.check.Command
+    clippy

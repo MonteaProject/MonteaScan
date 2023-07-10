@@ -35,8 +35,8 @@ export default async function ServerList() {
           <th className="responsive-serverlist-table__head__title responsive-serverlist-table__head__title--time">最終スキャン時間</th>
         </tr>
       </thead>
-      {f.map((d) => (
-      <tbody className="responsive-serverlist-table__body">
+      {f.map((d, i) => (
+      <tbody key={i} className="responsive-serverlist-table__body">
         <NextLink className="responsive-serverlist-table__link" href={`/info/${d.hostname}`}>
         <tr className="responsive-serverlist-table__row">
           <td className="responsive-serverlist-table__body__text responsive-serverlist-table__body__text--hostname">{d.hostname}</td>
